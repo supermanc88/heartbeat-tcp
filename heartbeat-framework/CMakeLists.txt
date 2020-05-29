@@ -6,4 +6,4 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_subdirectory(ARP)
 
-add_executable(heartbeat-framework main.cpp wrap.cpp heartbeat-config.h wrap.h)
+add_executable(heartbeat-framework main.cpp wrap.c heartbeat-config.h wrap.h)

@@ -1,18 +1,15 @@
-//
-// Created by CHM on 5/21/2020.
-//
-
-#include "heartbeat-config.h"
-
-#include <iostream>
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <strings.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <arpa/inet.h>
-#include "wrap.h"
 
-using namespace std;
+
+#include "wrap.h"
+#include "heartbeat-config.h"
+
 
 #define SERVER_IP "127.0.0.1"
 
@@ -44,11 +41,12 @@ int start_by_client_mode(void)
     serv_addr.sin_port = htons(5555);
     serv_addr.sin_addr.s_addr = i_addr;
 
-    ret = Connect(cfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
-    if(ret){
+    ret = connect(cfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
+    if(ret == -1){
+        perror("connect error");
         sleep(2);
-        close(cfd);
         goto reconnect;
     }
 
@@ -92,7 +90,7 @@ int start_by_server_mode(void)
 
     ret = Listen(lfd, 128);
 
-    socklen_t addr_len = sizeof(sockaddr_in);
+    socklen_t addr_len = sizeof(serv_addr);
 
     char buf[BUFSIZ];
     memset(buf, 0, BUFSIZ);
@@ -135,6 +133,8 @@ int start_by_server_mode(void)
                     close(cfd);
                     break;
                 }
+
+                printf("client input: %s\n", buf);
 
                 for (i=0; i<n; i++){
                     buf[i] = toupper(buf[i]);

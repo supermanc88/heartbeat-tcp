@@ -1,8 +1,3 @@
-//
-// Created by CHM on 5/27/2020.
-//
-
-#include "wrap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
