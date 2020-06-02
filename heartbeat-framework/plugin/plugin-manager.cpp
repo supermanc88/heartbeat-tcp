@@ -6,6 +6,22 @@
 
 #include "plugin-manager.h"
 
+struct PLUG_DATA {
+    char plugpath[BUFSIZ];
+    char plugname[BUFSIZ];
+
+    bool is_loaded;
+
+    void * plug_instance;
+
+    void * plug_init;       // 插件初始化函数
+
+    void * plug_stop;       // 插件停止函数
+
+    void * plug_run;        // 插件运行函数
+};
+
+
 PLUG_RET load_all_plugin() {
     return PLUG_RET_SUCCESS;
 }
