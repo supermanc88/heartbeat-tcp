@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "wrap.h"
+
 void perr_exit(const char *s)
 {
     perror(s);

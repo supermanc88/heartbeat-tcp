@@ -9,9 +9,17 @@
 
 #include "wrap.h"
 #include "heartbeat-config.h"
+#include "hbconf.h"
 
 
 #define SERVER_IP "127.0.0.1"
+
+int keepalive = KEEYALIVE;
+int deadtime = DEADTIME;
+int warntime = WARNTIME;
+int initdead = INITDEAD;
+int server_port = SERVERPORT;
+
 
 void usage(void)
 {
@@ -112,7 +120,6 @@ int start_by_server_mode(void)
 
             fd_set set;
             FD_ZERO(&set);
-            FD_SET(0, &set);
             FD_SET(cfd, &set);
 
             tv.tv_sec = 20;
@@ -173,6 +180,21 @@ int main(int argc, char * argv[])
                 break;
         }
     }
+
+    // 读取配置,不成功就使用默认配置
+    HBConfig hb;
+    if(RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r") ) {
+        char value[20] = {0};
+        if(hb.GetValue("keepalive", value) == RET_SUCCESS)
+            keepalive = atoi(value);
+        if(hb.GetValue("deadtime", value) == RET_SUCCESS)
+            deadtime = atoi(value);
+        if(hb.GetValue("warntime", value) == RET_SUCCESS)
+            warntime = atoi(value);
+        if(hb.GetValue("initdeat", value) == RET_SUCCESS)
+            initdead = atoi(value);
+    }
+
 
     if(b_mode_set) {
 // 只有两种启动方式，client server
