@@ -1,12 +1,13 @@
-//
-// Created by CHM on 5/27/2020.
-//
-
 #ifndef CLIENT_WRAP_H
 #define CLIENT_WRAP_H
 
 
 #include <unistd.h>
+
+/*
+ * 封装一下常用的socket函数，做一些基本的错误处理
+ */
+
 
 void perr_exit(const char *s);
 int Accept(int socket, struct sockaddr *address, socklen_t *address_len);

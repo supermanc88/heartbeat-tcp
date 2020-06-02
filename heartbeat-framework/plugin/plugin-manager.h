@@ -1,0 +1,17 @@
+#ifndef HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
+#define HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
+
+
+enum PLUG_RET {
+    PLUG_RET_SUCCESS,
+    PLUG_RET_ERROR,
+};
+
+PLUG_RET plug_init();
+
+PLUG_RET load_all_plugin();
+
+PLUG_RET load_plugin();
+
+
+#endif //HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
