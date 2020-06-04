@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 set(CMAKE_CXX_STANDARD 11)
 
 project(test-lib)
-add_library(test-lib SHARED test-lib.cpp test-lib.h)
+add_library(test-lib SHARED test-lib.cpp test-lib.h hb-plugin.h)
 
 
 project(plugin-test)
