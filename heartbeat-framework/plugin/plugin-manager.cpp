@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <string>
 #include <dlfcn.h>
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
+#include <map>
 
 #include "plugin-manager.h"
 
@@ -40,15 +42,46 @@ struct PLUG_DATA {
 
 
 std::vector<std::string> plugins_path;       // 用来存储插件的所有路径
-
+std::map<std::string, PLUG_DATA> plugin_map;
 
 PLUG_RET load_all_plugin()
 {
+    int i;
+    list_plug_directory(PLUGINS_DIRECTORY);
+
+    for ( i = 0; i < plugins_path.size(); i++) {
+        load_plugin((char *)plugins_path[i].c_str());
+    }
+
     return PLUG_RET_SUCCESS;
 }
 
 PLUG_RET load_plugin(char *plugin_path)
 {
+    void *dl = NULL;
+
+    dl  = dlopen(plugin_path, RTLD_NOW);
+
+    if (!dl) {
+        printf("load plugin error\n");
+        return PLUG_RET_ERROR;
+    }
+
+    printf("load plugin: %s\n", plugin_path);
+
+    struct PLUG_DATA data;
+
+    bzero(&data, sizeof(struct PLUG_DATA));
+
+    PLUGINIT plug_init = (PLUGINIT)dlsym(dl, "plug_init");
+    PLUGSTOP plug_stop = (PLUGSTOP)dlsym(dl, "plug_stop");
+    PLUGRUN  plug_run = (PLUGRUN)dlsym(dl, "plug_run");
+
+    data.plug_init = plug_init;
+    data.plug_stop = plug_stop;
+    data.plug_run = plug_run;
+
+
     return PLUG_RET_SUCCESS;
 }
 
@@ -134,6 +167,22 @@ int list_plug_directory(char *dir_path)
     }
 
     return 0;
+}
+
+int run_all_plugin() {
+
+    int result = 1;
+
+    std::map<std::string , PLUG_DATA> ::iterator iter;
+
+    iter = plugin_map.begin();
+
+    while (iter != plugin_map.end()) {
+        result & iter->second.plug_run(NULL);
+    }
+
+
+    return result;
 }
 
 

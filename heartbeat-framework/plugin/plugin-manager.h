@@ -32,4 +32,8 @@ PLUG_RET load_plugin(char * plugin_path);
 // 遍历插件目录
 int list_plug_directory(char * dir_path);
 
+
+// 运行所有的插件 获取结果
+int run_all_plugin();
+
 #endif //HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
