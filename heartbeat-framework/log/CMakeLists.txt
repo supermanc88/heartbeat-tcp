@@ -4,5 +4,8 @@ project(hb-log)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# 没有这句的话  提示编译的时候需要 -fPIC
+set(CMAKE_POSITION_INDEPENDENT_CODE 1)
+
 #add_executable(hb-log hb-log.cpp hb-log.h)
 add_library(hb-log STATIC hb-log.h hb-log.cpp)

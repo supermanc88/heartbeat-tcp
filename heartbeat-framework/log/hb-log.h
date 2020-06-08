@@ -24,8 +24,6 @@
 #define INFO_SOURCE_DB	"db"	/* 数据库产生的信息 */
 #define INFO_SOURCE_SYS	"sys"	/* 除进程自身、数据库以外的信息, 如因进程调度等其他原因产生的信息 */
 
-char log_path[512];			/* 日志文件存放路径 */
-char log_prefix[128];		/* 日志文件前缀 */
 
 
 /**

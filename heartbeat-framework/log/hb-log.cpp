@@ -6,8 +6,12 @@
 
 #include "hb-log.h"
 
+
 int hb_log(char* info_source, char* info_level, char* fmt, ... )
 {
+    char log_path[512] = LOG_FILE_PATH;			/* 日志文件存放路径 */
+    char log_prefix[128] = "hblog";		/* 日志文件前缀 */
+
     int ret = 0;
     va_list vaList;
     char tmpBuf[ MAX_RECORD_LEN + 1 ];
@@ -28,8 +32,8 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
         if(!ret)
             printf("create dir success\n");
         else {
-                perror("mkdir error\n");
-                exit(1);
+            perror("mkdir error");
+            exit(1);
         }
 
 
