@@ -161,16 +161,16 @@ int makedir(const char *dir_path)
 }
 
 
-int main(void)
-{
-    strcpy(log_path, "/var/log/heartbeat");
-    strcpy(log_prefix, "hb-test");
-
-
-//    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
-//    hb_log(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
-
-//    makedir("/home/superman/111/222/333/4444/");
-
-    return 0;
-}
+//int main(void)
+//{
+//    strcpy(log_path, "/var/log/heartbeat");
+//    strcpy(log_prefix, "hb-test");
+//
+//
+////    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
+////    hb_log(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
+//
+////    makedir("/home/superman/111/222/333/4444/");
+//
+//    return 0;
+//}

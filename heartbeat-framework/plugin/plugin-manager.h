@@ -1,7 +1,7 @@
 #ifndef HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
 #define HEARTBEAT_FRAMEWORK_PLUGIN_MANAGER_H
 
-#define PLUGINS_DIRECTORY "/tmp/heartbeat/heartbeat-framework/plugin/cmake-build-debug/"
+#define PLUGINS_DIRECTORY "/tmp/heartbeat/build/lib/plugins"
 
 
 enum PLUG_RET {
