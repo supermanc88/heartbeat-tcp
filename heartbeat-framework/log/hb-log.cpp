@@ -1,3 +1,7 @@
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+
 #include "hb-log.h"
 
 int hb_log(char* info_source, char* info_level, char* fmt, ... )
@@ -16,6 +20,20 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
 
     if ( fTorF )
     {
+
+        int ret = mkdir(log_path, 0666);
+
+        if(!ret)
+            printf("create dir success\n");
+        else {
+            if (errno == EEXIST)
+                printf("dir is already exist\n");
+            else {
+                perror("mkdir error\n");
+                exit(1);
+            }
+        }
+
         sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, tmpTime );
         fp = fopen( tmpBuf, "a" );
         if ( NULL == fp )
@@ -27,7 +45,9 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
                      tmpTime + 8,
                      tmpTime + 10,
                      tmpTime + 12,
-                     INFO_SOURCE_SYS, INFO_LEVEL_EXIT, "不能打开日志文件" );
+                     INFO_SOURCE_SYS, INFO_LEVEL_EXIT, "can not open file" );
+
+            perror("fopen error");
             fclose( fp );
             fp = NULL;
             exit(1);
@@ -69,7 +89,7 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
                  tmpTime + 8,
                  tmpTime + 10,
                  tmpTime + 12,
-                 INFO_SOURCE_SYS, INFO_LEVEL_EXIT, "发生异常情况，程序退出！\n" );
+                 INFO_SOURCE_SYS, INFO_LEVEL_EXIT, "exit with error\n" );
         if( fTorF )
         {
             fprintf( fp, "%s", tmpBuf );
@@ -91,14 +111,7 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
     return ret;
 }
 
-/**********************************************************
-    function: get_current_time
-    description: 获取当前系统时间
-    Input: outTimeStr: 保存时间的字符串
-    Output:
-    Return: D_SUCCEED: 成功
-    others:
-***********************************************************/
+
 int get_current_time(char* outTimeStr )
 {
     int ret = 0;
@@ -120,7 +133,7 @@ int get_current_time(char* outTimeStr )
 
 int main(void)
 {
-    strcpy(log_path, "/var/log");
+    strcpy(log_path, "/var/log/heartbeat");
     strcpy(log_prefix, "hb-test");
 
 
