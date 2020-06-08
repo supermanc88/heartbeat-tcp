@@ -45,4 +45,11 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... );
  */
 int get_current_time(char* outTimeStr );	/* 得到当前时间 */
 
+/**
+ * 当日志路径不存在时，创建日志目录
+ * @param dir_path 日志存在路径
+ * @return mkdir ret value
+ */
+int makedir(const char * dir_path);
+
 #endif //PLUGIN_TEST_HB_LOG_H

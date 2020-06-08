@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <errno.h>
 
+#include <string>
+
 #include "hb-log.h"
 
 int hb_log(char* info_source, char* info_level, char* fmt, ... )
@@ -21,18 +23,15 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
     if ( fTorF )
     {
 
-        int ret = mkdir(log_path, 0666);
+        int ret = makedir(log_path);
 
         if(!ret)
             printf("create dir success\n");
         else {
-            if (errno == EEXIST)
-                printf("dir is already exist\n");
-            else {
                 perror("mkdir error\n");
                 exit(1);
-            }
         }
+
 
         sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, tmpTime );
         fp = fopen( tmpBuf, "a" );
@@ -129,6 +128,37 @@ int get_current_time(char* outTimeStr )
     return ret;
 }
 
+int makedir(const char *dir_path)
+{
+    int ret;
+
+    std::string tmp_string;
+
+    tmp_string.assign(dir_path);
+
+    if(dir_path[strlen(dir_path)-1] == '/')
+        tmp_string.erase(tmp_string.length()-1);
+
+    ret = mkdir(dir_path, 0666);
+
+    if( !ret ) {
+        printf("create dir success\n");
+    } else {
+        if (errno == EEXIST)
+            printf("dir already exist\n");
+        else {
+            perror("mkdir error");
+
+            std::string up_dir = tmp_string.substr(0, tmp_string.rfind('/'));
+
+            makedir(up_dir.c_str());
+
+            ret = mkdir(dir_path, 0666);
+        }
+    }
+
+    return ret;
+}
 
 
 int main(void)
@@ -137,8 +167,10 @@ int main(void)
     strcpy(log_prefix, "hb-test");
 
 
-    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
-    hb_log(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
+//    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
+//    hb_log(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
+
+//    makedir("/home/superman/111/222/333/4444/");
 
     return 0;
 }
