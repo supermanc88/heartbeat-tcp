@@ -1,23 +1,6 @@
 #include "hb-log.h"
 
-
-void hb_log(const char *format, ...)
-{
-
-}
-
-
-/**********************************************************
-    function: dLog
-    description: 写日志信息
-    Input: dIfomSource: 信息来源
-		   dIfomLevel: 信息级别
-           dFmt: 信息格式
-    Output:
-    Return: D_SUCCEED: 成功, 失败退出
-    others:
-***********************************************************/
-int dLog( char* dIfomSource, char* dIfomLevel, char* dFmt, ... )
+int hb_log(char* info_source, char* info_level, char* fmt, ... )
 {
     int ret = 0;
     va_list vaList;
@@ -27,13 +10,13 @@ int dLog( char* dIfomSource, char* dIfomLevel, char* dFmt, ... )
 
     /* 0: print in terminal
      * 1: print in log file */
-    int fTorF = ( dLogPath[0] == '\0' || dLogPrefix[0] == '\0' ) ? 0 : 1; //判断是打印终端还是文件
+    int fTorF = (log_path[0] == '\0' || log_prefix[0] == '\0' ) ? 0 : 1; //判断是打印终端还是文件
     memset( tmpTime, 0, sizeof(tmpTime) );
-    getCurrTime( tmpTime );
+    get_current_time(tmpTime);
 
     if ( fTorF )
     {
-        sprintf( tmpBuf, "%s/%s%8.8s.runlog", dLogPath, dLogPrefix, tmpTime );
+        sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, tmpTime );
         fp = fopen( tmpBuf, "a" );
         if ( NULL == fp )
         {
@@ -50,14 +33,14 @@ int dLog( char* dIfomSource, char* dIfomLevel, char* dFmt, ... )
             exit(1);
         }
     }
-    sprintf( tmpBuf, "[%4.4s%2.2s%2.2s%2.2s%2.2s%2.2s][%s][%s]",
-             tmpTime,
+    sprintf(tmpBuf, "[%4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s][%s][%s]",
+            tmpTime,
              tmpTime + 4,
              tmpTime + 6,
              tmpTime + 8,
              tmpTime + 10,
              tmpTime + 12,
-             dIfomSource, dIfomLevel );
+            info_source, info_level );
     if ( fTorF )
     {
         fprintf( fp, "%s", tmpBuf );
@@ -66,20 +49,20 @@ int dLog( char* dIfomSource, char* dIfomLevel, char* dFmt, ... )
     {
         fprintf( stdout, "%s", tmpBuf );
     }
-    va_start( vaList, dFmt );
+    va_start(vaList, fmt );
     if ( fTorF )
     {
-        vfprintf( fp, dFmt, vaList );
+        vfprintf(fp, fmt, vaList );
     }
     else
     {
-        vsprintf( tmpBuf, dFmt, vaList );
+        vsprintf(tmpBuf, fmt, vaList );
         printf( "%s", tmpBuf );
     }
     va_end( vaList );
-    if ( 0 == strcmp( dIfomLevel, INFO_LEVEL_EXIT ) )
+    if ( 0 == strcmp(info_level, INFO_LEVEL_EXIT ) )
     {
-        sprintf( tmpBuf, "[%4.4s%2.2s%2.2s%2.2s%2.2s%2.2s][%s][%s][%s]\n",
+        sprintf( tmpBuf, "[%4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s][%s][%s][%s]\n",
                  tmpTime,
                  tmpTime + 4,
                  tmpTime + 6,
@@ -109,14 +92,14 @@ int dLog( char* dIfomSource, char* dIfomLevel, char* dFmt, ... )
 }
 
 /**********************************************************
-    function: getCurrTime
+    function: get_current_time
     description: 获取当前系统时间
     Input: outTimeStr: 保存时间的字符串
     Output:
     Return: D_SUCCEED: 成功
     others:
 ***********************************************************/
-int getCurrTime( char* outTimeStr )
+int get_current_time(char* outTimeStr )
 {
     int ret = 0;
     time_t tTime;
@@ -137,12 +120,12 @@ int getCurrTime( char* outTimeStr )
 
 int main(void)
 {
-    strcpy(dLogPath, "/var/log");
-    strcpy(dLogPrefix, "hb-test");
+    strcpy(log_path, "/var/log");
+    strcpy(log_prefix, "hb-test");
 
 
-    dLog(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
-    dLog(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
+    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "hhhhhhhhhhhhhhhhhhhhhh\n");
+    hb_log(INFO_SOURCE_APP, INFO_LEVEL_WARN, "aaaaaaaaaaaaaaaaaaaaaaaaa\n");
 
     return 0;
 }
