@@ -82,7 +82,7 @@ ssize_t Write(int fd, void *ptr, size_t nbytes)
     ssize_t n;
     again:
     if( (n = write(fd, ptr, nbytes)) < -1 ) {
-        if(errno = EINTR)
+        if(errno == EINTR)
             goto again;
         else
             return -1;

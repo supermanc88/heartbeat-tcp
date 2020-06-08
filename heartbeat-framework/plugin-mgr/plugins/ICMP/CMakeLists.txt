@@ -7,7 +7,8 @@ include_directories(../../../log)
 project(plug_icmp)
 
 
-link_libraries(/tmp/heartbeat/build/lib)
+#link_libraries(/tmp/heartbeat/build/lib)
+link_libraries(${LIBRARY_OUTPUT_PATH}/../)
 
 #add_executable(plug_icmp plug-icmp.cpp plug-icmp.h)
 add_library(plug_icmp SHARED plug-icmp.cpp plug-icmp.h)

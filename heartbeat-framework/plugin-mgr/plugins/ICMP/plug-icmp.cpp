@@ -14,7 +14,7 @@ int plug_init(void * data)
 
     pdata->initStruct.sdkVersion = 1;
     pdata->initStruct.pluginVersion = 1;
-    pdata->initStruct.pluginHandle = NULL;
+    pdata->initStruct.pluginHandle = 0;
 
     memcpy(pdata->initStruct.pluginName, "icmp", strlen("icmp"));
 
