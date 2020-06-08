@@ -4,21 +4,10 @@
 #define PLUGINS_DIRECTORY "/tmp/heartbeat/heartbeat-framework/plugin/cmake-build-debug/"
 
 
-
-typedef int (* PLUGINIT)(void * data) ;
-
-typedef int (* PLUGSTOP)(void ) ;
-
-typedef int (* PLUGRUN)(void * data) ;
-
-
 enum PLUG_RET {
     PLUG_RET_SUCCESS,
     PLUG_RET_ERROR,
 };
-
-
-
 
 // 插件管理器初始化
 PLUG_RET plugin_manager_init();

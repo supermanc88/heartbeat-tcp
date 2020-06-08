@@ -12,37 +12,15 @@
 #include <map>
 
 #include "plugin-manager.h"
-
-typedef struct {
-    //provided by the debugger
-    int pluginHandle;
-    //provided by the pluginit function
-    int sdkVersion;
-    int pluginVersion;
-    // 前面的这几个暂不使用
-    char pluginName[256];
-} PLUG_INITSTRUCT;
-
-struct PLUG_DATA {
-    char plugpath[BUFSIZ];
-    char plugname[BUFSIZ];
-
-    bool is_loaded;
-
-    void *plug_instance;
-
-    PLUGINIT plug_init;       // 插件初始化函数
-
-    PLUGSTOP plug_stop;       // 插件停止函数
-
-    PLUGRUN plug_run;        // 插件运行函数
-
-    PLUG_INITSTRUCT initStruct;
-};
+#include "hb-plugin.h"
 
 
 std::vector<std::string> plugins_path;       // 用来存储插件的所有路径
+
+// 觉得不太需要用map 先使用vector
 std::map<std::string, PLUG_DATA> plugin_map;
+
+std::vector<PLUG_DATA> plug_data_vector;
 
 PLUG_RET load_all_plugin()
 {
@@ -73,6 +51,10 @@ PLUG_RET load_plugin(char *plugin_path)
 
     bzero(&data, sizeof(struct PLUG_DATA));
 
+    memcpy(data.plugpath, plugin_path, strlen(plugin_path));
+    memcpy(data.plugname, plugin_path, strlen(plugin_path));
+
+
     PLUGINIT plug_init = (PLUGINIT)dlsym(dl, "plug_init");
     PLUGSTOP plug_stop = (PLUGSTOP)dlsym(dl, "plug_stop");
     PLUGRUN  plug_run = (PLUGRUN)dlsym(dl, "plug_run");
@@ -81,6 +63,11 @@ PLUG_RET load_plugin(char *plugin_path)
     data.plug_stop = plug_stop;
     data.plug_run = plug_run;
 
+
+    // 填充结构体中需要初始化的内容
+    plug_init(&data);
+
+    plug_data_vector.push_back(data);
 
     return PLUG_RET_SUCCESS;
 }
@@ -172,15 +159,19 @@ int list_plug_directory(char *dir_path)
 int run_all_plugin() {
 
     int result = 1;
+    int i = 0;
 
-    std::map<std::string , PLUG_DATA> ::iterator iter;
+//    std::map<std::string , PLUG_DATA> ::iterator iter;
+//
+//    iter = plugin_map.begin();
+//
+//    while (iter != plugin_map.end()) {
+//        result & iter->second.plug_run(NULL);
+//    }
 
-    iter = plugin_map.begin();
-
-    while (iter != plugin_map.end()) {
-        result & iter->second.plug_run(NULL);
+    for( i= 0; i < plug_data_vector.size(); i++) {
+        result &= plug_data_vector[i].plug_run(NULL);
     }
-
 
     return result;
 }
@@ -188,75 +179,6 @@ int run_all_plugin() {
 
 int main(void)
 {
-
-    // 由于加载so的时候，有个LD_LIBRARY_PATH的环境变量，必须要设置.so所在文件夹路径才能自动加载
-
-//    char *env_ld_lib_path = NULL;
-//
-//    char env_llp[256] = {0};
-//
-//    char *current_dir;
-//
-//    void *dl = NULL;
-//
-//    int ret, i;
-//
-//    if ((current_dir = getcwd(NULL, 0)) == NULL) {
-//        perror("getcwd error");
-//    } else {
-//        printf("%s\n", current_dir);
-//
-//        ret = unsetenv("LD_LIBRARY_PATH");
-//
-//        // 获取 LD_LIBRARY_PATH 环境变量
-//        env_ld_lib_path = getenv("LD_LIBRARY_PATH");
-//        if (env_ld_lib_path) {
-//            strcpy(env_llp, env_ld_lib_path);
-//            strcat(env_llp, ":");
-//            strcat(env_llp, current_dir);
-////            strcat(env_llp, "/plugins/");
-//            strcat(env_llp, "/");
-//        } else {
-//            strcpy(env_llp, current_dir);
-////            strcat(env_llp, "/plugins/");
-//            strcat(env_llp, "/");
-//        }
-//
-////        printf("%s\n", env_llp);
-//
-//        // 设置环境变量
-//        ret = setenv("LD_LIBRARY_PATH", env_llp, 1);
-//
-//        env_ld_lib_path = getenv("LD_LIBRARY_PATH");
-//
-//        printf("%s\n", env_ld_lib_path);
-//
-//        if (ret == -1) {
-//            perror("setenv error");
-//            exit(1);
-//        }
-//
-//    }
-//
-//
-//    // 动态加载so库
-//    int (*add_func)(int, int);
-//
-//    dl = dlopen("/tmp/heartbeat/heartbeat-framework/plugin/cmake-build-debug/libtest-lib.so", RTLD_NOW);
-//
-//    if (dl == NULL) {
-//        perror("dlopen error");
-//        printf("%d\n", errno);
-//        exit(1);
-//    }
-//
-//    add_func = (int (*)(int, int)) dlsym(dl, "test_add");
-//
-//    int a = add_func(1, 2);
-//    printf("%d\n", a);
-//
-//    dlclose(dl);
-
     plugin_manager_init();
 
     return 0;
