@@ -9,6 +9,9 @@ project(plug_icmp)
 
 #link_libraries(/tmp/heartbeat/build/lib)
 #link_libraries(${LIBRARY_OUTPUT_PATH}/../)
+
+set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+
 link_libraries(${LIBRARY_DIRECTORY})
 
 #add_executable(plug_icmp plug-icmp.cpp plug-icmp.h)

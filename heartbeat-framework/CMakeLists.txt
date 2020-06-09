@@ -15,3 +15,5 @@ add_subdirectory(ARP)
 add_subdirectory(log)
 
 add_subdirectory(plugin-mgr)
+
+add_subdirectory(resource-mgr)
