@@ -33,8 +33,9 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
         if(!ret)
             printf("create dir success\n");
         else {
-            perror("mkdir error");
-            exit(1);
+//            perror("mkdir error");
+            if( errno != EEXIST)
+                exit(1);
         }
 
 
@@ -149,10 +150,11 @@ int makedir(const char *dir_path)
     if( !ret ) {
         printf("create dir success\n");
     } else {
-        if (errno == EEXIST)
+        if (errno == EEXIST) {
             printf("dir already exist\n");
-        else {
-            perror("mkdir error");
+            return 0;
+        } else {
+//            perror("mkdir error");
 
             std::string up_dir = tmp_string.substr(0, tmp_string.rfind('/'));
 

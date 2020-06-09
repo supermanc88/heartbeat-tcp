@@ -10,7 +10,7 @@ target_link_libraries(plugin-mgr dl)
 
 
 
-
+set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH})
 
 set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
 

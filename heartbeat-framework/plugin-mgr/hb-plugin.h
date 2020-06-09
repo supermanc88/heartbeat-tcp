@@ -26,8 +26,8 @@ typedef struct {
 } PLUG_INITSTRUCT;
 
 struct PLUG_DATA {
-    char plugpath[BUFSIZ];
-    char plugname[BUFSIZ];
+    char plugpath[256];
+    char plugname[256];
 
     bool is_loaded;
 

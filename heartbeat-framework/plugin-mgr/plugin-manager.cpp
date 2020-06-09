@@ -25,7 +25,9 @@ std::vector<PLUG_DATA> plug_data_vector;
 PLUG_RET load_all_plugin()
 {
     int i;
-    list_plug_directory(PLUGINS_DIRECTORY);
+//    list_plug_directory(PLUGINS_DIRECTORY);
+
+    printf("plugins_path.size = %d\n", plugins_path.size());
 
     for ( i = 0; i < plugins_path.size(); i++) {
         load_plugin((char *)plugins_path[i].c_str());
@@ -76,6 +78,8 @@ PLUG_RET plugin_manager_init()
 {
 
     int i;
+    plugins_path.clear();
+    plug_data_vector.clear();
 
     // 先根据插件的路径 把 LD_LIBRARY_PATH 的环境变量设置好
 
@@ -170,8 +174,14 @@ int run_all_plugin() {
 //    }
 
     for( i= 0; i < plug_data_vector.size(); i++) {
-        result &= plug_data_vector[i].plug_run(NULL);
+        int tmp = plug_data_vector[i].plug_run(NULL);
+        printf("current runing plug:%s, and result = %d\n", plug_data_vector[i].plugname, tmp);
+
+//        result &= plug_data_vector[i].plug_run(NULL);
+        result &= tmp;
     }
+
+    printf("result = %d\n", result);
 
     return result;
 }
@@ -180,6 +190,10 @@ int run_all_plugin() {
 int main(void)
 {
     plugin_manager_init();
+
+    load_all_plugin();
+
+    run_all_plugin();
 
     return 0;
 }
