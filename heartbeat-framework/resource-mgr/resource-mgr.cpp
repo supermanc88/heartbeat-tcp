@@ -1,28 +1,37 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <strings.h>
 
 #include "resource-mgr.h"
-#include "heartbeat-config.h"
 
 
 int main(void)
 {
-    resource_manager(NULL, 0);
+    data_generator(NULL, nullptr);
     printf("resource manager\n");
     return 0;
 }
 
-int resource_manager(void *data, size_t size)
+int data_generator(void *recved_data, void **next_send_data)
 {
-    TRANS_DATA * p_trans_data = (TRANS_DATA *) data;
-
-    TRANS_TYPE trans_type = p_trans_data->type;
-
+    TRANS_DATA * p_trans_data;
+    TRANS_TYPE trans_type;
     ACTION_TYPE action_type;
     bool server_status;
     char * content;
 
-    size_t content_size;
+    TRANS_DATA * p_next_data;
+
+    size_t size, content_size;
+
+
+    p_trans_data = (TRANS_DATA *) recved_data;
+
+    size = p_trans_data->size;
+
+    trans_type = p_trans_data->type;
+
 
     switch (trans_type) {
         case TRANS_TYPE_ACTION: {
@@ -40,11 +49,21 @@ int resource_manager(void *data, size_t size)
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
-            server_status = p_trans_data->server_status;
+//            server_status = p_trans_data->server_status;
+            // 此类回复没有其它数据
+            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            bzero(p_next_data, sizeof(TRANS_DATA));
+            p_next_data->size = sizeof(TRANS_DATA);
+            p_next_data->type = TRANS_TYPE_REPLY_SERVER_STATUS;
+
+            *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_GET_DATA: {
             // 备机收到，向TRANS_DATA中填充数据
+            // 1. 通过插件拿到数据
+            // 2. 根据数据大小malloc内存并拷贝
+            // 3. 填充其它数据元素
         }
             break;
         case TRANS_TYPE_REPLY: {
@@ -80,3 +99,4 @@ int resource_manager(void *data, size_t size)
 
     return 0;
 }
+

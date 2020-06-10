@@ -64,7 +64,7 @@ struct TRANS_ACTION_DATA {
  * trans_action_data 用来保存发起动作的类型和结果
  * server_status 本机服务状态（所有插件运行and结果）
  * data 传输数据正文
- * extra_data 额外的数据
+ * extra_data 额外的数据 数据可使用protobuf编码
  *
  * 如果type为TRANS_TYPE_NONE时，直接使用data可拿到后面的数据，其它情况使用data时需要
  * 加上TRANS_ACTION_DATA结构体大小，或直接使用extra_data
