@@ -10,7 +10,29 @@
  * @param next_send_data
  * @return
  */
-int data_generator(void *recved_data, void **next_send_data);
+int trans_data_generator(void *recved_data, void **next_send_data);
+
+/**
+ * 主机构造数据，内容为请求备机的动作
+ * @param data  传入数据结构的指针
+ * @param type  请求动作的类型
+ * @return
+ */
+int trans_data_set_action(void * data, ACTION_TYPE type);
+
+/**
+ * 主机构造数据，请求备机的状态
+ * @param data 传入数据结构的指针
+ * @return
+ */
+int trans_data_set_get_server_status(void * data);
+
+/**
+ * 主机构造数据，内容为请求备机收集的数据
+ * @param data 传入数据结构的指针
+ * @return
+ */
+int trans_data_set_get_data(void * data);
 
 
 

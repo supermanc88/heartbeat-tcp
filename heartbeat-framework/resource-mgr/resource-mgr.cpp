@@ -8,12 +8,12 @@
 
 int main(void)
 {
-    data_generator(NULL, nullptr);
+    trans_data_generator(NULL, nullptr);
     printf("resource manager\n");
     return 0;
 }
 
-int data_generator(void *recved_data, void **next_send_data)
+int trans_data_generator(void *recved_data, void **next_send_data)
 {
     TRANS_DATA * p_trans_data;
     TRANS_TYPE trans_type;
@@ -96,6 +96,45 @@ int data_generator(void *recved_data, void **next_send_data)
         default:
             break;
     }
+
+    return 0;
+}
+
+int trans_data_set_action(void *data, ACTION_TYPE type) {
+
+    TRANS_DATA * pdata = (TRANS_DATA *) data;
+
+    bzero(pdata, sizeof(TRANS_DATA));
+
+    pdata->type = TRANS_TYPE_ACTION;
+    pdata->size = sizeof(TRANS_DATA);
+
+    pdata->trans_action_data.type = type;
+    pdata->trans_action_data.result = 1;
+
+    return 0;
+}
+
+int trans_data_set_get_server_status(void *data) {
+
+    TRANS_DATA * pdata = (TRANS_DATA *) data;
+
+    bzero(pdata, sizeof(TRANS_DATA));
+
+    pdata->type = TRANS_TYPE_GET_DATA;
+    pdata->size = sizeof(TRANS_DATA);
+
+    return 0;
+}
+
+int trans_data_set_get_data(void *data) {
+
+    TRANS_DATA * pdata = (TRANS_DATA *) data;
+
+    bzero(pdata, sizeof(TRANS_DATA));
+
+    pdata->type = TRANS_TYPE_GET_SERVER_STATUS;
+    pdata->size = sizeof(TRANS_DATA);
 
     return 0;
 }
