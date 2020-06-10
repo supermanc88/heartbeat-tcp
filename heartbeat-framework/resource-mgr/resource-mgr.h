@@ -5,6 +5,7 @@
 
 /**
  * 通过收到的包的内容，来生成下次要发送的包的内容
+ * 这个函数只有备机去调用,主机就是三个状态讯问加无数据
  * @param recved_data
  * @param next_send_data
  * @return
