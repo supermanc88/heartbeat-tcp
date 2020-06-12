@@ -31,7 +31,7 @@ enum TRANS_TYPE {
     TRANS_TYPE_GET_SERVER_STATUS,
     TRANS_TYPE_GET_DATA,
     /************上3为主机发包选择**************/
-    TRANS_TYPE_REPLY,
+    TRANS_TYPE_REPLY_ACTION,
     TRANS_TYPE_REPLY_SERVER_STATUS,
     TRANS_TYPE_REPLY_DATA,
     /************上3为备机发包选择**************/
@@ -57,6 +57,13 @@ struct TRANS_ACTION_DATA {
 };
 
 
+
+struct SERVER_STATUS_DATAS {
+    bool server_status;
+    bool have_virtual_ip;
+};
+
+
 /**
  * TRANS_DATA 数据结构体
  * type 传输数据类型
@@ -74,6 +81,7 @@ struct TRANS_DATA {
     size_t size;
     union {
         struct TRANS_ACTION_DATA trans_action_data;
+        struct SERVER_STATUS_DATAS server_status_datas;
         bool server_status;
         char data[1];
     };
