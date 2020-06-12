@@ -3,6 +3,8 @@
 
 #include "heartbeat-config.h"
 
+#define POLICY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
+
 /**
  * 通过收到的包的内容，来生成下次要发送的包的内容
  * 这个函数只有备机去调用,主机就是三个状态讯问加无数据
@@ -67,6 +69,9 @@ int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, boo
  * @return
  */
 int get_local_server_status_datas(SERVER_STATUS_DATAS * data);
+
+
+int resource_manager_init();
 
 
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H

@@ -2,14 +2,29 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <map>
+#include <string>
 
 #include "resource-mgr.h"
+
+std::map<std::string, int> policy_map;
 
 
 int main(void)
 {
-    trans_data_generator(NULL, nullptr);
+    resource_manager_init();
     printf("resource manager\n");
+    printf("---------------------------\n");
+
+    std::map<std::string, int>::iterator iter;
+    int i = 0;
+    for(iter = policy_map.begin(); iter != policy_map.end(); iter++){
+        printf("%s = %d\n", iter->first.c_str(), iter->second);
+        i++;
+    }
+
+    printf("total count: %d\n", i);
+
     return 0;
 }
 
@@ -234,6 +249,62 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 
     data->have_virtual_ip = true;
     data->server_status = true;
+    return 0;
+}
+
+
+
+int resource_manager_init()
+{
+    FILE * fp;
+    char str_line[256] = {0};
+    std::string sline;
+    int tail_pos = -1;
+    int space_pos = -1;
+
+    fp = fopen(POLICY_PATH, "r");
+
+    while (fgets(str_line, 256, fp)) {
+        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
+        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+            continue;
+
+        sline.assign(str_line);
+
+        tail_pos = sline.find("\n");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        tail_pos = sline.find("\r");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+            std::string skey = sline.substr(0, space_pos);
+            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+
+            skey.erase(0, skey.find_first_not_of(" "));
+            skey.erase(skey.find_last_not_of(" ") + 1);
+
+            svalue.erase(0, svalue.find_first_not_of(" "));
+            svalue.erase(svalue.find_last_not_of(" ") + 1);
+
+            policy_map[skey] = atoi(svalue.c_str());
+        }
+    }
+
+    if(fp == NULL) {
+        perror("fopen error");
+        return 0;
+    }
+
+
+
+    if( fp != NULL ) {
+        fclose(fp);
+        fp = NULL;
+    }
+
     return 0;
 }
 
