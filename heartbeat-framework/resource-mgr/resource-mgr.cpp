@@ -12,40 +12,40 @@ std::map<std::string, int> policy_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
 
 
-int main(void)
-{
-    resource_manager_init();
-    printf("resource manager\n");
-    printf("---------------------------\n");
-
-    std::map<std::string, int>::iterator iter;
-    int i = 0;
-    for(iter = policy_map.begin(); iter != policy_map.end(); iter++){
-        printf("%s = %d\n", iter->first.c_str(), iter->second);
-        i++;
-    }
-
-    printf("total count: %d\n", i);
-
-    printf("----------------------------\n");
-
-    policy_no_link_init();
-
-    std::map< std::string, std::map<std::string, int> >::iterator iter2;
-
-    i = 0;
-    for(iter2 = policy_nolink_map.begin(); iter2 != policy_nolink_map.end(); iter2++) {
-        std::map<std::string, int>::iterator iter3;
-        for(iter3 = iter2->second.begin(); iter3 != iter2->second.end(); iter3++){
-            printf("%s, %s = %d\n", iter2->first.c_str(), iter3->first.c_str(), iter3->second);
-            i++;
-        }
-    }
-
-    printf("total count: %d\n", i);
-
-    return 0;
-}
+//int main(void)
+//{
+//    policy_link_init();
+//    printf("resource manager\n");
+//    printf("---------------------------\n");
+//
+//    std::map<std::string, int>::iterator iter;
+//    int i = 0;
+//    for(iter = policy_map.begin(); iter != policy_map.end(); iter++){
+//        printf("%s = %d\n", iter->first.c_str(), iter->second);
+//        i++;
+//    }
+//
+//    printf("total count: %d\n", i);
+//
+//    printf("----------------------------\n");
+//
+//    policy_no_link_init();
+//
+//    std::map< std::string, std::map<std::string, int> >::iterator iter2;
+//
+//    i = 0;
+//    for(iter2 = policy_nolink_map.begin(); iter2 != policy_nolink_map.end(); iter2++) {
+//        std::map<std::string, int>::iterator iter3;
+//        for(iter3 = iter2->second.begin(); iter3 != iter2->second.end(); iter3++){
+//            printf("%s, %s = %d\n", iter2->first.c_str(), iter3->first.c_str(), iter3->second);
+//            i++;
+//        }
+//    }
+//
+//    printf("total count: %d\n", i);
+//
+//    return 0;
+//}
 
 int trans_data_generator(void *recved_data, void **next_send_data)
 {
@@ -69,6 +69,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
     switch (trans_type) {
         case TRANS_TYPE_ACTION: {
+
+            printf("reciving data type: TRANS_TYPE_ACTION\n");
+
             /*
               * 只有备机会收到此类信息
               */
@@ -83,6 +86,8 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
+            printf("reciving data type: TRANS_TYPE_GET_SERVER_STATUS\n");
+
             // 此类回复没有其它数据
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
@@ -93,6 +98,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_GET_DATA: {
+            printf("reciving data type: TRANS_TYPE_GET_DATA\n");
             // 备机收到，向TRANS_DATA中填充数据
             // 1. 通过插件拿到数据
             // 2. 根据数据大小malloc内存并拷贝
@@ -100,6 +106,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
+            printf("reciving data type: TRANS_TYPE_REPLY_ACTION\n");
             /*
              * 只有主机会收到此类信息
              */
@@ -118,6 +125,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
+            printf("reciving data type: TRANS_TYPE_REPLY_SERVER_STATUS\n");
             backup_server_status = p_trans_data->server_status_datas.server_status;
 
 
@@ -130,6 +138,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
+            printf("reciving data type: TRANS_TYPE_REPLY_DATA\n");
             content = p_trans_data->data;
             content_size = size - (size_t)(((TRANS_DATA *)0)->data);
 
@@ -139,12 +148,14 @@ int trans_data_generator(void *recved_data, void **next_send_data)
         }
             break;
         case TRANS_TYPE_NONE: {
+            printf("reciving data type: TRANS_TYPE_NONE\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
         }
             break;
         default: {
+            printf("reciving data type: default\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
@@ -273,7 +284,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 
 
 
-int resource_manager_init()
+int policy_link_init()
 {
     FILE * fp;
     char str_line[256] = {0};
@@ -414,6 +425,20 @@ int policy_no_link_init()
         fp = NULL;
     }
 
+    return 0;
+}
+
+int take_over_resources()
+{
+    // 开始接管资源
+    printf("Start taking over resources...\n");
+    return 0;
+}
+
+int release_resources()
+{
+    // 开始释放资源
+    printf("Start to release resources...\n");
     return 0;
 }
 

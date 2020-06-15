@@ -1,7 +1,7 @@
 #ifndef HEARTBEAT_TCP_RESOURCE_MGR_H
 #define HEARTBEAT_TCP_RESOURCE_MGR_H
 
-#include "heartbeat-config.h"
+#include "../heartbeat-config.h"
 
 #define POLICY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
 #define POLICY_NOLINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy2.dat"
@@ -75,7 +75,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS * data);
  * 初始化策略表，连通状态的策略
  * @return
  */
-int resource_manager_init();
+int policy_link_init();
 
 
 /**
@@ -84,5 +84,17 @@ int resource_manager_init();
  */
 int policy_no_link_init();
 
+
+/**
+ * 接管资源
+ * @return
+ */
+int take_over_resources();
+
+/**
+ * 释放资源
+ * @return
+ */
+int release_resources();
 
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H

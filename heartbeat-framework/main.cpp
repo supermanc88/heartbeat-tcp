@@ -10,6 +10,7 @@
 #include "wrap.h"
 #include "heartbeat-config.h"
 #include "hbconf.h"
+#include "resource-mgr/resource-mgr.h"
 
 
 #define SERVER_IP "127.0.0.1"
@@ -40,6 +41,8 @@ int start_by_client_mode(void)
 
     int n, i, ret;
 
+    int try_time_sum = 0;
+
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
@@ -54,13 +57,34 @@ int start_by_client_mode(void)
 
     if(ret == -1){
         perror("connect error");
-        sleep(2);
+
+        // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
+        if(try_time_sum >= deadtime) {
+            // 测试 直接退出 多次尝试均不能连通，退出
+            printf("Cannot connect after multiple attempts, exit!\n");
+
+            // 不能连通就直接接管资源
+            take_over_resources();
+
+            return 0;
+        }
+        sleep(keepalive);
+        try_time_sum += keepalive;
         goto reconnect;
     }
 
+    // 向服务端发包
+    TRANS_DATA trans_data;
+    TRANS_DATA * send_data;
+    // 一般情况下只发普通的包
+
+    // 开始构造none包
+    send_data = &trans_data;
+    trans_data_set_none(send_data);
     while(1){
-        fgets(buf, BUFSIZ, stdin);
-        n = Write(cfd, buf, strlen(buf));
+//        fgets(buf, BUFSIZ, stdin);
+
+        n = Write(cfd, send_data, send_data->size);
 
         n = Read(cfd, buf, n);
         if(n == 0){
@@ -69,9 +93,14 @@ int start_by_client_mode(void)
             goto reconnect;
             break;
         }
+        TRANS_DATA * next_send_data;
+        // 开始处理从服务器返回的包
+        trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
 
-        for(i = 0; i < n; i++)
-            printf("%c", buf[i]);
+        send_data = next_send_data;
+
+        // 休眠 keepalive的时间再发
+        sleep(keepalive);
     }
 
     close(cfd);
@@ -93,6 +122,9 @@ int start_by_server_mode(void)
     serv_addr.sin_port = htons(5555);
     unsigned int addr;
     inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
+
+    // 设置端口重用
+    setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, &serv_addr, sizeof(serv_addr));
 
     ret = Bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
@@ -141,13 +173,18 @@ int start_by_server_mode(void)
                     break;
                 }
 
-                printf("client input: %s\n", buf);
+//                printf("client input: %s\n", buf);
 
-                for (i=0; i<n; i++){
-                    buf[i] = toupper(buf[i]);
-                }
+//                for (i=0; i<n; i++){
+//                    buf[i] = toupper(buf[i]);
+//                }
 
-                n = Write(cfd, buf, n);
+                // 服务端开始处理收到的包
+                TRANS_DATA * next_send_data;
+
+                trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+
+                n = Write(cfd, next_send_data, next_send_data->size);
             }
 
         }
@@ -164,6 +201,11 @@ int main(int argc, char * argv[])
     char opt;
     char mode[20];
     bool b_mode_set = false;
+
+
+    // 初始化所有的策略文件
+    policy_link_init();
+    policy_no_link_init();
 
     bzero(mode, 20);
 
@@ -195,6 +237,9 @@ int main(int argc, char * argv[])
             initdead = atoi(value);
     }
 
+    printf("---------------------------------------\n");
+    printf("deadtime = %d, keepalice = %d\n", deadtime, keepalive);
+    printf("---------------------------------------\n");
 
     if(b_mode_set) {
 // 只有两种启动方式，client server
