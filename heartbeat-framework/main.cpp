@@ -22,6 +22,10 @@ int initdead = INITDEAD;
 int server_port = SERVERPORT;
 
 
+//资源接管状态
+bool client_resources_takeover_status = false;
+bool server_resources_takeover_status = false;
+
 void usage(void)
 {
     printf("heart help\n"
@@ -42,6 +46,8 @@ int start_by_client_mode(void)
     int n, i, ret;
 
     int try_time_sum = 0;
+    struct timeval tv;
+    tv.tv_sec = deadtime;
 
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -53,20 +59,25 @@ int start_by_client_mode(void)
     serv_addr.sin_addr.s_addr = i_addr;
 
 
-    ret = connect(cfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    ret = connect(cfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
-    if(ret == -1){
+    if (ret == -1) {
         perror("connect error");
 
         // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
-        if(try_time_sum >= deadtime) {
+        if (try_time_sum >= deadtime) {
             // 测试 直接退出 多次尝试均不能连通，退出
             printf("Cannot connect after multiple attempts, exit!\n");
 
-            // 不能连通就直接接管资源
-            take_over_resources();
+            if(!client_resources_takeover_status) {
+                // 不能连通就直接接管资源
+                take_over_resources();
+                client_resources_takeover_status = true;
+            }
 
-            return 0;
+            try_time_sum = 0;
+
+            goto reconnect;
         }
         sleep(keepalive);
         try_time_sum += keepalive;
@@ -75,32 +86,50 @@ int start_by_client_mode(void)
 
     // 向服务端发包
     TRANS_DATA trans_data;
-    TRANS_DATA * send_data;
-    // 一般情况下只发普通的包
-
-    // 开始构造none包
+    TRANS_DATA *send_data;
+    // 第一次发包时，先询问一次服务端的状态
     send_data = &trans_data;
-    trans_data_set_none(send_data);
-    while(1){
-//        fgets(buf, BUFSIZ, stdin);
+//    trans_data_set_none(send_data);
+    trans_data_set_get_server_status(send_data);
+    while (1) {
 
         n = Write(cfd, send_data, send_data->size);
 
-        n = Read(cfd, buf, n);
-        if(n == 0){
-            printf("server colse connect\n");
-            close(cfd);
-            goto reconnect;
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(cfd, &set);
+
+        ret = select(cfd+1, &set, NULL, NULL, &tv);
+
+        if (ret == -1) {
+            printf("select cfd error\n");
             break;
+        } else if (ret == 0) {
+            printf("select cfd time out\n");
+            if(!client_resources_takeover_status) {
+                take_over_resources();
+                client_resources_takeover_status = true;
+            }
+            continue;
+        } else {
+            n = Read(cfd, buf, n);
+            if (n == 0) {
+                // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
+                printf("server colse connect\n");
+                close(cfd);
+                take_over_resources();
+                goto reconnect;
+            }
+            TRANS_DATA *next_send_data;
+            // 开始处理从服务器返回的包
+            trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+
+            send_data = next_send_data;
+
+            // 休眠 keepalive的时间再发
+            sleep(keepalive);
         }
-        TRANS_DATA * next_send_data;
-        // 开始处理从服务器返回的包
-        trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
 
-        send_data = next_send_data;
-
-        // 休眠 keepalive的时间再发
-        sleep(keepalive);
     }
 
     close(cfd);
@@ -126,7 +155,7 @@ int start_by_server_mode(void)
     // 设置端口重用
     setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, &serv_addr, sizeof(serv_addr));
 
-    ret = Bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    ret = Bind(lfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
     ret = Listen(lfd, 128);
 
@@ -135,59 +164,78 @@ int start_by_server_mode(void)
     char buf[BUFSIZ];
     memset(buf, 0, BUFSIZ);
 
-    while (1){
+    while (1) {
 
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(lfd, &set);
 
-        cfd = Accept(lfd, (struct sockaddr *)&client_addr, &addr_len);
+        tv.tv_sec = deadtime;
+        ret = select(lfd + 1, &set, NULL, NULL, &tv);
 
-        inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
-        // 打印连入的客户端信息
-        printf("client addr: %s\n", buf);
-        printf("client port: %d\n", ntohs(client_addr.sin_port));
+        if (ret == -1) {
+            printf("select lfd error\n");
+            break;
+        } else if (ret == 0) {
+            // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
+            printf("select lfd time out\n");
+            if(!server_resources_takeover_status) {
+                take_over_resources();
+                server_resources_takeover_status = true;
+            }
+            continue;
+        } else {
+            // 在deadtime时间内建立连接
+            cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
+            inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
 
-        // select系统调用的的用途是：在一段指定的时间内，监听用户感兴趣的文件描述符上可读、可写和异常等事件。
-        // 使用select监控client发来的内容，在一定的时间内
+            // 打印连入的客户端信息
+            printf("client addr: %s\n", buf);
+            printf("client port: %d\n", ntohs(client_addr.sin_port));
 
-        while (1){
+            while (1) {
 
-            fd_set set;
-            FD_ZERO(&set);
-            FD_SET(cfd, &set);
+                // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
+                FD_ZERO(&set);
+                FD_SET(cfd, &set);
 
-            tv.tv_sec = 20;
-            ret = select(cfd+1, &set, NULL, NULL, &tv);
+                tv.tv_sec = deadtime;
+                ret = select(cfd + 1, &set, NULL, NULL, &tv);
 
-            if(ret == -1){
-                close(cfd);
-                break;
-            }else if(ret == 0){
-                printf("time out\n");
-                close(cfd);
-                break;
-            } else{
-                n = Read(cfd, buf, sizeof(buf));
-
-                if(n == 0){
-                    printf("client close connect!\n");
+                if (ret == -1) {
                     close(cfd);
                     break;
+                } else if (ret == 0) {
+                    printf("time out\n");
+                    if(!server_resources_takeover_status) {
+                        take_over_resources();
+                        server_resources_takeover_status = true;
+                    }
+                    close(cfd);
+                    break;
+                } else {
+                    n = Read(cfd, buf, sizeof(buf));
+                    if (n == 0) {
+                        // 如果客户端关闭的连接，也接管资源
+                        printf("client close connect!\n");
+                        if(!server_resources_takeover_status) {
+                            take_over_resources();
+                            server_resources_takeover_status = true;
+                        }
+                        close(cfd);
+                        break;
+                    }
+                    // 服务端开始处理收到的包
+                    TRANS_DATA *next_send_data;
+
+                    trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+
+                    n = Write(cfd, next_send_data, next_send_data->size);
                 }
 
-//                printf("client input: %s\n", buf);
-
-//                for (i=0; i<n; i++){
-//                    buf[i] = toupper(buf[i]);
-//                }
-
-                // 服务端开始处理收到的包
-                TRANS_DATA * next_send_data;
-
-                trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
-
-                n = Write(cfd, next_send_data, next_send_data->size);
             }
-
         }
+
     }
 
     close(lfd);
@@ -196,7 +244,7 @@ int start_by_server_mode(void)
     return 0;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
     char opt;
     char mode[20];
@@ -209,7 +257,7 @@ int main(int argc, char * argv[])
 
     bzero(mode, 20);
 
-    while( (opt = getopt(argc, argv, "m:")) != -1 ) {
+    while ((opt = getopt(argc, argv, "m:")) != -1) {
         switch (opt) {
             case 'm':
                 b_mode_set = true;
@@ -225,15 +273,15 @@ int main(int argc, char * argv[])
 
     // 读取配置,不成功就使用默认配置
     HBConfig hb;
-    if(RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r") ) {
+    if (RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r")) {
         char value[20] = {0};
-        if(hb.GetValue("keepalive", value) == RET_SUCCESS)
+        if (hb.GetValue("keepalive", value) == RET_SUCCESS)
             keepalive = atoi(value);
-        if(hb.GetValue("deadtime", value) == RET_SUCCESS)
+        if (hb.GetValue("deadtime", value) == RET_SUCCESS)
             deadtime = atoi(value);
-        if(hb.GetValue("warntime", value) == RET_SUCCESS)
+        if (hb.GetValue("warntime", value) == RET_SUCCESS)
             warntime = atoi(value);
-        if(hb.GetValue("initdeat", value) == RET_SUCCESS)
+        if (hb.GetValue("initdeat", value) == RET_SUCCESS)
             initdead = atoi(value);
     }
 
@@ -241,11 +289,11 @@ int main(int argc, char * argv[])
     printf("deadtime = %d, keepalice = %d\n", deadtime, keepalive);
     printf("---------------------------------------\n");
 
-    if(b_mode_set) {
+    if (b_mode_set) {
 // 只有两种启动方式，client server
-        if(strcmp(mode, "client") == 0)
+        if (strcmp(mode, "client") == 0)
             start_by_client_mode();
-        else if(strcmp(mode, "server") == 0)
+        else if (strcmp(mode, "server") == 0)
             start_by_server_mode();
         else {
             usage();

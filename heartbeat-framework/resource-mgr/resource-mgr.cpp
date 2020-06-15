@@ -103,6 +103,12 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             // 1. 通过插件拿到数据
             // 2. 根据数据大小malloc内存并拷贝
             // 3. 填充其它数据元素
+            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            bzero(p_next_data, sizeof(TRANS_DATA));
+            p_next_data->size = sizeof(TRANS_DATA);
+            p_next_data->type = TRANS_TYPE_REPLY_DATA;
+
+            *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
@@ -187,7 +193,7 @@ int trans_data_set_get_server_status(void *data) {
 
     bzero(pdata, sizeof(TRANS_DATA));
 
-    pdata->type = TRANS_TYPE_GET_DATA;
+    pdata->type = TRANS_TYPE_GET_SERVER_STATUS;
     pdata->size = sizeof(TRANS_DATA);
 
     return 0;
@@ -199,7 +205,7 @@ int trans_data_set_get_data(void *data) {
 
     bzero(pdata, sizeof(TRANS_DATA));
 
-    pdata->type = TRANS_TYPE_GET_SERVER_STATUS;
+    pdata->type = TRANS_TYPE_GET_DATA;
     pdata->size = sizeof(TRANS_DATA);
 
     return 0;
