@@ -4,10 +4,12 @@
 #include <strings.h>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "resource-mgr.h"
 
 std::map<std::string, int> policy_map;
+std::map<std::string, std::map<std::string, int>> policy_nolink_map;
 
 
 int main(void)
@@ -21,6 +23,23 @@ int main(void)
     for(iter = policy_map.begin(); iter != policy_map.end(); iter++){
         printf("%s = %d\n", iter->first.c_str(), iter->second);
         i++;
+    }
+
+    printf("total count: %d\n", i);
+
+    printf("----------------------------\n");
+
+    policy_no_link_init();
+
+    std::map< std::string, std::map<std::string, int> >::iterator iter2;
+
+    i = 0;
+    for(iter2 = policy_nolink_map.begin(); iter2 != policy_nolink_map.end(); iter2++) {
+        std::map<std::string, int>::iterator iter3;
+        for(iter3 = iter2->second.begin(); iter3 != iter2->second.end(); iter3++){
+            printf("%s, %s = %d\n", iter2->first.c_str(), iter3->first.c_str(), iter3->second);
+            i++;
+        }
     }
 
     printf("total count: %d\n", i);
@@ -290,6 +309,96 @@ int resource_manager_init()
             svalue.erase(svalue.find_last_not_of(" ") + 1);
 
             policy_map[skey] = atoi(svalue.c_str());
+        }
+    }
+
+    if(fp == NULL) {
+        perror("fopen error");
+        return 0;
+    }
+
+
+
+    if( fp != NULL ) {
+        fclose(fp);
+        fp = NULL;
+    }
+
+    return 0;
+}
+
+int policy_no_link_init()
+{
+    FILE * fp;
+    char str_line[256] = {0};
+    std::string sline;
+    int tail_pos = -1;
+    int space_pos = -1;
+
+    fp = fopen(POLICY_NOLINK_PATH, "r");
+
+    while (fgets(str_line, 256, fp)) {
+        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
+        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+            continue;
+
+        sline.assign(str_line);
+
+        tail_pos = sline.find("\n");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        tail_pos = sline.find("\r");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+            std::string skey = sline.substr(0, space_pos);
+            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+
+            skey.erase(0, skey.find_first_not_of(" "));
+            skey.erase(skey.find_last_not_of(" ") + 1);
+
+            svalue.erase(0, svalue.find_first_not_of(" "));
+            svalue.erase(svalue.find_last_not_of(" ") + 1);
+
+            // 开始拆分主机和备机 p:1|b:1
+
+            if(space_pos = svalue.find("|"), std::string::npos != space_pos) {
+                std::map<std::string, int> tmp_map;
+                int m_pos = - 1;
+                std::string buf1 = svalue.substr(0, space_pos);
+                std::string buf2 = svalue.substr(space_pos+1, svalue.length()-space_pos-1);
+
+                if(m_pos = buf1.find(":"), std::string::npos != m_pos) {
+                    std::string p = buf1.substr(0, m_pos);
+                    std::string p_value = buf1.substr(m_pos+1, buf1.length()-m_pos-1);
+
+                    p.erase(0, p.find_first_not_of(" "));
+                    p.erase(p.find_last_not_of(" ") + 1);
+
+                    p_value.erase(0, p_value.find_first_not_of(" "));
+                    p_value.erase(p_value.find_last_not_of(" ") + 1);
+
+                    tmp_map[p] = atoi(p_value.c_str());
+                }
+
+                if(m_pos = buf2.find(":"), std::string::npos != m_pos) {
+                    std::string b = buf2.substr(0, m_pos);
+                    std::string b_value = buf2.substr(m_pos+1, buf2.length()-m_pos-1);
+
+                    b.erase(0, b.find_first_not_of(" "));
+                    b.erase(b.find_last_not_of(" ") + 1);
+
+                    b_value.erase(0, b_value.find_first_not_of(" "));
+                    b_value.erase(b_value.find_last_not_of(" ") + 1);
+
+                    tmp_map[b] = atoi(b_value.c_str());
+                }
+
+                policy_nolink_map[skey] = tmp_map;
+            }
+
         }
     }
 

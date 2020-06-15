@@ -11,6 +11,8 @@ target_link_libraries(plugin-mgr dl)
 
 set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
 
+message(${LIBRARY_OUTPUT_PATH})
+
 #project(test-lib)
 #add_library(test-lib SHARED test-lib.cpp test-lib.h hb-plugin.h)
 

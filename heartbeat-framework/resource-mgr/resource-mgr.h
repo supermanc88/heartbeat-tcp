@@ -4,6 +4,7 @@
 #include "heartbeat-config.h"
 
 #define POLICY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
+#define POLICY_NOLINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy2.dat"
 
 /**
  * 通过收到的包的内容，来生成下次要发送的包的内容
@@ -70,8 +71,18 @@ int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, boo
  */
 int get_local_server_status_datas(SERVER_STATUS_DATAS * data);
 
-
+/**
+ * 初始化策略表，连通状态的策略
+ * @return
+ */
 int resource_manager_init();
+
+
+/**
+ * 初始化策略表，不连通状态的策略
+ * @return
+ */
+int policy_no_link_init();
 
 
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H
