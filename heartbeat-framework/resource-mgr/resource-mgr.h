@@ -46,7 +46,12 @@ int trans_data_set_get_data(void * data);
 int trans_data_set_none(void * data);
 
 
-
+/**
+ * 根据收到的数据，结合本机的服务状态，开始对资源进行操作
+ * @param recved_data
+ * @param next_data
+ * @return
+ */
 int resource_manager(void * recved_data, void * next_data);
 
 /**
@@ -89,12 +94,21 @@ int policy_no_link_init();
  * 接管资源
  * @return
  */
-int take_over_resources();
+int take_over_resources(const char *virtual_ip, const char *ethernet_name);
 
 /**
  * 释放资源
  * @return
  */
-int release_resources();
+int release_resources(const char *virtual_ip, const char *ethernet_name);
+
+
+/**
+ * 封装一层system函数，重定向写文件，不在屏幕打印
+ * @param cmd_string
+ * @param tmp_file
+ * @return
+ */
+int my_system(const char *cmd_string, const char * tmp_file);
 
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H

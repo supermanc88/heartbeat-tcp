@@ -11,9 +11,15 @@
 #include "heartbeat-config.h"
 #include "hbconf.h"
 #include "resource-mgr/resource-mgr.h"
+#include "plugin-mgr/plugin-manager.h"
 
 
 #define SERVER_IP "127.0.0.1"
+#define VIRTUAL_IP "192.168.231.155"
+
+// 每发送10次none包，便向服务端询问一次服务状态
+#define GET_STATUS_TIME_INTERVAL    10
+
 
 int keepalive = KEEYALIVE;
 int deadtime = DEADTIME;
@@ -22,7 +28,8 @@ int initdead = INITDEAD;
 int server_port = SERVERPORT;
 
 
-//资源接管状态
+
+//资源接管状态,资源接管后置为true，释放后置为false
 bool client_resources_takeover_status = false;
 bool server_resources_takeover_status = false;
 
@@ -37,6 +44,7 @@ void usage(void)
 int start_by_client_mode(void)
 {
     int cfd;
+    int none_package_send_times = 0;
 
     struct sockaddr_in serv_addr;
     unsigned int i_addr;
@@ -71,8 +79,11 @@ int start_by_client_mode(void)
 
             if(!client_resources_takeover_status) {
                 // 不能连通就直接接管资源
-                take_over_resources();
+                take_over_resources("192.168.231.155", "ens33");
                 client_resources_takeover_status = true;
+                printf("client take over resource\n");
+            } else {
+                printf("client take over resource already\n");
             }
 
             try_time_sum = 0;
@@ -85,15 +96,19 @@ int start_by_client_mode(void)
     }
 
     // 向服务端发包
-    TRANS_DATA trans_data;
     TRANS_DATA *send_data;
     // 第一次发包时，先询问一次服务端的状态
-    send_data = &trans_data;
+    send_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
 //    trans_data_set_none(send_data);
     trans_data_set_get_server_status(send_data);
     while (1) {
-
         n = Write(cfd, send_data, send_data->size);
+        // 释放内存
+        if(send_data)
+        {
+            free(send_data);
+            send_data = NULL;
+        }
 
         fd_set set;
         FD_ZERO(&set);
@@ -107,8 +122,11 @@ int start_by_client_mode(void)
         } else if (ret == 0) {
             printf("select cfd time out\n");
             if(!client_resources_takeover_status) {
-                take_over_resources();
+                take_over_resources("192.168.231.155", "ens33");
                 client_resources_takeover_status = true;
+                printf("client take over resource\n");
+            } else {
+                printf("client take over resource already\n");
             }
             continue;
         } else {
@@ -117,12 +135,23 @@ int start_by_client_mode(void)
                 // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
                 printf("server colse connect\n");
                 close(cfd);
-                take_over_resources();
+                take_over_resources("192.168.231.155", "ens33");
+                printf("client take over resource\n");
                 goto reconnect;
             }
+
             TRANS_DATA *next_send_data;
             // 开始处理从服务器返回的包
             trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+
+            if(next_send_data->type == TRANS_TYPE_NONE) {
+                none_package_send_times++;
+            }
+
+            if(none_package_send_times >= 10) {
+                trans_data_set_get_server_status(next_send_data);
+                none_package_send_times = 0;
+            }
 
             send_data = next_send_data;
 
@@ -180,8 +209,11 @@ int start_by_server_mode(void)
             // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
             printf("select lfd time out\n");
             if(!server_resources_takeover_status) {
-                take_over_resources();
+                take_over_resources("192.168.231.155", "ens33");
                 server_resources_takeover_status = true;
+                printf("server take over resource\n");
+            } else {
+                printf("server take over resource already\n");
             }
             continue;
         } else {
@@ -208,9 +240,13 @@ int start_by_server_mode(void)
                 } else if (ret == 0) {
                     printf("time out\n");
                     if(!server_resources_takeover_status) {
-                        take_over_resources();
+                        take_over_resources("192.168.231.155", "ens33");
                         server_resources_takeover_status = true;
+                        printf("server take over resource\n");
+                    } else {
+                        printf("server take over resource already\n");
                     }
+
                     close(cfd);
                     break;
                 } else {
@@ -219,8 +255,11 @@ int start_by_server_mode(void)
                         // 如果客户端关闭的连接，也接管资源
                         printf("client close connect!\n");
                         if(!server_resources_takeover_status) {
-                            take_over_resources();
+                            take_over_resources("192.168.231.155", "ens33");
                             server_resources_takeover_status = true;
+                            printf("server take over resource\n");
+                        } else {
+                            printf("server take over resource already\n");
                         }
                         close(cfd);
                         break;
@@ -254,6 +293,11 @@ int main(int argc, char *argv[])
     // 初始化所有的策略文件
     policy_link_init();
     policy_no_link_init();
+
+
+    // 初始化插件管理器
+    plugin_manager_init();
+    load_all_plugin();
 
     bzero(mode, 20);
 

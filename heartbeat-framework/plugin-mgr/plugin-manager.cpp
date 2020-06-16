@@ -187,13 +187,13 @@ int run_all_plugin() {
 }
 
 
-int main(void)
-{
-    plugin_manager_init();
-
-    load_all_plugin();
-
-    run_all_plugin();
-
-    return 0;
-}
+//int main(void)
+//{
+//    plugin_manager_init();
+//
+//    load_all_plugin();
+//
+//    run_all_plugin();
+//
+//    return 0;
+//}

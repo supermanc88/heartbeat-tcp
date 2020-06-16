@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "resource-mgr.h"
+#include "../plugin-mgr/plugin-manager.h"
 
 std::map<std::string, int> policy_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
@@ -93,6 +94,8 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_SERVER_STATUS;
+
+            get_local_server_status_datas(&p_next_data->server_status_datas);
 
             *next_send_data = (void *)p_next_data;
         }
@@ -281,10 +284,24 @@ int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, boo
 
 int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 {
+    char cmd_str[256] = {0};
+    int ret;
+    int check_vip_ret;
     // 这里运行一次本地的插件获取状态
+    printf("get_local_server_status_datas...\n");
 
-    data->have_virtual_ip = true;
-    data->server_status = true;
+    char * vip = "192.168.231.155";
+    // 这里通过check-vip程序来获取本机是否有虚ip
+    sprintf(cmd_str, "./check-virtual-ip %s", vip);
+
+    ret = system(cmd_str);
+
+    if(WIFEXITED(ret)) {
+        check_vip_ret = WEXITSTATUS(ret);
+    }
+
+    data->have_virtual_ip = (check_vip_ret==1) ? true: false;
+    data->server_status = (bool)run_all_plugin();
     return 0;
 }
 
@@ -434,17 +451,45 @@ int policy_no_link_init()
     return 0;
 }
 
-int take_over_resources()
+int take_over_resources(const char *virtual_ip, const char *ethernet_name)
 {
+    char cmd_str[256] = {0};
+
     // 开始接管资源
     printf("Start taking over resources...\n");
+
+    // 1. 绑定ip到网卡
+    sprintf(cmd_str, "ip -f inet addr add %s/24 dev %s label %s:0", virtual_ip, ethernet_name, ethernet_name);
+
+    my_system((const char *)cmd_str, "/tmp/takeover.tmp");
+
+
+    bzero(cmd_str, 256);
+    // 2. 发送免费arp
+    sprintf(cmd_str, "./send_arp -c 5 -s %s -w 5 -I %s %s", virtual_ip, ethernet_name, virtual_ip);
+
+    my_system((const char *)cmd_str, "/tmp/send_arp.tmp");
     return 0;
 }
 
-int release_resources()
+int release_resources(const char *virtual_ip, const char *ethernet_name)
 {
+    char cmd_str[256] = {0};
     // 开始释放资源
     printf("Start to release resources...\n");
+
+    // 1. 绑定ip到网卡
+    sprintf(cmd_str, "ip -f inet addr delete %s/24 dev %s", virtual_ip, ethernet_name);
+
+    my_system((const char *)cmd_str, "/tmp/release_resources.tmp");
     return 0;
+}
+
+int my_system(const char *cmd_string, const char *tmp_file)
+{
+    char my_cmd_str[256];
+    sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
+
+    return system(my_cmd_str);
 }
 

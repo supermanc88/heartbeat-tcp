@@ -12,6 +12,8 @@ project(plug_icmp)
 
 set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH}/../)
 
+set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
+
 message(${LIBRARY_DIRECTORY})
 
 link_libraries(${LIBRARY_DIRECTORY})
