@@ -9,9 +9,14 @@
 #include "resource-mgr.h"
 #include "../plugin-mgr/plugin-manager.h"
 
-std::map<std::string, int> policy_map;
+std::map<std::string, int> policy_link_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
 
+
+bool client_resources_takeover_status = false;
+bool server_resources_takeover_status = false;
+
+extern bool auto_failback;
 
 //int main(void)
 //{
@@ -73,17 +78,33 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
             printf("reciving data type: TRANS_TYPE_ACTION\n");
 
+            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            bzero(p_next_data, sizeof(TRANS_DATA));
             /*
               * 只有备机会收到此类信息
               */
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == GET_RES) {
+                printf("server recv get res,so server start take over the resources\n");
+                take_over_resources("192.168.231.155", "ens33");
+                server_resources_takeover_status = true;
+                p_next_data->type = TRANS_TYPE_REPLY_ACTION;
+
+                p_next_data->trans_action_data.type = GOT_RES;
+                p_next_data->trans_action_data.result = 1;
 
             } else if (action_type == FREE_RES) {
+                printf("server recv free res,so server start release the resources\n");
+                release_resources("192.168.231.155", "ens33");
+                server_resources_takeover_status = false;
+                p_next_data->type = TRANS_TYPE_REPLY_ACTION;
 
+                p_next_data->trans_action_data.type = FREED_RES;
+                p_next_data->trans_action_data.result = 1;
             } else {
 
             }
+            *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
@@ -121,9 +142,13 @@ int trans_data_generator(void *recved_data, void **next_send_data)
              */
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == GOT_RES) {
+                client_resources_takeover_status = false;
                 // nothing!
             } else if (action_type == FREED_RES) {
                 // 开始接管资源
+                printf("server reply freed resource,so client start take over the resources\n");
+                take_over_resources("192.168.231.155", "ens33");
+                client_resources_takeover_status = true;
             } else {
                 // nothing!
             }
@@ -251,17 +276,18 @@ int resource_manager(void *recved_data, void *next_data)
 
             get_local_server_status_datas(&local_server_status_datas);
 
-            policy = policy_manager(local_server_status_datas.server_status, local_server_status_datas.have_virtual_ip, true,
+
+
+            policy = policy_manager(local_server_status_datas.server_status, local_server_status_datas.have_virtual_ip, auto_failback,
                            backup_server_status, backup_have_virtual_ip);
 
-            if( policy == 0 ) {
+            if( policy == DO_NOTHING ) {
                 trans_data_set_none(next_data);
-            } else if (policy == 1) {
+            } else if (policy == BACKUP_NODE_TAKEOVER) {
                 trans_data_set_action(next_data, GET_RES);
-            } else if (policy == 2) {
+            } else if (policy == PRIMARY_NODE_TAKEOVER) {
                 trans_data_set_action(next_data, FREE_RES);
             }
-
         }
             break;
         default: {
@@ -277,9 +303,27 @@ int resource_manager(void *recved_data, void *next_data)
 int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
                    bool backup_server_status, bool backup_have_virtual_ip)
 {
+    char policy_str[256] = {0};
+    std::string spolicy;
     // 这里根据８＊８的策略表来写
 
-    return 0;
+    sprintf(policy_str, "p_ss:%d|p_vip:%d|p_afk:%d|b_ss:%d|b_vip:%d",
+            primary_server_status, primary_have_virtual_ip, primary_auto_fail_back,
+            backup_server_status, backup_have_virtual_ip);
+
+    printf("construct string: %s\n", policy_str);
+
+    spolicy.assign(policy_str);
+
+    if(policy_link_map.count(spolicy) > 0) {
+
+        // 返回0 1 2
+        return policy_link_map[spolicy];
+
+    } else
+        return DO_NOTHING;
+
+    return DO_NOTHING;
 }
 
 int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
@@ -342,7 +386,7 @@ int policy_link_init()
             svalue.erase(0, svalue.find_first_not_of(" "));
             svalue.erase(svalue.find_last_not_of(" ") + 1);
 
-            policy_map[skey] = atoi(svalue.c_str());
+            policy_link_map[skey] = atoi(svalue.c_str());
         }
     }
 

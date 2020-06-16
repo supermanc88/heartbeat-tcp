@@ -6,6 +6,10 @@
 #define POLICY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
 #define POLICY_NOLINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy2.dat"
 
+#define DO_NOTHING 0
+#define BACKUP_NODE_TAKEOVER 1
+#define PRIMARY_NODE_TAKEOVER 2
+
 /**
  * 通过收到的包的内容，来生成下次要发送的包的内容
  * 这个函数只有备机去调用,主机就是三个状态讯问加无数据

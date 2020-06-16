@@ -18,7 +18,7 @@
 #define VIRTUAL_IP "192.168.231.155"
 
 // 每发送10次none包，便向服务端询问一次服务状态
-#define GET_STATUS_TIME_INTERVAL    10
+#define GET_STATUS_TIME_INTERVAL    30
 
 
 int keepalive = KEEYALIVE;
@@ -26,12 +26,13 @@ int deadtime = DEADTIME;
 int warntime = WARNTIME;
 int initdead = INITDEAD;
 int server_port = SERVERPORT;
+bool auto_failback = false;
 
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
-bool client_resources_takeover_status = false;
-bool server_resources_takeover_status = false;
+extern bool client_resources_takeover_status;
+extern bool server_resources_takeover_status;
 
 void usage(void)
 {
@@ -148,7 +149,7 @@ int start_by_client_mode(void)
                 none_package_send_times++;
             }
 
-            if(none_package_send_times >= 10) {
+            if(none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
                 trans_data_set_get_server_status(next_send_data);
                 none_package_send_times = 0;
             }
@@ -327,6 +328,12 @@ int main(int argc, char *argv[])
             warntime = atoi(value);
         if (hb.GetValue("initdeat", value) == RET_SUCCESS)
             initdead = atoi(value);
+        if (hb.GetValue("auto_failback", value) == RET_SUCCESS) {
+            if (strcmp(value, "on") == 0)
+                auto_failback = true;
+            else
+                auto_failback = false;
+        }
     }
 
     printf("---------------------------------------\n");
