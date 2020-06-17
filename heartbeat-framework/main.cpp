@@ -79,12 +79,42 @@ int start_by_client_mode(void)
             printf("Cannot connect after multiple attempts, exit!\n");
 
             if(!client_resources_takeover_status) {
-                // 不能连通就直接接管资源
-                take_over_resources("192.168.231.155", "ens33");
-                client_resources_takeover_status = true;
-                printf("client take over resource\n");
+
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = true;
+                    printf("client take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = false;
+                }
+
             } else {
                 printf("client take over resource already\n");
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = true;
+                    printf("client take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = false;
+                }
             }
 
             try_time_sum = 0;
@@ -123,11 +153,40 @@ int start_by_client_mode(void)
         } else if (ret == 0) {
             printf("select cfd time out\n");
             if(!client_resources_takeover_status) {
-                take_over_resources("192.168.231.155", "ens33");
-                client_resources_takeover_status = true;
-                printf("client take over resource\n");
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = true;
+                    printf("client take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = false;
+                }
             } else {
                 printf("client take over resource already\n");
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = true;
+                    printf("client take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = false;
+                }
             }
             continue;
         } else {
@@ -136,8 +195,22 @@ int start_by_client_mode(void)
                 // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
                 printf("server colse connect\n");
                 close(cfd);
-                take_over_resources("192.168.231.155", "ens33");
-                printf("client take over resource\n");
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = true;
+                    printf("client take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    client_resources_takeover_status = false;
+                }
                 goto reconnect;
             }
 
@@ -210,11 +283,42 @@ int start_by_server_mode(void)
             // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
             printf("select lfd time out\n");
             if(!server_resources_takeover_status) {
-                take_over_resources("192.168.231.155", "ens33");
-                server_resources_takeover_status = true;
-                printf("server take over resource\n");
+
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    server_resources_takeover_status = true;
+                    printf("server take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    server_resources_takeover_status = false;
+                }
+
             } else {
                 printf("server take over resource already\n");
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if(act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    // 不能连通就直接接管资源
+                    take_over_resources("192.168.231.155", "ens33");
+                    server_resources_takeover_status = true;
+                    printf("server take over resource\n");
+                } else {
+                    // release
+                    release_resources("192.168.231.155", "ens33");
+                    server_resources_takeover_status = false;
+                }
             }
             continue;
         } else {
@@ -241,11 +345,40 @@ int start_by_server_mode(void)
                 } else if (ret == 0) {
                     printf("time out\n");
                     if(!server_resources_takeover_status) {
-                        take_over_resources("192.168.231.155", "ens33");
-                        server_resources_takeover_status = true;
-                        printf("server take over resource\n");
+                        SERVER_STATUS_DATAS datas = {0};
+                        get_local_server_status_datas(&datas);
+
+                        int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                        if(act == NOLINK_ACT_DO_NOTING) {
+                            // do nothing
+                        } else if (act == NOLINK_ACT_TAKEOVER) {
+                            // 不能连通就直接接管资源
+                            take_over_resources("192.168.231.155", "ens33");
+                            server_resources_takeover_status = true;
+                            printf("server take over resource\n");
+                        } else {
+                            // release
+                            release_resources("192.168.231.155", "ens33");
+                            server_resources_takeover_status = false;
+                        }
                     } else {
                         printf("server take over resource already\n");
+                        SERVER_STATUS_DATAS datas = {0};
+                        get_local_server_status_datas(&datas);
+
+                        int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                        if(act == NOLINK_ACT_DO_NOTING) {
+                            // do nothing
+                        } else if (act == NOLINK_ACT_TAKEOVER) {
+                            // 不能连通就直接接管资源
+                            take_over_resources("192.168.231.155", "ens33");
+                            server_resources_takeover_status = true;
+                            printf("server take over resource\n");
+                        } else {
+                            // release
+                            release_resources("192.168.231.155", "ens33");
+                            server_resources_takeover_status = false;
+                        }
                     }
 
                     close(cfd);
@@ -256,11 +389,40 @@ int start_by_server_mode(void)
                         // 如果客户端关闭的连接，也接管资源
                         printf("client close connect!\n");
                         if(!server_resources_takeover_status) {
-                            take_over_resources("192.168.231.155", "ens33");
-                            server_resources_takeover_status = true;
-                            printf("server take over resource\n");
+                            SERVER_STATUS_DATAS datas = {0};
+                            get_local_server_status_datas(&datas);
+
+                            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                            if(act == NOLINK_ACT_DO_NOTING) {
+                                // do nothing
+                            } else if (act == NOLINK_ACT_TAKEOVER) {
+                                // 不能连通就直接接管资源
+                                take_over_resources("192.168.231.155", "ens33");
+                                server_resources_takeover_status = true;
+                                printf("server take over resource\n");
+                            } else {
+                                // release
+                                release_resources("192.168.231.155", "ens33");
+                                server_resources_takeover_status = false;
+                            }
                         } else {
                             printf("server take over resource already\n");
+                            SERVER_STATUS_DATAS datas = {0};
+                            get_local_server_status_datas(&datas);
+
+                            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                            if(act == NOLINK_ACT_DO_NOTING) {
+                                // do nothing
+                            } else if (act == NOLINK_ACT_TAKEOVER) {
+                                // 不能连通就直接接管资源
+                                take_over_resources("192.168.231.155", "ens33");
+                                server_resources_takeover_status = true;
+                                printf("server take over resource\n");
+                            } else {
+                                // release
+                                release_resources("192.168.231.155", "ens33");
+                                server_resources_takeover_status = false;
+                            }
                         }
                         close(cfd);
                         break;
