@@ -62,6 +62,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
     ACTION_TYPE action_type;
     bool backup_server_status;
     char * content;
+    int policy;
 
     TRANS_DATA * p_next_data;
 
@@ -91,6 +92,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 take_over_resources("192.168.231.155", "ens33");
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
+                p_next_data->size = sizeof(TRANS_DATA);
 
                 p_next_data->trans_action_data.type = GOT_RES;
                 p_next_data->trans_action_data.result = 1;
@@ -100,6 +102,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 release_resources("192.168.231.155", "ens33");
                 server_resources_takeover_status = false;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
+                p_next_data->size = sizeof(TRANS_DATA);
 
                 p_next_data->trans_action_data.type = FREED_RES;
                 p_next_data->trans_action_data.result = 1;
@@ -162,14 +165,21 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
             printf("reciving data type: TRANS_TYPE_REPLY_SERVER_STATUS\n");
-            backup_server_status = p_trans_data->server_status_datas.server_status;
-
-
             // 这里根据决策开始操作,先把结构体填充成无操作
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
 
-            resource_manager(recved_data, next_send_data);
+            policy = resource_manager(recved_data, p_next_data);
+
+            if (policy == LINK_ACT_DO_NOTHING) {
+
+            } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
+                release_resources("192.168.231.155", "ens33");
+                client_resources_takeover_status = false;
+            } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
+                // 需要向备机发包，让备机先释放，我再拿
+            }
+
             *next_send_data = (void *)p_next_data;
         }
             break;
@@ -300,7 +310,7 @@ int resource_manager(void *recved_data, void *next_data)
     }
 
 
-    return 0;
+    return policy;
 }
 
 int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,

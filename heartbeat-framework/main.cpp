@@ -14,7 +14,7 @@
 #include "plugin-mgr/plugin-manager.h"
 
 
-#define SERVER_IP "127.0.0.1"
+#define SERVER_IP "192.168.231.132"
 #define VIRTUAL_IP "192.168.231.155"
 
 // 每发送10次none包，便向服务端询问一次服务状态
@@ -26,7 +26,7 @@ int deadtime = DEADTIME;
 int warntime = WARNTIME;
 int initdead = INITDEAD;
 int server_port = SERVERPORT;
-bool auto_failback = false;
+bool auto_failback = true;
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -50,6 +50,7 @@ int start_by_client_mode(void)
     unsigned int i_addr;
 
     char buf[BUFSIZ];
+    TRANS_DATA *next_send_data;
 
     int n, i, ret;
 
@@ -164,6 +165,8 @@ int start_by_client_mode(void)
                 }
 
             }
+            next_send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
+            send_data = next_send_data;
             continue;
         } else {
             n = Read(cfd, buf, n);
@@ -200,7 +203,6 @@ int start_by_client_mode(void)
                 goto reconnect;
             }
 
-            TRANS_DATA *next_send_data;
             // 开始处理从服务器返回的包
             trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
 
@@ -239,8 +241,9 @@ int start_by_server_mode(void)
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(5555);
     unsigned int addr;
-    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
+//    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
     // 设置端口重用
     setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, &serv_addr, sizeof(serv_addr));
 
@@ -385,6 +388,8 @@ int start_by_server_mode(void)
                     trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
 
                     n = Write(cfd, next_send_data, next_send_data->size);
+
+                    printf("server send %d bytes datas to client\n", n);
                 }
 
             }
