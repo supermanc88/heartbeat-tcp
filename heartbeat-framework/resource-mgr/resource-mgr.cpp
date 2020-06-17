@@ -11,6 +11,8 @@
 
 std::map<std::string, int> policy_link_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
+std::map<std::string, int> policy_nolink_primary_map;
+std::map<std::string, int> policy_nolink_backup_map;
 
 
 bool client_resources_takeover_status = false;
@@ -278,14 +280,15 @@ int resource_manager(void *recved_data, void *next_data)
 
 
 
-            policy = policy_manager(local_server_status_datas.server_status, local_server_status_datas.have_virtual_ip, auto_failback,
-                           backup_server_status, backup_have_virtual_ip);
+            policy = policy_link_manager(local_server_status_datas.server_status,
+                                         local_server_status_datas.have_virtual_ip, auto_failback,
+                                         backup_server_status, backup_have_virtual_ip);
 
-            if( policy == DO_NOTHING ) {
+            if(policy == LINK_ACT_DO_NOTHING ) {
                 trans_data_set_none(next_data);
-            } else if (policy == BACKUP_NODE_TAKEOVER) {
+            } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
                 trans_data_set_action(next_data, GET_RES);
-            } else if (policy == PRIMARY_NODE_TAKEOVER) {
+            } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
                 trans_data_set_action(next_data, FREE_RES);
             }
         }
@@ -300,8 +303,8 @@ int resource_manager(void *recved_data, void *next_data)
     return 0;
 }
 
-int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
-                   bool backup_server_status, bool backup_have_virtual_ip)
+int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
+                        bool backup_server_status, bool backup_have_virtual_ip)
 {
     char policy_str[256] = {0};
     std::string spolicy;
@@ -321,9 +324,9 @@ int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, boo
         return policy_link_map[spolicy];
 
     } else
-        return DO_NOTHING;
+        return LINK_ACT_DO_NOTHING;
 
-    return DO_NOTHING;
+    return LINK_ACT_DO_NOTHING;
 }
 
 int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
@@ -359,7 +362,7 @@ int policy_link_init()
     int tail_pos = -1;
     int space_pos = -1;
 
-    fp = fopen(POLICY_PATH, "r");
+    fp = fopen(POLICY_LINK_PATH, "r");
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
@@ -407,90 +410,92 @@ int policy_link_init()
 
 int policy_no_link_init()
 {
-    FILE * fp;
-    char str_line[256] = {0};
-    std::string sline;
-    int tail_pos = -1;
-    int space_pos = -1;
+//    FILE * fp;
+//    char str_line[256] = {0};
+//    std::string sline;
+//    int tail_pos = -1;
+//    int space_pos = -1;
+//
+//    fp = fopen(POLICY_NOLINK_PATH, "r");
+//
+//    while (fgets(str_line, 256, fp)) {
+//        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
+//        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+//            continue;
+//
+//        sline.assign(str_line);
+//
+//        tail_pos = sline.find("\n");
+//        if(std::string::npos != tail_pos)
+//            sline.erase(tail_pos, 1);
+//
+//        tail_pos = sline.find("\r");
+//        if(std::string::npos != tail_pos)
+//            sline.erase(tail_pos, 1);
+//
+//        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+//            std::string skey = sline.substr(0, space_pos);
+//            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+//
+//            skey.erase(0, skey.find_first_not_of(" "));
+//            skey.erase(skey.find_last_not_of(" ") + 1);
+//
+//            svalue.erase(0, svalue.find_first_not_of(" "));
+//            svalue.erase(svalue.find_last_not_of(" ") + 1);
+//
+//            // 开始拆分主机和备机 p:1|b:1
+//
+//            if(space_pos = svalue.find("|"), std::string::npos != space_pos) {
+//                std::map<std::string, int> tmp_map;
+//                int m_pos = - 1;
+//                std::string buf1 = svalue.substr(0, space_pos);
+//                std::string buf2 = svalue.substr(space_pos+1, svalue.length()-space_pos-1);
+//
+//                if(m_pos = buf1.find(":"), std::string::npos != m_pos) {
+//                    std::string p = buf1.substr(0, m_pos);
+//                    std::string p_value = buf1.substr(m_pos+1, buf1.length()-m_pos-1);
+//
+//                    p.erase(0, p.find_first_not_of(" "));
+//                    p.erase(p.find_last_not_of(" ") + 1);
+//
+//                    p_value.erase(0, p_value.find_first_not_of(" "));
+//                    p_value.erase(p_value.find_last_not_of(" ") + 1);
+//
+//                    tmp_map[p] = atoi(p_value.c_str());
+//                }
+//
+//                if(m_pos = buf2.find(":"), std::string::npos != m_pos) {
+//                    std::string b = buf2.substr(0, m_pos);
+//                    std::string b_value = buf2.substr(m_pos+1, buf2.length()-m_pos-1);
+//
+//                    b.erase(0, b.find_first_not_of(" "));
+//                    b.erase(b.find_last_not_of(" ") + 1);
+//
+//                    b_value.erase(0, b_value.find_first_not_of(" "));
+//                    b_value.erase(b_value.find_last_not_of(" ") + 1);
+//
+//                    tmp_map[b] = atoi(b_value.c_str());
+//                }
+//
+//                policy_nolink_map[skey] = tmp_map;
+//            }
+//
+//        }
+//    }
+//
+//    if(fp == NULL) {
+//        perror("fopen error");
+//        return 0;
+//    }
+//
+//    if( fp != NULL ) {
+//        fclose(fp);
+//        fp = NULL;
+//    }
 
-    fp = fopen(POLICY_NOLINK_PATH, "r");
 
-    while (fgets(str_line, 256, fp)) {
-        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
-            continue;
-
-        sline.assign(str_line);
-
-        tail_pos = sline.find("\n");
-        if(std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
-
-        tail_pos = sline.find("\r");
-        if(std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
-
-        if(space_pos = sline.find("="), std::string::npos != space_pos) {
-            std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
-
-            skey.erase(0, skey.find_first_not_of(" "));
-            skey.erase(skey.find_last_not_of(" ") + 1);
-
-            svalue.erase(0, svalue.find_first_not_of(" "));
-            svalue.erase(svalue.find_last_not_of(" ") + 1);
-
-            // 开始拆分主机和备机 p:1|b:1
-
-            if(space_pos = svalue.find("|"), std::string::npos != space_pos) {
-                std::map<std::string, int> tmp_map;
-                int m_pos = - 1;
-                std::string buf1 = svalue.substr(0, space_pos);
-                std::string buf2 = svalue.substr(space_pos+1, svalue.length()-space_pos-1);
-
-                if(m_pos = buf1.find(":"), std::string::npos != m_pos) {
-                    std::string p = buf1.substr(0, m_pos);
-                    std::string p_value = buf1.substr(m_pos+1, buf1.length()-m_pos-1);
-
-                    p.erase(0, p.find_first_not_of(" "));
-                    p.erase(p.find_last_not_of(" ") + 1);
-
-                    p_value.erase(0, p_value.find_first_not_of(" "));
-                    p_value.erase(p_value.find_last_not_of(" ") + 1);
-
-                    tmp_map[p] = atoi(p_value.c_str());
-                }
-
-                if(m_pos = buf2.find(":"), std::string::npos != m_pos) {
-                    std::string b = buf2.substr(0, m_pos);
-                    std::string b_value = buf2.substr(m_pos+1, buf2.length()-m_pos-1);
-
-                    b.erase(0, b.find_first_not_of(" "));
-                    b.erase(b.find_last_not_of(" ") + 1);
-
-                    b_value.erase(0, b_value.find_first_not_of(" "));
-                    b_value.erase(b_value.find_last_not_of(" ") + 1);
-
-                    tmp_map[b] = atoi(b_value.c_str());
-                }
-
-                policy_nolink_map[skey] = tmp_map;
-            }
-
-        }
-    }
-
-    if(fp == NULL) {
-        perror("fopen error");
-        return 0;
-    }
-
-
-
-    if( fp != NULL ) {
-        fclose(fp);
-        fp = NULL;
-    }
+    policy_no_link_primary_init();
+    policy_no_link_backup_init();
 
     return 0;
 }
@@ -535,5 +540,140 @@ int my_system(const char *cmd_string, const char *tmp_file)
     sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
 
     return system(my_cmd_str);
+}
+
+int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_type)
+{
+
+    char policy_str[256] = {0};
+    std::string spolicy;
+
+    // primary
+    if(node_type == 0) {
+        sprintf(policy_str, "p_ss:%d|p_vip:%d", server_status, have_virtual_ip);
+        spolicy.assign(policy_str);
+        if(policy_nolink_primary_map.count(spolicy) > 0) {
+            return policy_nolink_primary_map[spolicy];
+        } else
+            return NOLINK_ACT_DO_NOTING;
+
+    } else if (node_type == 1) {
+        // backup
+        sprintf(policy_str, "p_ss:%d|p_vip:%d", server_status, have_virtual_ip);
+        spolicy.assign(policy_str);
+        if(policy_nolink_primary_map.count(spolicy) > 0) {
+            return policy_nolink_primary_map[spolicy];
+        } else
+            return NOLINK_ACT_DO_NOTING;
+    } else
+        return NOLINK_ACT_DO_NOTING;
+}
+
+int policy_no_link_primary_init()
+{
+    FILE * fp;
+    char str_line[256] = {0};
+    std::string sline;
+    int tail_pos = -1;
+    int space_pos = -1;
+
+    fp = fopen(POLICY_NOLINK_PRIMARY_PATH, "r");
+
+    while (fgets(str_line, 256, fp)) {
+        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
+        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+            continue;
+
+        sline.assign(str_line);
+
+        tail_pos = sline.find("\n");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        tail_pos = sline.find("\r");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+            std::string skey = sline.substr(0, space_pos);
+            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+
+            skey.erase(0, skey.find_first_not_of(" "));
+            skey.erase(skey.find_last_not_of(" ") + 1);
+
+            svalue.erase(0, svalue.find_first_not_of(" "));
+            svalue.erase(svalue.find_last_not_of(" ") + 1);
+
+            policy_nolink_primary_map[skey] = atoi(svalue.c_str());
+        }
+    }
+
+    if(fp == NULL) {
+        perror("fopen error");
+        return 0;
+    }
+
+
+
+    if( fp != NULL ) {
+        fclose(fp);
+        fp = NULL;
+    }
+
+    return 0;
+}
+
+int policy_no_link_backup_init()
+{
+    FILE * fp;
+    char str_line[256] = {0};
+    std::string sline;
+    int tail_pos = -1;
+    int space_pos = -1;
+
+    fp = fopen(POLICY_NOLINK_BACKUP_PATH, "r");
+
+    while (fgets(str_line, 256, fp)) {
+        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
+        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+            continue;
+
+        sline.assign(str_line);
+
+        tail_pos = sline.find("\n");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        tail_pos = sline.find("\r");
+        if(std::string::npos != tail_pos)
+            sline.erase(tail_pos, 1);
+
+        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+            std::string skey = sline.substr(0, space_pos);
+            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+
+            skey.erase(0, skey.find_first_not_of(" "));
+            skey.erase(skey.find_last_not_of(" ") + 1);
+
+            svalue.erase(0, svalue.find_first_not_of(" "));
+            svalue.erase(svalue.find_last_not_of(" ") + 1);
+
+            policy_nolink_backup_map[skey] = atoi(svalue.c_str());
+        }
+    }
+
+    if(fp == NULL) {
+        perror("fopen error");
+        return 0;
+    }
+
+
+
+    if( fp != NULL ) {
+        fclose(fp);
+        fp = NULL;
+    }
+
+    return 0;
 }
 

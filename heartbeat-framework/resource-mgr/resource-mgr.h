@@ -3,12 +3,18 @@
 
 #include "../heartbeat-config.h"
 
-#define POLICY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
+#define POLICY_LINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
 #define POLICY_NOLINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy2.dat"
+#define POLICY_NOLINK_PRIMARY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy_primary.dat"
+#define POLICY_NOLINK_BACKUP_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy_backup.dat"
 
-#define DO_NOTHING 0
-#define BACKUP_NODE_TAKEOVER 1
-#define PRIMARY_NODE_TAKEOVER 2
+#define LINK_ACT_DO_NOTHING 0
+#define LINK_ACT_BACKUP_NODE_TAKEOVER 1
+#define LINK_ACT_PRIMARY_NODE_TAKEOVER 2
+
+#define NOLINK_ACT_DO_NOTING 0
+#define NOLINK_ACT_TAKEOVER 1
+#define NOLINK_ACT_RELEASE 2
 
 /**
  * 通过收到的包的内容，来生成下次要发送的包的内容
@@ -69,8 +75,19 @@ int resource_manager(void * recved_data, void * next_data);
  * 1 主机让备机拿资源
  * 2 主机让备机释放资源
  */
-int policy_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
-        bool backup_server_status, bool backup_have_virtual_ip);
+int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
+                        bool backup_server_status, bool backup_have_virtual_ip);
+
+
+
+/**
+ * 这是在主备机不能正常通信时采取的策略
+ * @param server_status
+ * @param have_virtual_ip
+ * @param node_type 主机0 or 备机1
+ * @return 动作类型
+ */
+int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_type);
 
 
 /**
@@ -92,6 +109,19 @@ int policy_link_init();
  * @return
  */
 int policy_no_link_init();
+
+/**
+ * 初始化主机在不连通状态下的策略
+ * @return
+ */
+int policy_no_link_primary_init();
+
+
+/**
+ * 初始化备机在不连通状态下的策略
+ * @return
+ */
+int policy_no_link_backup_init();
 
 
 /**
