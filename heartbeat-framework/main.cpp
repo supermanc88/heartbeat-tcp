@@ -454,9 +454,22 @@ int main(int argc, char *argv[])
                 auto_failback = false;
         }
     }
+    hb.CloseFile();
 
     printf("---------------------------------------\n");
-    printf("deadtime = %d, keepalice = %d\n", deadtime, keepalive);
+    printf("deadtime = %d, keepalive = %d\n", deadtime, keepalive);
+    printf("---------------------------------------\n");
+
+    // 读取补充配置
+    HBConfig hb_extra;
+    if (RET_SUCCESS == hb_extra.OpenFile("./ha-extra.cf", "r")) {
+        char value[20] = {0};
+        if (hb_extra.GetValue("mode", value) == RET_SUCCESS)
+            strcpy(mode, value);
+    }
+    hb_extra.CloseFile();
+
+    printf("start mode %s\n", mode);
     printf("---------------------------------------\n");
 
     if (b_mode_set) {

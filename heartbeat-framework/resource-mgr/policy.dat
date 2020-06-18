@@ -1,7 +1,10 @@
-# p_ 开头为主机状态
-# b_ 开关为备机状态
-# ss:serverstatus vip:virtual ip  afk:auto_failback
+# p_ 开头为主机状态 primary
+# b_ 开关为备机状态 backup
+# ss:serverstatus
+# vip:virtual ip
+# afk:auto_failback
 # 0:什么也不做 1：备机接管 2：主机接管
+# 0:release 1:takeover
 
 p_ss:1|p_vip:1|p_afk:1|b_ss:1|b_vip:1 = 2
 p_ss:1|p_vip:1|p_afk:1|b_ss:1|b_vip:1 = 2

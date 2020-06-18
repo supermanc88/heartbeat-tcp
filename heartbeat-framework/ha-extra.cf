@@ -1,0 +1,5 @@
+# 用于补充/etc/ha.d/ha.cf中的配置
+# 格式和ha.cf一致
+
+# 启动方式
+mode    server
