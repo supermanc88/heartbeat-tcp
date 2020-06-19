@@ -33,6 +33,7 @@ message ServerStatusDatas {
 message TransData {
     TransType type = 1;
     int32 size = 2;
+    // 如果这个oneof不好用  还可以直接换成optional
     oneof data_oneof {
         TransActionData trans_action_data = 3;
         ServerStatusDatas server_status_datas = 4;
