@@ -206,7 +206,7 @@ int start_by_client_mode(void)
             // 开始处理从服务器返回的包
             trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
 
-            if (next_send_data->type == TRANS_TYPE_NONE) {
+            if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
                 none_package_send_times++;
             }
 

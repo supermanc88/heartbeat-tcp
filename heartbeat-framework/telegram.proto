@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+enum TransType {
+    HEARTBEAT = 0;
+    ACTION = 1;
+    GET_SERVER_STATUS = 2;
+    GET_DATA = 3;
+    REPLY_ACTION = 4;
+    REPLY_SERVER_STATUS = 5;
+    REPLY_DATA = 6;
+}
+
+enum ActionType {
+    GET_RES = 0;           // 主机要求备机接管资源
+    GOT_RES = 1;            // 备机向主机回复已接管资源
+    FREE_RES = 2;           // 主机要求备机释放资源
+    FREED_RES = 3;          // 备机向主机回复已释放资源
+};
+
+message TransActionData {
+    ActionType type = 1;
+    bool result = 2;
+}
+
+message ServerStatusDatas {
+    bool server_status = 1;
+    bool have_virtual_ip = 2;
+}
+
+/**
+通信的数据
+*/
+message TransData {
+    TransType type = 1;
+    int32 size = 2;
+    oneof data_oneof {
+        TransActionData trans_action_data = 3;
+        ServerStatusDatas server_status_datas = 4;
+        bytes data_collection = 5;
+    }
+/***后续的直接添加即可***/
+}
+
+
+message Telegram {
+    string version = 1;             // 通信版本
+    TransData data = 2;
+}

@@ -35,7 +35,7 @@ enum TRANS_TYPE {
     TRANS_TYPE_REPLY_SERVER_STATUS,
     TRANS_TYPE_REPLY_DATA,
     /************上3为备机发包选择**************/
-    TRANS_TYPE_NONE,
+    TRANS_TYPE_HEARTBEAT,
     /********通用发包选择，仅检测是否活跃**********/
 };
 

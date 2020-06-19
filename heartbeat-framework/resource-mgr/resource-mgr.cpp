@@ -193,7 +193,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             *next_send_data = (void *)p_next_data;
         }
             break;
-        case TRANS_TYPE_NONE: {
+        case TRANS_TYPE_HEARTBEAT: {
             printf("reciving data type: TRANS_TYPE_NONE\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
@@ -257,7 +257,7 @@ int trans_data_set_none(void *data)
 
     bzero(pdata, sizeof(TRANS_DATA));
 
-    pdata->type = TRANS_TYPE_NONE;
+    pdata->type = TRANS_TYPE_HEARTBEAT;
     pdata->size = sizeof(TRANS_DATA);
     return 0;
 }
