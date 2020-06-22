@@ -27,6 +27,8 @@
  * TRANS_TYPE_NONE时，TRANS_DATA中union数据均不使用
  */
 enum TRANS_TYPE {
+    TRANS_TYPE_HEARTBEAT,
+    /********通用发包选择，仅检测是否活跃**********/
     TRANS_TYPE_ACTION,
     TRANS_TYPE_GET_SERVER_STATUS,
     TRANS_TYPE_GET_DATA,
@@ -35,15 +37,13 @@ enum TRANS_TYPE {
     TRANS_TYPE_REPLY_SERVER_STATUS,
     TRANS_TYPE_REPLY_DATA,
     /************上3为备机发包选择**************/
-    TRANS_TYPE_HEARTBEAT,
-    /********通用发包选择，仅检测是否活跃**********/
 };
 
 enum ACTION_TYPE {
-    GET_RES,            // 主机要求备机接管资源
-    GOT_RES,            // 备机向主机回复已接管资源
-    FREE_RES,           // 主机要求备机释放资源
-    FREED_RES,          // 备机向主机回复已释放资源
+    ACTION_TYPE_GET_RES,            // 主机要求备机接管资源
+    ACTION_TYPE_GOT_RES,            // 备机向主机回复已接管资源
+    ACTION_TYPE_FREE_RES,           // 主机要求备机释放资源
+    ACTION_TYPE_FREED_RES,          // 备机向主机回复已释放资源
 };
 
 /**

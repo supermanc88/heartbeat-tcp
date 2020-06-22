@@ -87,24 +87,24 @@ int trans_data_generator(void *recved_data, void **next_send_data)
               * 只有备机会收到此类信息
               */
             action_type = p_trans_data->trans_action_data.type;
-            if (action_type == GET_RES) {
+            if (action_type == ACTION_TYPE_GET_RES) {
                 printf("server recv get res,so server start take over the resources\n");
                 take_over_resources("192.168.231.155", "ens33");
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
 
-                p_next_data->trans_action_data.type = GOT_RES;
+                p_next_data->trans_action_data.type = ACTION_TYPE_GOT_RES;
                 p_next_data->trans_action_data.result = 1;
 
-            } else if (action_type == FREE_RES) {
+            } else if (action_type == ACTION_TYPE_FREE_RES) {
                 printf("server recv free res,so server start release the resources\n");
                 release_resources("192.168.231.155", "ens33");
                 server_resources_takeover_status = false;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
 
-                p_next_data->trans_action_data.type = FREED_RES;
+                p_next_data->trans_action_data.type = ACTION_TYPE_FREED_RES;
                 p_next_data->trans_action_data.result = 1;
             } else {
 
@@ -146,10 +146,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
              * 只有主机会收到此类信息
              */
             action_type = p_trans_data->trans_action_data.type;
-            if (action_type == GOT_RES) {
+            if (action_type == ACTION_TYPE_GOT_RES) {
                 client_resources_takeover_status = false;
                 // nothing!
-            } else if (action_type == FREED_RES) {
+            } else if (action_type == ACTION_TYPE_FREED_RES) {
                 // 开始接管资源
                 printf("server reply freed resource,so client start take over the resources\n");
                 take_over_resources("192.168.231.155", "ens33");
@@ -297,9 +297,9 @@ int resource_manager(void *recved_data, void *next_data)
             if(policy == LINK_ACT_DO_NOTHING ) {
                 trans_data_set_none(next_data);
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
-                trans_data_set_action(next_data, GET_RES);
+                trans_data_set_action(next_data, ACTION_TYPE_GET_RES);
             } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
-                trans_data_set_action(next_data, FREE_RES);
+                trans_data_set_action(next_data, ACTION_TYPE_FREE_RES);
             }
         }
             break;

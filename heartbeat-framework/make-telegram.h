@@ -6,10 +6,11 @@
 #define HEARTBEAT_TCP_MAKE_TELEGRAM_H
 
 #include <stdlib.h>
+#include <string>
 
 
-int make_telegram(void *data, void **telegram_data, size_t *t_data_size);
+int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size);
 
-int parse_telegram(void * telegram_data, size_t t_data_size, void ** data);
+int parse_telegram(std::string telegram_data, size_t t_data_size, void ** data);
 
 #endif //HEARTBEAT_TCP_MAKE_TELEGRAM_H

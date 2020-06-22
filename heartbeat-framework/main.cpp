@@ -15,7 +15,7 @@
 #include "make-telegram.h"
 
 
-#define SERVER_IP "192.168.231.132"
+#define SERVER_IP "192.168.231.133"
 #define VIRTUAL_IP "192.168.231.155"
 
 // 每发送10次none包，便向服务端询问一次服务状态
@@ -59,6 +59,7 @@ int start_by_client_mode(void)
     struct timeval tv;
     tv.tv_sec = deadtime;
 
+#pragma region client_create_connect
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
@@ -70,7 +71,9 @@ int start_by_client_mode(void)
 
 
     ret = connect(cfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+#pragma endregion client_create_connect
 
+#pragma region client_connect_fail
     if (ret == -1) {
         perror("connect server error");
 
@@ -114,7 +117,9 @@ int start_by_client_mode(void)
         try_time_sum += keepalive;
         goto reconnect;
     }
+#pragma endregion client_connect_fail
 
+#pragma region client_connect_success
     // 向服务端发包
     TRANS_DATA *send_data;
     // 第一次发包时，先询问一次服务端的状态
@@ -122,12 +127,12 @@ int start_by_client_mode(void)
 //    trans_data_set_none(send_data);
     trans_data_set_get_server_status(send_data);
     while (1) {
-        unsigned char * serialized_data;
+        std::string serialized_data;
         size_t serialized_data_size;
 
-        make_telegram(send_data, reinterpret_cast<void **>(&serialized_data), &serialized_data_size);
+        make_telegram(send_data, serialized_data, &serialized_data_size);
 
-        n = Write(cfd, reinterpret_cast<void *>(serialized_data_size), serialized_data_size);
+        n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
         // 释放内存
         if (send_data) {
             free(send_data);
@@ -176,6 +181,7 @@ int start_by_client_mode(void)
             send_data = next_send_data;
             continue;
         } else {
+            bzero(buf, BUFSIZ);
             n = Read(cfd, buf, n);
             if (n == 0) {
                 // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
@@ -212,7 +218,9 @@ int start_by_client_mode(void)
 
             // 开始处理从服务器返回的包
             unsigned char * parsed_buf;
-            parse_telegram(buf, n, reinterpret_cast<void **>(&parsed_buf));
+            std::string sbuf;
+            sbuf.assign(buf, n);
+            parse_telegram(sbuf, n, reinterpret_cast<void **>(&parsed_buf));
 
             trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
 
@@ -234,6 +242,7 @@ int start_by_client_mode(void)
     }
 
     close(cfd);
+#pragma endregion client_connect_success
 
     return 0;
 }
@@ -246,7 +255,7 @@ int start_by_server_mode(void)
     struct sockaddr_in client_addr;
     struct timeval tv;
 
-
+#pragma region server_pre_create_connect
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(5555);
@@ -265,9 +274,9 @@ int start_by_server_mode(void)
 
     char buf[BUFSIZ];
     memset(buf, 0, BUFSIZ);
+#pragma endregion server_pre_create_connect
 
     while (1) {
-
         fd_set set;
         FD_ZERO(&set);
         FD_SET(lfd, &set);
@@ -279,6 +288,7 @@ int start_by_server_mode(void)
             printf("select lfd error\n");
             break;
         } else if (ret == 0) {
+#pragma region server_create_connect_timeout
             // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
             printf("select lfd time out\n");
 
@@ -308,7 +318,9 @@ int start_by_server_mode(void)
                 }
             }
             continue;
+#pragma endregion server_create_connect_timeout
         } else {
+#pragma region server_create_connect_success
             // 在deadtime时间内建立连接
             cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
             inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
@@ -360,7 +372,9 @@ int start_by_server_mode(void)
                     close(cfd);
                     break;
                 } else {
+#pragma region server_recv
                     n = Read(cfd, buf, sizeof(buf));
+#pragma region client_close
                     if (n == 0) {
                         // 如果客户端关闭的连接，也接管资源
                         printf("client close connect!\n");
@@ -392,25 +406,30 @@ int start_by_server_mode(void)
                         close(cfd);
                         break;
                     }
+#pragma endregion client_close
                     // 服务端开始处理收到的包
                     TRANS_DATA *next_send_data;
 
                     unsigned char * parsed_buf;
-                    parse_telegram(buf, n, reinterpret_cast<void **>(&parsed_buf));
+                    std::string sbuf;
+                    sbuf.assign(buf, n);
+                    parse_telegram(sbuf, n, reinterpret_cast<void **>(&parsed_buf));
 
                     trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
 
-                    unsigned char * serialized_data;
+                    std::string serialized_data;
                     size_t serialized_data_size;
 
-                    make_telegram(next_send_data, reinterpret_cast<void **>(&serialized_data), &serialized_data_size);
+                    make_telegram(next_send_data, serialized_data, &serialized_data_size);
 
-                    n = Write(cfd, serialized_data, serialized_data_size);
+                    n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
 
                     printf("server send %d bytes datas to client\n", n);
+#pragma endregion server_recv
                 }
 
             }
+#pragma endregion server_create_connect_success
         }
 
     }
@@ -439,6 +458,7 @@ int main(int argc, char *argv[])
 
     bzero(mode, 20);
 
+#pragma region main_parse_parameters
     while ((opt = getopt(argc, argv, "m:")) != -1) {
         switch (opt) {
             case 'm':
@@ -452,7 +472,9 @@ int main(int argc, char *argv[])
                 break;
         }
     }
+#pragma endregion main_parse_parameters
 
+#pragma region main_read_config
     // 读取配置,不成功就使用默认配置
     HBConfig hb;
     if (RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r")) {
@@ -489,7 +511,8 @@ int main(int argc, char *argv[])
 
     printf("start mode %s\n", mode);
     printf("---------------------------------------\n");
-
+#pragma endregion main_read_config
+    
     if (b_mode_set) {
 // 只有两种启动方式，client server
         if (strcmp(mode, "client") == 0)
