@@ -27,6 +27,11 @@ message ServerStatusDatas {
     bool have_virtual_ip = 2;
 }
 
+message DataCollection {
+    int32 size = 1;
+    string data = 2;
+}
+
 /**
 通信的数据
 */
@@ -37,7 +42,7 @@ message TransData {
     oneof data_oneof {
         TransActionData trans_action_data = 3;
         ServerStatusDatas server_status_datas = 4;
-        bytes data_collection = 5;
+        DataCollection data_collection = 5;
     }
 /***后续的直接添加即可***/
 }

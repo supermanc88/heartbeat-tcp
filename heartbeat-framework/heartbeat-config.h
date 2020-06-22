@@ -10,7 +10,7 @@
 /**
  * 默认数值
  */
-#define KEEYALIVE           2
+#define KEEYALIVE           10
 #define DEADTIME            30
 #define WARNTIME            10
 #define INITDEAD            120
@@ -63,6 +63,10 @@ struct SERVER_STATUS_DATAS {
     bool have_virtual_ip;
 };
 
+struct DATA_COLLECTION {
+    size_t size;
+    unsigned char data[1];
+};
 
 /**
  * TRANS_DATA 数据结构体
@@ -82,10 +86,11 @@ struct TRANS_DATA {
     union {
         struct TRANS_ACTION_DATA trans_action_data;
         struct SERVER_STATUS_DATAS server_status_datas;
-        bool server_status;
-        char data[1];
+//        bool server_status;
+        struct DATA_COLLECTION data_ollection;
+//        char data[1];
     };
-    char extra_data[1];
+//    char extra_data[1];
 };
 
 

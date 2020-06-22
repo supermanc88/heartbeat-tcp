@@ -14,9 +14,10 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DataCollection_telegram_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ServerStatusDatas_telegram_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TransActionData_telegram_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_TransData_telegram_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_TransData_telegram_2eproto;
 class TransActionDataDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TransActionData> _instance;
@@ -25,17 +26,35 @@ class ServerStatusDatasDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ServerStatusDatas> _instance;
 } _ServerStatusDatas_default_instance_;
+class DataCollectionDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<DataCollection> _instance;
+} _DataCollection_default_instance_;
 class TransDataDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TransData> _instance;
   const ::TransActionData* trans_action_data_;
   const ::ServerStatusDatas* server_status_datas_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_collection_;
+  const ::DataCollection* data_collection_;
 } _TransData_default_instance_;
 class TelegramDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Telegram> _instance;
 } _Telegram_default_instance_;
+static void InitDefaultsscc_info_DataCollection_telegram_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_DataCollection_default_instance_;
+    new (ptr) ::DataCollection();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::DataCollection::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DataCollection_telegram_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_DataCollection_telegram_2eproto}, {}};
+
 static void InitDefaultsscc_info_ServerStatusDatas_telegram_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -90,12 +109,13 @@ static void InitDefaultsscc_info_TransData_telegram_2eproto() {
   ::TransData::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_TransData_telegram_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_TransData_telegram_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_TransData_telegram_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_TransData_telegram_2eproto}, {
       &scc_info_TransActionData_telegram_2eproto.base,
-      &scc_info_ServerStatusDatas_telegram_2eproto.base,}};
+      &scc_info_ServerStatusDatas_telegram_2eproto.base,
+      &scc_info_DataCollection_telegram_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_telegram_2eproto[4];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_telegram_2eproto[5];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_telegram_2eproto[2];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_telegram_2eproto = nullptr;
 
@@ -114,6 +134,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_telegram_2eproto::offsets[] PR
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::ServerStatusDatas, server_status_),
   PROTOBUF_FIELD_OFFSET(::ServerStatusDatas, have_virtual_ip_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::DataCollection, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::DataCollection, size_),
+  PROTOBUF_FIELD_OFFSET(::DataCollection, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::TransData, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -136,13 +163,15 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_telegram_2eproto::offsets[] PR
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::TransActionData)},
   { 7, -1, sizeof(::ServerStatusDatas)},
-  { 14, -1, sizeof(::TransData)},
-  { 25, -1, sizeof(::Telegram)},
+  { 14, -1, sizeof(::DataCollection)},
+  { 21, -1, sizeof(::TransData)},
+  { 32, -1, sizeof(::Telegram)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_TransActionData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ServerStatusDatas_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_DataCollection_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_TransData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Telegram_default_instance_),
 };
@@ -151,23 +180,25 @@ const char descriptor_table_protodef_telegram_2eproto[] PROTOBUF_SECTION_VARIABL
   "\n\016telegram.proto\"<\n\017TransActionData\022\031\n\004t"
   "ype\030\001 \001(\0162\013.ActionType\022\016\n\006result\030\002 \001(\010\"C"
   "\n\021ServerStatusDatas\022\025\n\rserver_status\030\001 \001"
-  "(\010\022\027\n\017have_virtual_ip\030\002 \001(\010\"\276\001\n\tTransDat"
-  "a\022\030\n\004type\030\001 \001(\0162\n.TransType\022\014\n\004size\030\002 \001("
-  "\005\022-\n\021trans_action_data\030\003 \001(\0132\020.TransActi"
-  "onDataH\000\0221\n\023server_status_datas\030\004 \001(\0132\022."
-  "ServerStatusDatasH\000\022\031\n\017data_collection\030\005"
-  " \001(\014H\000B\014\n\ndata_oneof\"5\n\010Telegram\022\017\n\007vers"
-  "ion\030\001 \001(\t\022\030\n\004data\030\002 \001(\0132\n.TransData*\206\001\n\t"
-  "TransType\022\r\n\tHEARTBEAT\020\000\022\n\n\006ACTION\020\001\022\025\n\021"
-  "GET_SERVER_STATUS\020\002\022\014\n\010GET_DATA\020\003\022\020\n\014REP"
-  "LY_ACTION\020\004\022\027\n\023REPLY_SERVER_STATUS\020\005\022\016\n\n"
-  "REPLY_DATA\020\006*C\n\nActionType\022\013\n\007GET_RES\020\000\022"
-  "\013\n\007GOT_RES\020\001\022\014\n\010FREE_RES\020\002\022\r\n\tFREED_RES\020"
-  "\003b\006proto3"
+  "(\010\022\027\n\017have_virtual_ip\030\002 \001(\010\",\n\016DataColle"
+  "ction\022\014\n\004size\030\001 \001(\005\022\014\n\004data\030\002 \001(\t\"\317\001\n\tTr"
+  "ansData\022\030\n\004type\030\001 \001(\0162\n.TransType\022\014\n\004siz"
+  "e\030\002 \001(\005\022-\n\021trans_action_data\030\003 \001(\0132\020.Tra"
+  "nsActionDataH\000\0221\n\023server_status_datas\030\004 "
+  "\001(\0132\022.ServerStatusDatasH\000\022*\n\017data_collec"
+  "tion\030\005 \001(\0132\017.DataCollectionH\000B\014\n\ndata_on"
+  "eof\"5\n\010Telegram\022\017\n\007version\030\001 \001(\t\022\030\n\004data"
+  "\030\002 \001(\0132\n.TransData*\206\001\n\tTransType\022\r\n\tHEAR"
+  "TBEAT\020\000\022\n\n\006ACTION\020\001\022\025\n\021GET_SERVER_STATUS"
+  "\020\002\022\014\n\010GET_DATA\020\003\022\020\n\014REPLY_ACTION\020\004\022\027\n\023RE"
+  "PLY_SERVER_STATUS\020\005\022\016\n\nREPLY_DATA\020\006*C\n\nA"
+  "ctionType\022\013\n\007GET_RES\020\000\022\013\n\007GOT_RES\020\001\022\014\n\010F"
+  "REE_RES\020\002\022\r\n\tFREED_RES\020\003b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_telegram_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_telegram_2eproto_sccs[4] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_telegram_2eproto_sccs[5] = {
+  &scc_info_DataCollection_telegram_2eproto.base,
   &scc_info_ServerStatusDatas_telegram_2eproto.base,
   &scc_info_Telegram_telegram_2eproto.base,
   &scc_info_TransActionData_telegram_2eproto.base,
@@ -175,10 +206,10 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tel
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_telegram_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_telegram_2eproto = {
-  false, false, descriptor_table_protodef_telegram_2eproto, "telegram.proto", 609,
-  &descriptor_table_telegram_2eproto_once, descriptor_table_telegram_2eproto_sccs, descriptor_table_telegram_2eproto_deps, 4, 0,
+  false, false, descriptor_table_protodef_telegram_2eproto, "telegram.proto", 672,
+  &descriptor_table_telegram_2eproto_once, descriptor_table_telegram_2eproto_sccs, descriptor_table_telegram_2eproto_deps, 5, 0,
   schemas, file_default_instances, TableStruct_telegram_2eproto::offsets,
-  file_level_metadata_telegram_2eproto, 4, file_level_enum_descriptors_telegram_2eproto, file_level_service_descriptors_telegram_2eproto,
+  file_level_metadata_telegram_2eproto, 5, file_level_enum_descriptors_telegram_2eproto, file_level_service_descriptors_telegram_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -678,18 +709,255 @@ void ServerStatusDatas::InternalSwap(ServerStatusDatas* other) {
 
 // ===================================================================
 
+void DataCollection::InitAsDefaultInstance() {
+}
+class DataCollection::_Internal {
+ public:
+};
+
+DataCollection::DataCollection(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:DataCollection)
+}
+DataCollection::DataCollection(const DataCollection& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_data().empty()) {
+    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_data(),
+      GetArena());
+  }
+  size_ = from.size_;
+  // @@protoc_insertion_point(copy_constructor:DataCollection)
+}
+
+void DataCollection::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_DataCollection_telegram_2eproto.base);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  size_ = 0;
+}
+
+DataCollection::~DataCollection() {
+  // @@protoc_insertion_point(destructor:DataCollection)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void DataCollection::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void DataCollection::ArenaDtor(void* object) {
+  DataCollection* _this = reinterpret_cast< DataCollection* >(object);
+  (void)_this;
+}
+void DataCollection::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void DataCollection::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const DataCollection& DataCollection::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_DataCollection_telegram_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void DataCollection::Clear() {
+// @@protoc_insertion_point(message_clear_start:DataCollection)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  size_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DataCollection::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 size = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          size_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string data = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_data();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "DataCollection.data"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* DataCollection::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:DataCollection)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 size = 1;
+  if (this->size() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_size(), target);
+  }
+
+  // string data = 2;
+  if (this->data().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_data().data(), static_cast<int>(this->_internal_data().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "DataCollection.data");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:DataCollection)
+  return target;
+}
+
+size_t DataCollection::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:DataCollection)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string data = 2;
+  if (this->data().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_data());
+  }
+
+  // int32 size = 1;
+  if (this->size() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_size());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void DataCollection::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:DataCollection)
+  GOOGLE_DCHECK_NE(&from, this);
+  const DataCollection* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<DataCollection>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:DataCollection)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:DataCollection)
+    MergeFrom(*source);
+  }
+}
+
+void DataCollection::MergeFrom(const DataCollection& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:DataCollection)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.data().size() > 0) {
+    _internal_set_data(from._internal_data());
+  }
+  if (from.size() != 0) {
+    _internal_set_size(from._internal_size());
+  }
+}
+
+void DataCollection::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:DataCollection)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DataCollection::CopyFrom(const DataCollection& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:DataCollection)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DataCollection::IsInitialized() const {
+  return true;
+}
+
+void DataCollection::InternalSwap(DataCollection* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  data_.Swap(&other->data_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(size_, other->size_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DataCollection::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 void TransData::InitAsDefaultInstance() {
   ::_TransData_default_instance_.trans_action_data_ = const_cast< ::TransActionData*>(
       ::TransActionData::internal_default_instance());
   ::_TransData_default_instance_.server_status_datas_ = const_cast< ::ServerStatusDatas*>(
       ::ServerStatusDatas::internal_default_instance());
-  ::_TransData_default_instance_.data_collection_.UnsafeSetDefault(
-      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  ::_TransData_default_instance_.data_collection_ = const_cast< ::DataCollection*>(
+      ::DataCollection::internal_default_instance());
 }
 class TransData::_Internal {
  public:
   static const ::TransActionData& trans_action_data(const TransData* msg);
   static const ::ServerStatusDatas& server_status_datas(const TransData* msg);
+  static const ::DataCollection& data_collection(const TransData* msg);
 };
 
 const ::TransActionData&
@@ -699,6 +967,10 @@ TransData::_Internal::trans_action_data(const TransData* msg) {
 const ::ServerStatusDatas&
 TransData::_Internal::server_status_datas(const TransData* msg) {
   return *msg->data_oneof_.server_status_datas_;
+}
+const ::DataCollection&
+TransData::_Internal::data_collection(const TransData* msg) {
+  return *msg->data_oneof_.data_collection_;
 }
 void TransData::set_allocated_trans_action_data(::TransActionData* trans_action_data) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
@@ -730,6 +1002,21 @@ void TransData::set_allocated_server_status_datas(::ServerStatusDatas* server_st
   }
   // @@protoc_insertion_point(field_set_allocated:TransData.server_status_datas)
 }
+void TransData::set_allocated_data_collection(::DataCollection* data_collection) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_data_oneof();
+  if (data_collection) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(data_collection);
+    if (message_arena != submessage_arena) {
+      data_collection = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, data_collection, submessage_arena);
+    }
+    set_has_data_collection();
+    data_oneof_.data_collection_ = data_collection;
+  }
+  // @@protoc_insertion_point(field_set_allocated:TransData.data_collection)
+}
 TransData::TransData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
@@ -753,7 +1040,7 @@ TransData::TransData(const TransData& from)
       break;
     }
     case kDataCollection: {
-      _internal_set_data_collection(from._internal_data_collection());
+      _internal_mutable_data_collection()->::DataCollection::MergeFrom(from._internal_data_collection());
       break;
     }
     case DATA_ONEOF_NOT_SET: {
@@ -815,7 +1102,9 @@ void TransData::clear_data_oneof() {
       break;
     }
     case kDataCollection: {
-      data_oneof_.data_collection_.Destroy(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+      if (GetArena() == nullptr) {
+        delete data_oneof_.data_collection_;
+      }
       break;
     }
     case DATA_ONEOF_NOT_SET: {
@@ -876,11 +1165,10 @@ const char* TransData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // bytes data_collection = 5;
+      // .DataCollection data_collection = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          auto str = _internal_mutable_data_collection();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ctx->ParseMessage(_internal_mutable_data_collection(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -941,10 +1229,12 @@ failure:
         4, _Internal::server_status_datas(this), target, stream);
   }
 
-  // bytes data_collection = 5;
+  // .DataCollection data_collection = 5;
   if (_internal_has_data_collection()) {
-    target = stream->WriteBytesMaybeAliased(
-        5, this->_internal_data_collection(), target);
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::data_collection(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -991,11 +1281,11 @@ size_t TransData::ByteSizeLong() const {
           *data_oneof_.server_status_datas_);
       break;
     }
-    // bytes data_collection = 5;
+    // .DataCollection data_collection = 5;
     case kDataCollection: {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
-          this->_internal_data_collection());
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *data_oneof_.data_collection_);
       break;
     }
     case DATA_ONEOF_NOT_SET: {
@@ -1049,7 +1339,7 @@ void TransData::MergeFrom(const TransData& from) {
       break;
     }
     case kDataCollection: {
-      _internal_set_data_collection(from._internal_data_collection());
+      _internal_mutable_data_collection()->::DataCollection::MergeFrom(from._internal_data_collection());
       break;
     }
     case DATA_ONEOF_NOT_SET: {
@@ -1354,6 +1644,9 @@ template<> PROTOBUF_NOINLINE ::TransActionData* Arena::CreateMaybeMessage< ::Tra
 }
 template<> PROTOBUF_NOINLINE ::ServerStatusDatas* Arena::CreateMaybeMessage< ::ServerStatusDatas >(Arena* arena) {
   return Arena::CreateMessageInternal< ::ServerStatusDatas >(arena);
+}
+template<> PROTOBUF_NOINLINE ::DataCollection* Arena::CreateMaybeMessage< ::DataCollection >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::DataCollection >(arena);
 }
 template<> PROTOBUF_NOINLINE ::TransData* Arena::CreateMaybeMessage< ::TransData >(Arena* arena) {
   return Arena::CreateMessageInternal< ::TransData >(arena);

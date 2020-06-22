@@ -19,7 +19,7 @@
 #define VIRTUAL_IP "192.168.231.155"
 
 // 每发送10次none包，便向服务端询问一次服务状态
-#define GET_STATUS_TIME_INTERVAL    30
+#define GET_STATUS_TIME_INTERVAL    6
 
 
 int keepalive = KEEYALIVE;
@@ -59,7 +59,7 @@ int start_by_client_mode(void)
     struct timeval tv;
     tv.tv_sec = deadtime;
 
-#pragma region client_create_connect
+#pragma region client_create_connect    //客户端创建连接
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
@@ -73,14 +73,16 @@ int start_by_client_mode(void)
     ret = connect(cfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 #pragma endregion client_create_connect
 
-#pragma region client_connect_fail
+#pragma region client_connect_fail  // 客户端创建连接失败
     if (ret == -1) {
         perror("connect server error");
 
         // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
         if (try_time_sum >= deadtime) {
             // 测试 直接退出 多次尝试均不能连通，所以根据“nolink“策略进行操作资源
-            printf("Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy!\n");
+            printf("---------------------------------------------------------------------------------------------------------\n");
+            printf("| Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy! |\n");
+            printf("---------------------------------------------------------------------------------------------------------\n");
 
             SERVER_STATUS_DATAS datas = {0};
             get_local_server_status_datas(&datas);
@@ -92,19 +94,27 @@ int start_by_client_mode(void)
                 if (!client_resources_takeover_status) {
                     take_over_resources("192.168.231.155", "ens33");
                     client_resources_takeover_status = true;
-                    printf("client take over resource\n");
+                    printf("-----------------------------\n");
+                    printf("| client take over resource |\n");
+                    printf("-----------------------------\n");
                 } else {
-                    printf("client take over resource already\n");
+                    printf("-------------------------------------\n");
+                    printf("| client take over resource already |\n");
+                    printf("-------------------------------------\n");
                 }
 
             } else {
                 // release
                 if (!client_resources_takeover_status) {
-                    printf("client release resource already\n");
+                    printf("-----------------------------------\n");
+                    printf("| client release resource already |\n");
+                    printf("-----------------------------------\n");
                 } else {
                     release_resources("192.168.231.155", "ens33");
                     client_resources_takeover_status = false;
-                    printf("client release resource\n");
+                    printf("---------------------------\n");
+                    printf("| client release resource |\n");
+                    printf("---------------------------\n");
                 }
 
             }
@@ -119,26 +129,32 @@ int start_by_client_mode(void)
     }
 #pragma endregion client_connect_fail
 
-#pragma region client_connect_success
+#pragma region client_connect_success   // 客户端创建连接成功
+
+#pragma region client_construct_first_data  // 客户端构造连接成功后的第一次发包内容
     // 向服务端发包
     TRANS_DATA *send_data;
     // 第一次发包时，先询问一次服务端的状态
     send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
 //    trans_data_set_none(send_data);
     trans_data_set_get_server_status(send_data);
+#pragma endregion client_construct_first_data
     while (1) {
+#pragma region client_send_data        // 客户端向server发送数据
+        // 1. 将要发送的数据序列化
         std::string serialized_data;
         size_t serialized_data_size;
 
         make_telegram(send_data, serialized_data, &serialized_data_size);
 
+        // 2. 发送数据
         n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
         // 释放内存
         if (send_data) {
             free(send_data);
             send_data = NULL;
         }
-
+#pragma endregion client_send_data
         fd_set set;
         FD_ZERO(&set);
         FD_SET(cfd, &set);
@@ -146,10 +162,16 @@ int start_by_client_mode(void)
         ret = select(cfd + 1, &set, NULL, NULL, &tv);
 
         if (ret == -1) {
-            printf("select cfd error\n");
+            printf("--------------------\n");
+            printf("| select cfd error |\n");
+            printf("--------------------\n");
             break;
         } else if (ret == 0) {
-            printf("select cfd time out\n");
+#pragma region client_read_timeout  // 客户端等待server返回信息超时
+            printf("-----------------------\n");
+            printf("| select cfd time out |\n");
+            printf("-----------------------\n");
+
             SERVER_STATUS_DATAS datas = {0};
             get_local_server_status_datas(&datas);
 
@@ -160,19 +182,27 @@ int start_by_client_mode(void)
                 if (!client_resources_takeover_status) {
                     take_over_resources("192.168.231.155", "ens33");
                     client_resources_takeover_status = true;
-                    printf("client take over resource\n");
+                    printf("-----------------------------\n");
+                    printf("| client take over resource |\n");
+                    printf("-----------------------------\n");
                 } else {
-                    printf("client take over resource already\n");
+                    printf("-------------------------------------\n");
+                    printf("| client take over resource already |\n");
+                    printf("-------------------------------------\n");
                 }
 
             } else {
                 // release
                 if (!client_resources_takeover_status) {
-                    printf("client release resource already\n");
+                    printf("-----------------------------------\n");
+                    printf("| client release resource already |\n");
+                    printf("-----------------------------------\n");
                 } else {
                     release_resources("192.168.231.155", "ens33");
                     client_resources_takeover_status = false;
-                    printf("client release resource\n");
+                    printf("---------------------------\n");
+                    printf("| client release resource |\n");
+                    printf("---------------------------\n");
                 }
 
             }
@@ -180,12 +210,16 @@ int start_by_client_mode(void)
             trans_data_set_none(next_send_data);
             send_data = next_send_data;
             continue;
+#pragma endregion client_read_timeout
         } else {
             bzero(buf, BUFSIZ);
             n = Read(cfd, buf, n);
+#pragma region server_closed_connect    // 客户端发现server关闭了连接
             if (n == 0) {
                 // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
-                printf("server colse connect\n");
+                printf("------------------------\n");
+                printf("| server colse connect |\n");
+                printf("------------------------\n");
                 close(cfd);
                 SERVER_STATUS_DATAS datas = {0};
                 get_local_server_status_datas(&datas);
@@ -197,32 +231,46 @@ int start_by_client_mode(void)
                     if (!client_resources_takeover_status) {
                         take_over_resources("192.168.231.155", "ens33");
                         client_resources_takeover_status = true;
-                        printf("client take over resource\n");
+                        printf("-----------------------------\n");
+                        printf("| client take over resource |\n");
+                        printf("-----------------------------\n");
                     } else {
-                        printf("client take over resource already\n");
+                        printf("-------------------------------------\n");
+                        printf("| client take over resource already |\n");
+                        printf("-------------------------------------\n");
                     }
 
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
-                        printf("client release resource already\n");
+                        printf("-----------------------------------\n");
+                        printf("| client release resource already |\n");
+                        printf("-----------------------------------\n");
                     } else {
                         release_resources("192.168.231.155", "ens33");
                         client_resources_takeover_status = false;
-                        printf("client release resource\n");
+                        printf("---------------------------\n");
+                        printf("| client release resource |\n");
+                        printf("---------------------------\n");
                     }
 
                 }
                 goto reconnect;
             }
+#pragma endregion server_closed_connect
 
-            // 开始处理从服务器返回的包
+#pragma region client_read_success      // 客户端正常处理从server返回的数据
+            // 开始处理从服务器返回的数据
+
+            // 1. 反序列化数据
             unsigned char * parsed_buf;
             std::string sbuf;
             sbuf.assign(buf, n);
-            parse_telegram(sbuf, n, reinterpret_cast<void **>(&parsed_buf));
+            parse_telegram(sbuf, n, (void **)(&parsed_buf));
 
-            trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
+            // 2. 根据收到的数据生成下次要发送的数据
+            trans_data_generator(parsed_buf, (void **)(&next_send_data));
+            free(parsed_buf);
 
             if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
                 none_package_send_times++;
@@ -237,6 +285,9 @@ int start_by_client_mode(void)
 
             // 休眠 keepalive的时间再发
             sleep(keepalive);
+
+            // 3. 转到while开始处序列化数据并发送
+#pragma endregion client_read_success
         }
 
     }
@@ -255,7 +306,7 @@ int start_by_server_mode(void)
     struct sockaddr_in client_addr;
     struct timeval tv;
 
-#pragma region server_pre_create_connect
+#pragma region server_pre_create_connect    // 设置端口复用等
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(5555);
@@ -342,6 +393,7 @@ int start_by_server_mode(void)
                     close(cfd);
                     break;
                 } else if (ret == 0) {
+#pragma region server_recv_timeout      // server等待从client来的信息超时
                     printf("time out\n");
                     SERVER_STATUS_DATAS datas = {0};
                     get_local_server_status_datas(&datas);
@@ -371,13 +423,16 @@ int start_by_server_mode(void)
 
                     close(cfd);
                     break;
+#pragma endregion server_recv_timeout
                 } else {
-#pragma region server_recv
+#pragma region server_recv      // server 正常收到从client来的数据
                     n = Read(cfd, buf, sizeof(buf));
-#pragma region client_close
+#pragma region client_closed_connect        // server发现client关闭了连接
                     if (n == 0) {
                         // 如果客户端关闭的连接，也接管资源
-                        printf("client close connect!\n");
+                        printf("-------------------------\n");
+                        printf("| client close connect! |\n");
+                        printf("-------------------------\n");
                         SERVER_STATUS_DATAS datas = {0};
                         get_local_server_status_datas(&datas);
 
@@ -388,43 +443,57 @@ int start_by_server_mode(void)
                             if (!server_resources_takeover_status) {
                                 take_over_resources("192.168.231.155", "ens33");
                                 server_resources_takeover_status = true;
-                                printf("server take over resource\n");
+                                printf("-----------------------------\n");
+                                printf("| server take over resource |\n");
+                                printf("-----------------------------\n");
                             } else {
-                                printf("server take over resource already\n");
+                                printf("-------------------------------------\n");
+                                printf("| server take over resource already |\n");
+                                printf("-------------------------------------\n");
                             }
 
                         } else {
                             // release
                             if (!server_resources_takeover_status) {
-                                printf("server release resource already\n");
+                                printf("-----------------------------------\n");
+                                printf("| server release resource already |\n");
+                                printf("-----------------------------------\n");
                             } else {
                                 release_resources("192.168.231.155", "ens33");
                                 server_resources_takeover_status = false;
-                                printf("server release resource\n");
+                                printf("---------------------------\n");
+                                printf("| server release resource |\n");
+                                printf("---------------------------\n");
                             }
                         }
                         close(cfd);
                         break;
                     }
-#pragma endregion client_close
-                    // 服务端开始处理收到的包
-                    TRANS_DATA *next_send_data;
+#pragma endregion client_closed_connect
+                    // 服务端开始处理收到的数据
 
+                    TRANS_DATA *next_send_data;
+                    // 1. 反序列化数据
                     unsigned char * parsed_buf;
                     std::string sbuf;
                     sbuf.assign(buf, n);
-                    parse_telegram(sbuf, n, reinterpret_cast<void **>(&parsed_buf));
+                    parse_telegram(sbuf, n, (void **)(&parsed_buf));
 
-                    trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
+                    // 2. 根据收到的数据生成下次要发送的数据
+                    trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                    free(parsed_buf);
 
+                    // 3. 序列化数据
                     std::string serialized_data;
                     size_t serialized_data_size;
-
                     make_telegram(next_send_data, serialized_data, &serialized_data_size);
 
+                    // 4. 发送数据
                     n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
 
-                    printf("server send %d bytes datas to client\n", n);
+                    printf("----------------------------------------\n");
+                    printf("| server send %d bytes datas to client |\n", n);
+                    printf("----------------------------------------\n");
 #pragma endregion server_recv
                 }
 
@@ -512,7 +581,7 @@ int main(int argc, char *argv[])
     printf("start mode %s\n", mode);
     printf("---------------------------------------\n");
 #pragma endregion main_read_config
-    
+
     if (b_mode_set) {
 // 只有两种启动方式，client server
         if (strcmp(mode, "client") == 0)

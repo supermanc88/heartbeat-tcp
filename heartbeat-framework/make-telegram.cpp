@@ -1,6 +1,6 @@
-//
-// Created by CHM on 2020/6/22.
-//
+/**
+ * 序列化和反序列化数据
+ */
 
 #include "make-telegram.h"
 #include "telegram.pb.h"
@@ -55,13 +55,17 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size)
         case TRANS_TYPE_GET_DATA: {
             telegram_transdata.set_type(GET_DATA);
             telegram_transdata.set_size(pdata->size);
+            telegram_transdata.mutable_data_collection()->set_size(3);
+            telegram_transdata.mutable_data_collection()->set_data("get");
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
             telegram_transdata.set_type(REPLY_DATA);
             telegram_transdata.set_size(pdata->size);
-            telegram_transdata.mutable_data_collection()->assign(pdata->data,
-                                                                 pdata->size - (size_t) (&((TRANS_DATA *) 0)->data));
+//            telegram_transdata.mutable_data_collection()->assign(pdata->data,
+//                                                                 pdata->size - (size_t) (&((TRANS_DATA *) 0)->data));
+            telegram_transdata.mutable_data_collection()->set_size(5);
+            telegram_transdata.mutable_data_collection()->set_data("reply");
         }
             break;
         default: {
