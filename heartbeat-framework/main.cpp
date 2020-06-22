@@ -12,6 +12,7 @@
 #include "hbconf.h"
 #include "resource-mgr/resource-mgr.h"
 #include "plugin-mgr/plugin-manager.h"
+#include "make-telegram.h"
 
 
 #define SERVER_IP "192.168.231.132"
@@ -121,7 +122,12 @@ int start_by_client_mode(void)
 //    trans_data_set_none(send_data);
     trans_data_set_get_server_status(send_data);
     while (1) {
-        n = Write(cfd, send_data, send_data->size);
+        unsigned char * serialized_data;
+        size_t serialized_data_size;
+
+        make_telegram(send_data, reinterpret_cast<void **>(&serialized_data), &serialized_data_size);
+
+        n = Write(cfd, reinterpret_cast<void *>(serialized_data_size), serialized_data_size);
         // 释放内存
         if (send_data) {
             free(send_data);
@@ -166,6 +172,7 @@ int start_by_client_mode(void)
 
             }
             next_send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
+            trans_data_set_none(next_send_data);
             send_data = next_send_data;
             continue;
         } else {
@@ -204,7 +211,10 @@ int start_by_client_mode(void)
             }
 
             // 开始处理从服务器返回的包
-            trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+            unsigned char * parsed_buf;
+            parse_telegram(buf, n, reinterpret_cast<void **>(&parsed_buf));
+
+            trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
 
             if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
                 none_package_send_times++;
@@ -385,9 +395,17 @@ int start_by_server_mode(void)
                     // 服务端开始处理收到的包
                     TRANS_DATA *next_send_data;
 
-                    trans_data_generator(buf, reinterpret_cast<void **>(&next_send_data));
+                    unsigned char * parsed_buf;
+                    parse_telegram(buf, n, reinterpret_cast<void **>(&parsed_buf));
 
-                    n = Write(cfd, next_send_data, next_send_data->size);
+                    trans_data_generator(parsed_buf, reinterpret_cast<void **>(&next_send_data));
+
+                    unsigned char * serialized_data;
+                    size_t serialized_data_size;
+
+                    make_telegram(next_send_data, reinterpret_cast<void **>(&serialized_data), &serialized_data_size);
+
+                    n = Write(cfd, serialized_data, serialized_data_size);
 
                     printf("server send %d bytes datas to client\n", n);
                 }

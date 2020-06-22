@@ -6,6 +6,8 @@ project(heartbeat-framework VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 11)
 
+include_directories(protobuf-src)
+
 set(SRC_PATH
         main.cpp
         wrap.cpp
@@ -13,12 +15,17 @@ set(SRC_PATH
         wrap.h
         hbconf.cpp
         hbconf.h
+        telegram.pb.cc
         resource-mgr/resource-mgr.cpp
-        plugin-mgr/plugin-manager.cpp)
+        plugin-mgr/plugin-manager.cpp
+        make-telegram.cpp
+        make-telegram.h)
 
 add_executable(heartbeat-framework  ${SRC_PATH})
 
 target_link_libraries(heartbeat-framework dl)
+
+target_link_libraries(heartbeat-framework protobuf)
 
 #add_executable(hbconf hbconf.cpp hbconf.h)
 
