@@ -4,6 +4,7 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string>
 #include <arpa/inet.h>
 
 
@@ -28,6 +29,9 @@ int warntime = WARNTIME;
 int initdead = INITDEAD;
 int server_port = SERVERPORT;
 bool auto_failback = true;
+char server_addr[BUFSIZ] = SERVER_IP;
+char virtual_ip[BUFSIZ] = VIRTUAL_IP;
+char ethernet_name[BUFSIZ] = "ens33";
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -63,7 +67,7 @@ int start_by_client_mode(void)
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-    inet_pton(AF_INET, SERVER_IP, &i_addr);
+    inet_pton(AF_INET, server_addr, &i_addr);
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(5555);
@@ -92,7 +96,7 @@ int start_by_client_mode(void)
                 // do nothing
             } else if (act == NOLINK_ACT_TAKEOVER) {
                 if (!client_resources_takeover_status) {
-                    take_over_resources("192.168.231.155", "ens33");
+                    take_over_resources(virtual_ip, ethernet_name);
                     client_resources_takeover_status = true;
                     printf("-----------------------------\n");
                     printf("| client take over resource |\n");
@@ -110,7 +114,7 @@ int start_by_client_mode(void)
                     printf("| client release resource already |\n");
                     printf("-----------------------------------\n");
                 } else {
-                    release_resources("192.168.231.155", "ens33");
+                    release_resources(virtual_ip, ethernet_name);
                     client_resources_takeover_status = false;
                     printf("---------------------------\n");
                     printf("| client release resource |\n");
@@ -182,7 +186,7 @@ int start_by_client_mode(void)
                 // do nothing
             } else if (act == NOLINK_ACT_TAKEOVER) {
                 if (!client_resources_takeover_status) {
-                    take_over_resources("192.168.231.155", "ens33");
+                    take_over_resources(virtual_ip, ethernet_name);
                     client_resources_takeover_status = true;
                     printf("-----------------------------\n");
                     printf("| client take over resource |\n");
@@ -200,7 +204,7 @@ int start_by_client_mode(void)
                     printf("| client release resource already |\n");
                     printf("-----------------------------------\n");
                 } else {
-                    release_resources("192.168.231.155", "ens33");
+                    release_resources(virtual_ip, ethernet_name);
                     client_resources_takeover_status = false;
                     printf("---------------------------\n");
                     printf("| client release resource |\n");
@@ -232,7 +236,7 @@ int start_by_client_mode(void)
                     // do nothing
                 } else if (act == NOLINK_ACT_TAKEOVER) {
                     if (!client_resources_takeover_status) {
-                        take_over_resources("192.168.231.155", "ens33");
+                        take_over_resources(virtual_ip, ethernet_name);
                         client_resources_takeover_status = true;
                         printf("-----------------------------\n");
                         printf("| client take over resource |\n");
@@ -250,7 +254,7 @@ int start_by_client_mode(void)
                         printf("| client release resource already |\n");
                         printf("-----------------------------------\n");
                     } else {
-                        release_resources("192.168.231.155", "ens33");
+                        release_resources(virtual_ip, ethernet_name);
                         client_resources_takeover_status = false;
                         printf("---------------------------\n");
                         printf("| client release resource |\n");
@@ -359,7 +363,7 @@ int start_by_server_mode(void)
                 // do nothing
             } else if (act == NOLINK_ACT_TAKEOVER) {
                 if (!server_resources_takeover_status) {
-                    take_over_resources("192.168.231.155", "ens33");
+                    take_over_resources(virtual_ip, ethernet_name);
                     server_resources_takeover_status = true;
                     printf("server take over resource\n");
                 } else {
@@ -371,7 +375,7 @@ int start_by_server_mode(void)
                 if (!server_resources_takeover_status) {
                     printf("server release resource already\n");
                 } else {
-                    release_resources("192.168.231.155", "ens33");
+                    release_resources(virtual_ip, ethernet_name);
                     server_resources_takeover_status = false;
                     printf("server release resource\n");
                 }
@@ -411,7 +415,7 @@ int start_by_server_mode(void)
                         // do nothing
                     } else if (act == NOLINK_ACT_TAKEOVER) {
                         if (!server_resources_takeover_status) {
-                            take_over_resources("192.168.231.155", "ens33");
+                            take_over_resources(virtual_ip, ethernet_name);
                             server_resources_takeover_status = true;
                             printf("server take over resource\n");
                         } else {
@@ -423,7 +427,7 @@ int start_by_server_mode(void)
                         if (!server_resources_takeover_status) {
                             printf("server release resource already\n");
                         } else {
-                            release_resources("192.168.231.155", "ens33");
+                            release_resources(virtual_ip, ethernet_name);
                             server_resources_takeover_status = false;
                             printf("server release resource\n");
                         }
@@ -454,7 +458,7 @@ int start_by_server_mode(void)
                             // do nothing
                         } else if (act == NOLINK_ACT_TAKEOVER) {
                             if (!server_resources_takeover_status) {
-                                take_over_resources("192.168.231.155", "ens33");
+                                take_over_resources(virtual_ip, ethernet_name);
                                 server_resources_takeover_status = true;
                                 printf("-----------------------------\n");
                                 printf("| server take over resource |\n");
@@ -472,7 +476,7 @@ int start_by_server_mode(void)
                                 printf("| server release resource already |\n");
                                 printf("-----------------------------------\n");
                             } else {
-                                release_resources("192.168.231.155", "ens33");
+                                release_resources(virtual_ip, ethernet_name);
                                 server_resources_takeover_status = false;
                                 printf("---------------------------\n");
                                 printf("| server release resource |\n");
@@ -564,6 +568,10 @@ int main(int argc, char *argv[])
 #pragma region main_read_config
     // 读取配置,不成功就使用默认配置
     HBConfig hb;
+    char p_hostname[BUFSIZ];
+    char b_hostname[BUFSIZ];
+    char ping_target[BUFSIZ];
+    char ucast[BUFSIZ];
     if (RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r")) {
         char value[20] = {0};
         if (hb.GetValue("keepalive", value) == RET_SUCCESS)
@@ -580,12 +588,36 @@ int main(int argc, char *argv[])
             else
                 auto_failback = false;
         }
+        if (hb.GetValue("node", value) == RET_SUCCESS)
+            strcpy(p_hostname, value);
+        if (hb.GetValue("node-backup", value) == RET_SUCCESS)
+            strcpy(b_hostname, value);
+        if (hb.GetValue("ping", value) == RET_SUCCESS)
+            strcpy(ping_target, value);
+        if (hb.GetValue("server_port", value) == RET_SUCCESS)
+            server_port = atoi(value);
+        if (hb.GetValue("ucast", value) == RET_SUCCESS)
+            strcpy(ucast, value);
     }
     hb.CloseFile();
 
-    printf("---------------------------------------\n");
+    printf("-------------------------------------------------------------------\n");
     printf("deadtime = %d, keepalive = %d\n", deadtime, keepalive);
-    printf("---------------------------------------\n");
+    printf("primary hostname = %s, backup hostname = %s\n", p_hostname, b_hostname);
+    printf("ping_target = %s, server_port = %d\n", ping_target, server_port);
+    printf("ucast = %s\n", ucast);
+    printf("-------------------------------------------------------------------\n");
+
+
+    std::string saddr;
+    saddr.assign(ucast);
+    int offset = saddr.find(" ");
+    if( offset != std::string::npos) {
+        strcpy(server_addr, saddr.substr(offset+1).c_str());
+    }
+
+    printf("server_addr = %s\n", server_addr);
+    printf("-------------------------------------------------------------------\n");
 
     // 读取补充配置
     HBConfig hb_extra;
@@ -598,7 +630,28 @@ int main(int argc, char *argv[])
 
     printf("start mode %s\n", mode);
     printf("---------------------------------------\n");
+
+    /*************************/
+    // 获取hostname 用户判断主备机
+    char hostname[BUFSIZ];
+    gethostname(hostname, BUFSIZ);
+
+    printf("hostname = %s\n", hostname);
+    printf("---------------------------------------\n");
+    /*************************/
+
 #pragma endregion main_read_config
+
+#pragma region start_mode // 启动方式
+    bzero(mode, 0);
+    if (strcmp(hostname, p_hostname) == 0) {
+        strcpy(mode, "client");
+    } else {
+        strcpy(mode, "server");
+    }
+
+    printf("start mode = %s\n", mode);
+    printf("---------------------------------------\n");
 
     if (b_mode_set) {
 // 只有两种启动方式，client server
@@ -612,7 +665,7 @@ int main(int argc, char *argv[])
         }
     } else          // 如果没有设置-m参数，则默认以client形式启动
         start_by_client_mode();
-
+#pragma endregion start_mode
 
     return 0;
 }

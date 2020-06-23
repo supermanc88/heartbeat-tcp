@@ -75,10 +75,16 @@ HB_RET HBConfig::ParseFile() {
             ClearHeadTailSpace(skey);
             ClearHeadTailSpace(svalue);
 
-//            std::cout << skey << std::endl;
-//            std::cout << svalue <<std::endl;
+            if(skey.compare("node") == 0) {
+                if (keymap.count("node") > 0) {
+                    keymap["node-backup"] = svalue;
+                } else {
+                    keymap["node"] = svalue;
+                }
+            } else {
+                keymap[skey] = svalue;
+            }
 
-            keymap[skey] = svalue;
         }
         if(space_pos = sline.find("\t"), std::string::npos != space_pos) {
             std::string skey = sline.substr(0, space_pos);
@@ -87,10 +93,15 @@ HB_RET HBConfig::ParseFile() {
             ClearHeadTailSpace(skey);
             ClearHeadTailSpace(svalue);
 
-//            std::cout << skey << std::endl;
-//            std::cout << svalue <<std::endl;
-
-            keymap[skey] = svalue;
+            if(skey.compare("node") == 0) {
+                if (keymap.count("node") > 0) {
+                    keymap["node-backup"] = svalue;
+                } else {
+                    keymap["node"] = svalue;
+                }
+            } else {
+                keymap[skey] = svalue;
+            }
         }
 
 

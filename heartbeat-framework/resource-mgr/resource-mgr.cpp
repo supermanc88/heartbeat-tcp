@@ -19,6 +19,9 @@ bool client_resources_takeover_status = false;
 bool server_resources_takeover_status = false;
 
 extern bool auto_failback;
+extern char server_addr[BUFSIZ];
+extern char virtual_ip[BUFSIZ];
+extern char ethernet_name[BUFSIZ];
 
 //int main(void)
 //{
@@ -89,7 +92,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == ACTION_TYPE_GET_RES) {
                 printf("server recv get res,so server start take over the resources\n");
-                take_over_resources("192.168.231.155", "ens33");
+                take_over_resources(virtual_ip, ethernet_name);
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
@@ -99,7 +102,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
             } else if (action_type == ACTION_TYPE_FREE_RES) {
                 printf("server recv free res,so server start release the resources\n");
-                release_resources("192.168.231.155", "ens33");
+                release_resources(virtual_ip, ethernet_name);
                 server_resources_takeover_status = false;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
@@ -154,7 +157,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else if (action_type == ACTION_TYPE_FREED_RES) {
                 // 开始接管资源
                 printf("server reply freed resource,so client start take over the resources\n");
-                take_over_resources("192.168.231.155", "ens33");
+                take_over_resources(virtual_ip, ethernet_name);
                 client_resources_takeover_status = true;
             } else {
                 // nothing!
@@ -176,7 +179,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             if (policy == LINK_ACT_DO_NOTHING) {
                 printf("send data type: TRANS_TYPE_HEARTBEAT\n");
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
-                release_resources("192.168.231.155", "ens33");
+                release_resources(virtual_ip, ethernet_name);
                 client_resources_takeover_status = false;
                 printf("send data type: TRANS_TYPE_ACTION\n");
             } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
@@ -351,7 +354,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
     // 这里运行一次本地的插件获取状态
     printf("get_local_server_status_datas...\n");
 
-    char * vip = "192.168.231.155";
+    char * vip = virtual_ip;
     // 这里通过check-vip程序来获取本机是否有虚ip
     sprintf(cmd_str, "./check-virtual-ip %s", vip);
 
