@@ -10,7 +10,7 @@
 /**
  * 默认数值
  */
-#define KEEYALIVE           10
+#define KEEYALIVE           2
 #define DEADTIME            30
 #define WARNTIME            10
 #define INITDEAD            120

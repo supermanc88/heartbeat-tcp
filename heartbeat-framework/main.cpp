@@ -19,7 +19,7 @@
 #define VIRTUAL_IP "192.168.231.155"
 
 // 每发送10次none包，便向服务端询问一次服务状态
-#define GET_STATUS_TIME_INTERVAL    6
+#define GET_STATUS_TIME_INTERVAL    10
 
 
 int keepalive = KEEYALIVE;
@@ -165,7 +165,9 @@ int start_by_client_mode(void)
             printf("--------------------\n");
             printf("| select cfd error |\n");
             printf("--------------------\n");
-            break;
+            // 出错就直接重新和server建立一个连接
+            close(cfd);
+            goto reconnect;
         } else if (ret == 0) {
 #pragma region client_read_timeout  // 客户端等待server返回信息超时
             printf("-----------------------\n");
@@ -213,9 +215,10 @@ int start_by_client_mode(void)
 #pragma endregion client_read_timeout
         } else {
             bzero(buf, BUFSIZ);
-            n = Read(cfd, buf, n);
-#pragma region server_closed_connect    // 客户端发现server关闭了连接
+            n = Read(cfd, buf, BUFSIZ);
+
             if (n == 0) {
+#pragma region server_closed_connect    // 客户端发现server关闭了连接
                 // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
                 printf("------------------------\n");
                 printf("| server colse connect |\n");
@@ -256,38 +259,43 @@ int start_by_client_mode(void)
 
                 }
                 goto reconnect;
-            }
 #pragma endregion server_closed_connect
-
+            } else if (n == -1) {
+                perror("read error");
+                close(cfd);
+                goto reconnect;
+            } else {
 #pragma region client_read_success      // 客户端正常处理从server返回的数据
-            // 开始处理从服务器返回的数据
+                // 开始处理从服务器返回的数据
 
-            // 1. 反序列化数据
-            unsigned char * parsed_buf;
-            std::string sbuf;
-            sbuf.assign(buf, n);
-            parse_telegram(sbuf, n, (void **)(&parsed_buf));
+                // 1. 反序列化数据
+                unsigned char * parsed_buf;
+                std::string sbuf;
+                sbuf.assign(buf, n);
+                parse_telegram(sbuf, n, (void **)(&parsed_buf));
 
-            // 2. 根据收到的数据生成下次要发送的数据
-            trans_data_generator(parsed_buf, (void **)(&next_send_data));
-            free(parsed_buf);
+                // 2. 根据收到的数据生成下次要发送的数据
+                trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                free(parsed_buf);
 
-            if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
-                none_package_send_times++;
-            }
+                if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
+                    none_package_send_times++;
+                }
 
-            if (none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
-                trans_data_set_get_server_status(next_send_data);
-                none_package_send_times = 0;
-            }
+                if (none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
+                    trans_data_set_get_server_status(next_send_data);
+                    none_package_send_times = 0;
+                }
 
-            send_data = next_send_data;
+                send_data = next_send_data;
 
-            // 休眠 keepalive的时间再发
-            sleep(keepalive);
+                // 休眠 keepalive的时间再发
+                sleep(keepalive);
 
-            // 3. 转到while开始处序列化数据并发送
+                // 3. 转到while开始处序列化数据并发送
 #pragma endregion client_read_success
+            }
+
         }
 
     }
@@ -426,9 +434,14 @@ int start_by_server_mode(void)
 #pragma endregion server_recv_timeout
                 } else {
 #pragma region server_recv      // server 正常收到从client来的数据
-                    n = Read(cfd, buf, sizeof(buf));
-#pragma region client_closed_connect        // server发现client关闭了连接
+                    bzero(buf, BUFSIZ);
+                    n = Read(cfd, buf, BUFSIZ);
+                    printf("------------------------------\n");
+                    printf("read num %d\n", n);
+                    printf("------------------------------\n");
+
                     if (n == 0) {
+#pragma region client_closed_connect        // server发现client关闭了连接
                         // 如果客户端关闭的连接，也接管资源
                         printf("-------------------------\n");
                         printf("| client close connect! |\n");
@@ -468,10 +481,14 @@ int start_by_server_mode(void)
                         }
                         close(cfd);
                         break;
-                    }
 #pragma endregion client_closed_connect
-                    // 服务端开始处理收到的数据
+                    } else if (n == -1) {
+                        perror("read error");
+                        close(cfd);
+                        break;
+                    }
 
+                    // 服务端开始处理收到的数据
                     TRANS_DATA *next_send_data;
                     // 1. 反序列化数据
                     unsigned char * parsed_buf;
@@ -490,6 +507,7 @@ int start_by_server_mode(void)
 
                     // 4. 发送数据
                     n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
+                    // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
 
                     printf("----------------------------------------\n");
                     printf("| server send %d bytes datas to client |\n", n);

@@ -68,9 +68,9 @@ ssize_t Read(int fd, void *ptr, size_t nbytes)
     ssize_t n;
 again:
     if( (n = read(fd, ptr, nbytes)) == -1) {
-//        if(errno == EINTR)
-//            goto again;
-//        else
+        if(errno == EINTR)
+            goto again;
+        else
             return -1;
     }
     return n;
@@ -82,9 +82,9 @@ ssize_t Write(int fd, void *ptr, size_t nbytes)
     ssize_t n;
     again:
     if( (n = write(fd, ptr, nbytes)) < -1 ) {
-//        if(errno == EINTR)
-//            goto again;
-//        else
+        if(errno == EINTR)
+            goto again;
+        else
             return -1;
     }
     return n;
