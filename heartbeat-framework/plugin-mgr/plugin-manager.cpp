@@ -140,7 +140,7 @@ int list_plug_directory(char *dir_path)
         printf("file name : %s\n", filename->d_name);
 
         bzero(plug_path_obs, 256);
-        strcpy(plug_path_obs, PLUGINS_DIRECTORY);
+        strcpy(plug_path_obs, dir_path);
 
         // Find the .so file in the file list
         // and judge based on whether the last three characters are .so

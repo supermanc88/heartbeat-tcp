@@ -124,6 +124,6 @@ node	backup
 #	note: don't use a cluster node as ping node	
 #
 ping 192.168.231.1
-#   插件路径
-plugins_dir /tmp/heartbeat/build/lib/plugins/
+#   plugins directory
+plugins_dir /opt/infosec-heartbeat/plugins/
 
