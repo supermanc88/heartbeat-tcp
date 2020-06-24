@@ -32,7 +32,7 @@ bool auto_failback = true;
 char server_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "ens33";
-char plugins_dir[BUFSIZ] = "/opt/heartbeat/plugins/";
+char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -574,7 +574,7 @@ int main(int argc, char *argv[])
     char ping_target[BUFSIZ];
     char ucast[BUFSIZ];
     if (RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r")) {
-        char value[20] = {0};
+        char value[BUFSIZ] = {0};
         if (hb.GetValue("keepalive", value) == RET_SUCCESS)
             keepalive = atoi(value);
         if (hb.GetValue("deadtime", value) == RET_SUCCESS)
@@ -622,15 +622,6 @@ int main(int argc, char *argv[])
     printf("server_addr = %s\n", server_addr);
     printf("-------------------------------------------------------------------\n");
 
-    // 读取补充配置
-    HBConfig hb_extra;
-    if (RET_SUCCESS == hb_extra.OpenFile("./ha-extra.cf", "r")) {
-        char value[20] = {0};
-        if (hb_extra.GetValue("mode", value) == RET_SUCCESS)
-            strcpy(mode, value);
-    }
-    hb_extra.CloseFile();
-
     printf("start mode %s\n", mode);
     printf("---------------------------------------\n");
 
@@ -646,6 +637,16 @@ int main(int argc, char *argv[])
     printf("plugins_dir = %s\n", plugins_dir);
     printf("---------------------------------------\n");
     /*************************/
+
+
+    // 读取补充配置
+    HBConfig hb_extra;
+    if (RET_SUCCESS == hb_extra.OpenFile("./ha-extra.cf", "r")) {
+        char value[20] = {0};
+        if (hb_extra.GetValue("mode", value) == RET_SUCCESS)
+            strcpy(mode, value);
+    }
+    hb_extra.CloseFile();
 
 #pragma endregion main_read_config
 

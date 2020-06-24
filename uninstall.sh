@@ -1,4 +1,4 @@
 #!/bin/sh
 # delete
-rm -rf /opt/heartbeat
-rm /usr/local/lib/libprotobuf*
+rm -rf /opt/infosec-heartbeat
+# rm /usr/local/lib/libprotobuf*

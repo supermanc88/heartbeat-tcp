@@ -123,6 +123,7 @@ std::string &HBConfig::ClearHeadTailSpace(std::string &str) {
 }
 
 HB_RET HBConfig::GetValue(const char *key, char *value) {
+    bzero(value, BUFSIZ);
     if(keymap.count(key) > 0 ) {
         std::string tmp = keymap[key];
         strcpy(value, tmp.c_str());
