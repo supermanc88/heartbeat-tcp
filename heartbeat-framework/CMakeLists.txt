@@ -6,7 +6,7 @@ project(heartbeat-framework VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(protobuf-src)
+#include_directories(protobuf-src)
 
 set(SRC_PATH
         main.cpp

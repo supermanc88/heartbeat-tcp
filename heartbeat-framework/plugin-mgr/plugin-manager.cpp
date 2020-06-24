@@ -22,6 +22,8 @@ std::map<std::string, PLUG_DATA> plugin_map;
 
 std::vector<PLUG_DATA> plug_data_vector;
 
+extern char plugins_dir[BUFSIZ];
+
 PLUG_RET load_all_plugin()
 {
     int i;
@@ -89,7 +91,7 @@ PLUG_RET plugin_manager_init()
 
     // First traverse your own plugin directory, load all plugins
 
-    list_plug_directory(PLUGINS_DIRECTORY);
+    list_plug_directory(plugins_dir);
 
     printf("----------------------------\n");
 

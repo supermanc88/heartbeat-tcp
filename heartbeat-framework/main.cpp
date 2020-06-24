@@ -32,6 +32,7 @@ bool auto_failback = true;
 char server_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "ens33";
+char plugins_dir[BUFSIZ] = "/opt/heartbeat/plugins/";
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -598,6 +599,8 @@ int main(int argc, char *argv[])
             server_port = atoi(value);
         if (hb.GetValue("ucast", value) == RET_SUCCESS)
             strcpy(ucast, value);
+        if (hb.GetValue("plugins_dir", value) == RET_SUCCESS)
+            strcpy(plugins_dir, value);
     }
     hb.CloseFile();
 
@@ -637,6 +640,10 @@ int main(int argc, char *argv[])
     gethostname(hostname, BUFSIZ);
 
     printf("hostname = %s\n", hostname);
+    printf("---------------------------------------\n");
+
+
+    printf("plugins_dir = %s\n", plugins_dir);
     printf("---------------------------------------\n");
     /*************************/
 
