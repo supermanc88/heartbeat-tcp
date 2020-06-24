@@ -1,11 +1,17 @@
 #!/bin/sh
-packagePath="/root/heartbeat"
-if [ ! -d "$packagePath" ]
+rootPath="/root/heartbeat"
+if [ ! -d "$rootPath" ]
 then
-	mkdir "$packagePath"
+	mkdir "$rootPath"
 fi
 
-pluginsPath=$packagePath/"plugins"
+binPath=$rootPath/"bin"
+if [ ! -d "$binPath" ]
+then
+	mkdir "$binPath"
+fi
+
+pluginsPath=$rootPath/"plugins"
 
 #echo $pluginsPath
 if [ ! -d "$pluginsPath" ]
@@ -13,6 +19,17 @@ then
 	mkdir "$pluginsPath"
 fi
 
-cp ./build/bin/* $packagePath
+runtimes=$rootPath/"runtimes"
+
+if [ ! -d "$runtimes" ]
+then
+	mkdir "$runtimes"
+fi
+
+cp ./build/bin/* $binPath
 cp ./build/lib/plugins/* $pluginsPath
-cp ./heartbeat-framework/ha.cf $packagePath
+cp ./heartbeat-framework/ha.cf $rootPath
+cp install.sh $rootPath
+cp uninstall.sh $rootPath
+cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
+
