@@ -3,10 +3,10 @@
 
 #include "../heartbeat-config.h"
 
-#define POLICY_LINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy.dat"
-#define POLICY_NOLINK_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy2.dat"
-#define POLICY_NOLINK_PRIMARY_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy_primary.dat"
-#define POLICY_NOLINK_BACKUP_PATH "/tmp/heartbeat/heartbeat-framework/resource-mgr/policy_backup.dat"
+#define POLICY_LINK_PATH "/etc/ha.d/policy/policy.dat"
+#define POLICY_NOLINK_PATH "/etc/ha.d/policy/policy2.dat"
+#define POLICY_NOLINK_PRIMARY_PATH "/etc/ha.d/policy/policy_primary.dat"
+#define POLICY_NOLINK_BACKUP_PATH "/etc/ha.d/policy/policy_backup.dat"
 
 #define LINK_ACT_DO_NOTHING 0
 #define LINK_ACT_BACKUP_NODE_TAKEOVER 1
