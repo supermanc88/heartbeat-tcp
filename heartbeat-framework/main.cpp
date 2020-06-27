@@ -573,7 +573,7 @@ int main(int argc, char *argv[])
     char b_hostname[BUFSIZ];
     char ping_target[BUFSIZ];
     char ucast[BUFSIZ];
-    if (RET_SUCCESS == hb.OpenFile("/etc/ha.d/ha.cf", "r")) {
+    if (RET_SUCCESS == hb.OpenFile(HACONFIG_FILE_PATH, "r")) {
         char value[BUFSIZ] = {0};
         if (hb.GetValue("keepalive", value) == RET_SUCCESS)
             keepalive = atoi(value);

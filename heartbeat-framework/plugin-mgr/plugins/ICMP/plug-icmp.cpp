@@ -6,8 +6,11 @@
 #include "plug-icmp.h"
 #include "../../hb-plugin.h"
 #include "hb-log.h"
-#include "../NetSignStatus/plug-netsignstatus.h"
 
+#include "../../../heartbeat-config.h"
+#include "../../../hbconf.h"
+
+char ping_target[BUFSIZ] = "192.168.1.1";
 
 int plug_init(void * data)
 {
@@ -23,6 +26,15 @@ int plug_init(void * data)
 
     hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "icmp plug init\n");
 
+
+    HBConfig hb;
+    if (RET_SUCCESS == hb.OpenFile(HACONFIG_FILE_PATH, "r")) {
+        char value[BUFSIZ] = {0};
+        if (hb.GetValue("ping", value) == RET_SUCCESS)
+            strcpy(ping_target, value);
+    }
+    hb.CloseFile();
+
     return 0;
 }
 
@@ -35,7 +47,12 @@ int plug_stop(void)
 int plug_run(void * data)
 {
     int ret;
-    ret = system("ping -c 5 192.168.231.1");
+
+    char cmdstr[BUFSIZ] = {0};
+
+    sprintf(cmdstr, "ping -c 5 %s", ping_target);
+
+    ret = system(cmdstr);
 
     if( ret == -1 )
         return 0;

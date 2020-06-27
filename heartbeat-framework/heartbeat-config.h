@@ -16,6 +16,9 @@
 #define INITDEAD            120
 #define SERVERPORT          8888
 
+
+#define HACONFIG_FILE_PATH  "/etc/ha.d/ha.cf"
+
 /**
  * 传输数据的类型
  * 主机向备机发起action,备机收到后处理并reply，
