@@ -359,7 +359,7 @@ int start_by_server_mode(void)
             SERVER_STATUS_DATAS datas = {0};
             get_local_server_status_datas(&datas);
 
-            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
             if (act == NOLINK_ACT_DO_NOTING) {
                 // do nothing
             } else if (act == NOLINK_ACT_TAKEOVER) {
@@ -411,7 +411,7 @@ int start_by_server_mode(void)
                     SERVER_STATUS_DATAS datas = {0};
                     get_local_server_status_datas(&datas);
 
-                    int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                    int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
                     if (act == NOLINK_ACT_DO_NOTING) {
                         // do nothing
                     } else if (act == NOLINK_ACT_TAKEOVER) {
@@ -454,7 +454,7 @@ int start_by_server_mode(void)
                         SERVER_STATUS_DATAS datas = {0};
                         get_local_server_status_datas(&datas);
 
-                        int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                        int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
                         if (act == NOLINK_ACT_DO_NOTING) {
                             // do nothing
                         } else if (act == NOLINK_ACT_TAKEOVER) {
