@@ -27,6 +27,13 @@ then
   mkdir "$hadir"
 fi
 
+policyPath=$hadir/"policy"
+
+if [ ! -d "$policyPath" ]
+then
+  mkdir "$policyPath"
+fi
+
 # install to the directory
 cp ./bin/* $binPath
 cp ./plugins/* $pluginsPath
@@ -34,6 +41,7 @@ cp ha.cf $installRootPath
 cp ha.cf $hadir
 cp haresources $installRootPath
 cp uninstall.sh $installRootPath
+cp ./policy/* $policyPath
 
 
 # dependent libraries

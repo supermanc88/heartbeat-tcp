@@ -26,6 +26,13 @@ then
 	mkdir "$runtimes"
 fi
 
+policyPath=$rootPath/"policy"
+
+if [ ! -d "$policyPath" ]
+then
+  mkdir "$policyPath"
+fi
+
 cp ./build/bin/* $binPath
 cp ./build/lib/plugins/* $pluginsPath
 cp ./heartbeat-framework/ha.cf $rootPath
@@ -33,4 +40,5 @@ cp ./heartbeat-framework/haresources $rootPath
 cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
+cp ./heartbeat-framework/policy* $policyPath
 
