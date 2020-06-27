@@ -1,0 +1,120 @@
+
+/*Message identifiers and types*/
+
+/*Identifiers*/
+#define TAG_PROCESSOR					1
+#define TAG_TYPE						2
+#define TAG_CLIENT_ID					3
+#define TAG_RESULT						4
+#define TAG_ERROR_MESSAGE				5
+#define TAG_COMMUNICATE_MODE			6
+#define TAG_ZIP_MODE					7
+#define TAG_ENCRYPT_KEY					8
+#define TAG_ENCRYPT_KEY_HASH			9
+#define TAG_PLAIN_TEXT					10
+#define TAG_CRYPTO_TEXT					11
+#define TAG_TSA_TEXT					12
+#define TAG_USE_TSA						13
+#define TAG_CERT						14
+#define TAG_TRANS_CERT					15
+#define TAG_ENCRYPT_CERT_DN				16
+#define TAG_SIGN_CERT_DN				17
+#define TAG_DIGEST_ALG					18
+#define TAG_SYMMETRICAL_ALG				19
+#define TAG_SIGN_CERT_SUBJECT			20
+#define TAG_SIGN_CERT_SERNUMBER			21
+#define TAG_SIGN_CERT_ISSUER_SUBJECT	22
+#define TAG_SIGN_CERT_START_TIME		23
+#define TAG_SIGN_CERT_END_TIME			24
+#define TAG_ENCRYPT_CERT_SUBJECT		25
+#define TAG_ENCRYPT_CERT_SERNUMBER		26
+#define TAG_ENCRYPT_CERT_ISSUER_SUBJECT	27
+#define TAG_ENCRYPT_CERT_START_TIME		28
+#define TAG_ENCRYPT_CERT_END_TIME		29
+#define TAG_TSA_GENERATE_TIME			30
+#define TAG_HASH_VALUE					31
+
+
+
+#define TAG_PDF_PASSWORD				37
+#define TAG_PDF_SIGN_PARAMETERS			38
+#define TAG_PDF_VERIFY_RESULTS			39
+#define TAG_BC_HEIGHT					44
+#define TAG_BC_ELEMENT_WIDTH			45	
+#define TAG_BC_DO_QUIET_ZONE			46	
+#define TAG_BC_QUIET_ZONE_WIDTH			47	
+#define TAG_BC_DISPLAY_HUMAN_READABLE   48	
+#define TAG_BC_DISPLAY_HUMAN_READABLE_START_STOP    49	
+#define TAG_BC_RETURN_FORMAT			50	
+#define TAG_BC_ADD_CHECK_SUM			51	
+#define TAG_BC_WIDE_FACTOR				52	
+#define TAG_BC_ENCODING_MODE			53	
+#define TAG_BC_ERROR_CORRECTING_LEVEL   54	
+#define TAG_BC_ASPECT_RATIO				55	
+#define TAG_BC_Y_HEIGHT					56	
+#define TAG_BC_BAR_SIZE					57	
+#define TAG_BC_SYMBOLOGY				58
+
+
+#define TAG_XML_TRANSID 				60
+
+#define TAG_XML_VERIFY_RESULTS			61
+
+
+
+/*types*/
+#define TAG_PROCESSOR_TYPE						"S"
+#define TAG_TYPE_TYPE							"S"
+#define TAG_CLIENT_ID_TYPE						"S"
+#define TAG_RESULT_TYPE							"b"
+#define TAG_ERROR_MESSAGE_TYPE					"S"
+#define TAG_COMMUNICATE_MODE_TYPE				"b"
+#define TAG_ZIP_MODE_TYPE						"B"
+#define TAG_ENCRYPT_KEY_TYPE					"b"
+#define TAG_ENCRYPT_KEY_HASH_TYPE				"b"
+#define TAG_PLAIN_TEXT_TYPE						"b"
+#define TAG_CRYPTO_TEXT_TYPE					"b"
+#define TAG_TSA_TEXT_TYPE						"b"
+#define TAG_USE_TSA_TYPE						"B"
+#define TAG_CERT_TYPE							"b"
+#define TAG_TRANS_CERT_TYPE						"B"
+#define TAG_ENCRYPT_CERT_DN_TYPE				"S"
+#define TAG_SIGN_CERT_DN_TYPE					"S"
+#define TAG_DIGEST_ALG_TYPE						"S"
+#define TAG_SYMMETRICAL_ALG_TYPE				"S"
+#define TAG_SIGN_CERT_SUBJECT_TYPE				"S"
+#define TAG_SIGN_CERT_SERNUMBER_TYPE			"S"
+#define TAG_SIGN_CERT_ISSUER_SUBJECT_TYPE		"S"
+#define TAG_SIGN_CERT_START_TIME_TYPE			"S"
+#define TAG_SIGN_CERT_END_TIME_TYPE				"S"
+#define TAG_ENCRYPT_CERT_SUBJECT_TYPE			"S"
+#define TAG_ENCRYPT_CERT_SERNUMBER_TYPE			"S"
+#define TAG_ENCRYPT_CERT_ISSUER_SUBJECT_TYPE	"S"
+#define TAG_ENCRYPT_CERT_START_TIME_TYPE		"S"
+#define TAG_ENCRYPT_CERT_END_TIME_TYPE			"S"
+#define TAG_TSA_GENERATE_TIME_TYPE				"S"
+#define TAG_HASH_VALUE_TYPE						"b"
+
+
+
+#define TAG_PDF_PASSWORD_TYPE					"S"
+#define TAG_PDF_SIGN_PARAMETERS_TYPE			"S"
+#define TAG_BC_HEIGHT_TYPE						"S"
+#define TAG_BC_ELEMENT_WIDTH_TYPE				"S"	
+#define TAG_BC_DO_QUIET_ZONE_TYPE				"S"	
+#define TAG_BC_QUIET_ZONE_WIDTH_TYPE			"S"	
+#define TAG_BC_DISPLAY_HUMAN_READABLE_TYPE		"S"	
+#define TAG_BC_DISPLAY_HUMAN_READABLE_START_STOP_TYPE    "S"	
+#define TAG_BC_RETURN_FORMAT_TYPE				"S"	
+#define TAG_BC_ADD_CHECK_SUM_TYPE				"S"	
+#define TAG_BC_WIDE_FACTOR_TYPE					"S"	
+#define TAG_BC_ENCODING_MODE_TYPE				"S"	
+#define TAG_BC_ERROR_CORRECTING_LEVEL_TYPE		"S"	
+#define TAG_BC_ASPECT_RATIO_TYPE				"S"	
+#define TAG_BC_Y_HEIGHT_TYPE					"S"	
+#define TAG_BC_BAR_SIZE_TYPE					"S"	
+#define TAG_BC_SYMBOLOGY_TYPE					"S"
+
+#define TAG_XML_TRANSID_TYPE				"b"
+
+

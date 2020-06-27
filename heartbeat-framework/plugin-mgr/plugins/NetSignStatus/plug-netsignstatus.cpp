@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
-
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include "plug-netsignstatus.h"
 #include "../../hb-plugin.h"
 #include "hb-log.h"
+#include "MonitorSrv.h"
 
 
 int plug_init(void * data)
@@ -32,5 +36,8 @@ int plug_stop(void)
 
 int plug_run(void * data)
 {
-    return 0;
+    monitor_srv_init();
+
+    int ret = GetSrvStatus("127.0.0.1", NULL);
+    return (ret == 0 ? 1 : 0);
 }

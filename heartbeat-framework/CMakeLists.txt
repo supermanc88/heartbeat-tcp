@@ -38,6 +38,9 @@ add_subdirectory(log)
 # 编译ICMP插件
 add_subdirectory(plugin-mgr/plugins/ICMP)
 
+# 编译netsign插件
+add_subdirectory(plugin-mgr/plugins/NetSignStatus)
+
 # 单个模块测试
 #
 #add_subdirectory(log)

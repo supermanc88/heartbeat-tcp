@@ -13,6 +13,16 @@ project(plug_netsignstatus)
 
 include_directories(../../../log)
 
-add_library(plug_netsignstatus SHARED plug-netsignstatus.cpp plug-netsignstatus.h)
+set(NETSIGN_SRC plug-netsignstatus.cpp plug-netsignstatus.h
+        Detect.h Detect.cpp
+        ErrMsg.h
+        MessageIdentifiers.h
+        MonitorSrv.cpp MonitorSrv.h
+        MyFunc.cpp MyFunc.h
+        MyLog.cpp MyLog.h
+        Ping.cpp Ping.h
+        SlimXml.cpp SlimXml.h)
+
+add_library(plug_netsignstatus SHARED ${NETSIGN_SRC})
 
 target_link_libraries(plug_netsignstatus hb-log)
