@@ -25,7 +25,7 @@ add_executable(heartbeat-framework  ${SRC_PATH})
 
 target_link_libraries(heartbeat-framework dl)
 
-target_link_libraries(heartbeat-framework protobuf)
+target_link_libraries(heartbeat-framework protobuf pthread)
 
 #add_executable(hbconf hbconf.cpp hbconf.h)
 

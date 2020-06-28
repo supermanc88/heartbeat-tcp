@@ -40,6 +40,8 @@ char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 extern bool client_resources_takeover_status;
 extern bool server_resources_takeover_status;
 
+bool local_resource_takeover_status;
+
 bool trouble = false;
 
 void usage(void)
