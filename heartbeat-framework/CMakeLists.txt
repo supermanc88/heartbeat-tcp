@@ -41,6 +41,10 @@ add_subdirectory(plugin-mgr/plugins/ICMP)
 # 编译netsign插件
 add_subdirectory(plugin-mgr/plugins/NetSignStatus)
 
+
+# 编译hb_manual 手动切换
+add_subdirectory(manual-switch)
+
 # 单个模块测试
 #
 #add_subdirectory(log)

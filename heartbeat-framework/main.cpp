@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <string>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 
 #include "wrap.h"
@@ -38,6 +39,8 @@ char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 //资源接管状态,资源接管后置为true，释放后置为false
 extern bool client_resources_takeover_status;
 extern bool server_resources_takeover_status;
+
+bool trouble = false;
 
 void usage(void)
 {
@@ -82,153 +85,14 @@ int start_by_client_mode(void)
     if (ret == -1) {
         perror("connect server error");
 
-        // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
-        if (try_time_sum >= deadtime) {
-            // 测试 直接退出 多次尝试均不能连通，所以根据“nolink“策略进行操作资源
-            printf("---------------------------------------------------------------------------------------------------------\n");
-            printf("| Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy! |\n");
-            printf("---------------------------------------------------------------------------------------------------------\n");
+        if (!trouble) {
+            // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
+            if (try_time_sum >= deadtime) {
+                // 测试 直接退出 多次尝试均不能连通，所以根据“nolink“策略进行操作资源
+                printf("---------------------------------------------------------------------------------------------------------\n");
+                printf("| Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy! |\n");
+                printf("---------------------------------------------------------------------------------------------------------\n");
 
-            SERVER_STATUS_DATAS datas = {0};
-            get_local_server_status_datas(&datas);
-
-            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
-            if (act == NOLINK_ACT_DO_NOTING) {
-                // do nothing
-            } else if (act == NOLINK_ACT_TAKEOVER) {
-                if (!client_resources_takeover_status) {
-                    take_over_resources(virtual_ip, ethernet_name);
-                    client_resources_takeover_status = true;
-                    printf("-----------------------------\n");
-                    printf("| client take over resource |\n");
-                    printf("-----------------------------\n");
-                } else {
-                    printf("-------------------------------------\n");
-                    printf("| client take over resource already |\n");
-                    printf("-------------------------------------\n");
-                }
-
-            } else {
-                // release
-                if (!client_resources_takeover_status) {
-                    printf("-----------------------------------\n");
-                    printf("| client release resource already |\n");
-                    printf("-----------------------------------\n");
-                } else {
-                    release_resources(virtual_ip, ethernet_name);
-                    client_resources_takeover_status = false;
-                    printf("---------------------------\n");
-                    printf("| client release resource |\n");
-                    printf("---------------------------\n");
-                }
-
-            }
-
-            try_time_sum = 0;
-
-            goto reconnect;
-        }
-        sleep(keepalive);
-        try_time_sum += keepalive;
-        goto reconnect;
-    }
-#pragma endregion client_connect_fail
-
-#pragma region client_connect_success   // 客户端创建连接成功
-
-#pragma region client_construct_first_data  // 客户端构造连接成功后的第一次发包内容
-    // 向服务端发包
-    TRANS_DATA *send_data;
-    // 第一次发包时，先询问一次服务端的状态
-    send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
-//    trans_data_set_none(send_data);
-    trans_data_set_get_server_status(send_data);
-#pragma endregion client_construct_first_data
-    while (1) {
-#pragma region client_send_data        // 客户端向server发送数据
-        // 1. 将要发送的数据序列化
-        std::string serialized_data;
-        size_t serialized_data_size;
-
-        make_telegram(send_data, serialized_data, &serialized_data_size);
-
-        // 2. 发送数据
-        n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
-        // 释放内存
-        if (send_data) {
-            free(send_data);
-            send_data = NULL;
-        }
-#pragma endregion client_send_data
-        fd_set set;
-        FD_ZERO(&set);
-        FD_SET(cfd, &set);
-
-        ret = select(cfd + 1, &set, NULL, NULL, &tv);
-
-        if (ret == -1) {
-            printf("--------------------\n");
-            printf("| select cfd error |\n");
-            printf("--------------------\n");
-            // 出错就直接重新和server建立一个连接
-            close(cfd);
-            goto reconnect;
-        } else if (ret == 0) {
-#pragma region client_read_timeout  // 客户端等待server返回信息超时
-            printf("-----------------------\n");
-            printf("| select cfd time out |\n");
-            printf("-----------------------\n");
-
-            SERVER_STATUS_DATAS datas = {0};
-            get_local_server_status_datas(&datas);
-
-            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
-            if (act == NOLINK_ACT_DO_NOTING) {
-                // do nothing
-            } else if (act == NOLINK_ACT_TAKEOVER) {
-                if (!client_resources_takeover_status) {
-                    take_over_resources(virtual_ip, ethernet_name);
-                    client_resources_takeover_status = true;
-                    printf("-----------------------------\n");
-                    printf("| client take over resource |\n");
-                    printf("-----------------------------\n");
-                } else {
-                    printf("-------------------------------------\n");
-                    printf("| client take over resource already |\n");
-                    printf("-------------------------------------\n");
-                }
-
-            } else {
-                // release
-                if (!client_resources_takeover_status) {
-                    printf("-----------------------------------\n");
-                    printf("| client release resource already |\n");
-                    printf("-----------------------------------\n");
-                } else {
-                    release_resources(virtual_ip, ethernet_name);
-                    client_resources_takeover_status = false;
-                    printf("---------------------------\n");
-                    printf("| client release resource |\n");
-                    printf("---------------------------\n");
-                }
-
-            }
-            next_send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
-            trans_data_set_none(next_send_data);
-            send_data = next_send_data;
-            continue;
-#pragma endregion client_read_timeout
-        } else {
-            bzero(buf, BUFSIZ);
-            n = Read(cfd, buf, BUFSIZ);
-
-            if (n == 0) {
-#pragma region server_closed_connect    // 客户端发现server关闭了连接
-                // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
-                printf("------------------------\n");
-                printf("| server colse connect |\n");
-                printf("------------------------\n");
-                close(cfd);
                 SERVER_STATUS_DATAS datas = {0};
                 get_local_server_status_datas(&datas);
 
@@ -263,46 +127,192 @@ int start_by_client_mode(void)
                     }
 
                 }
+
+                try_time_sum = 0;
+
                 goto reconnect;
-#pragma endregion server_closed_connect
-            } else if (n == -1) {
-                perror("read error");
-                close(cfd);
-                goto reconnect;
-            } else {
-#pragma region client_read_success      // 客户端正常处理从server返回的数据
-                // 开始处理从服务器返回的数据
-
-                // 1. 反序列化数据
-                unsigned char * parsed_buf;
-                std::string sbuf;
-                sbuf.assign(buf, n);
-                parse_telegram(sbuf, n, (void **)(&parsed_buf));
-
-                // 2. 根据收到的数据生成下次要发送的数据
-                trans_data_generator(parsed_buf, (void **)(&next_send_data));
-                free(parsed_buf);
-
-                if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
-                    none_package_send_times++;
-                }
-
-                if (none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
-                    trans_data_set_get_server_status(next_send_data);
-                    none_package_send_times = 0;
-                }
-
-                send_data = next_send_data;
-
-                // 休眠 keepalive的时间再发
-                sleep(keepalive);
-
-                // 3. 转到while开始处序列化数据并发送
-#pragma endregion client_read_success
             }
-
         }
 
+        sleep(keepalive);
+        try_time_sum += keepalive;
+        goto reconnect;
+    }
+#pragma endregion client_connect_fail
+
+#pragma region client_connect_success   // 客户端创建连接成功
+
+#pragma region client_construct_first_data  // 客户端构造连接成功后的第一次发包内容
+    // 向服务端发包
+    TRANS_DATA *send_data;
+    // 第一次发包时，先询问一次服务端的状态
+    send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
+//    trans_data_set_none(send_data);
+    trans_data_set_get_server_status(send_data);
+#pragma endregion client_construct_first_data
+    while (1) {
+        if (!trouble) {
+
+#pragma region client_send_data        // 客户端向server发送数据
+            // 1. 将要发送的数据序列化
+            std::string serialized_data;
+            size_t serialized_data_size;
+
+            make_telegram(send_data, serialized_data, &serialized_data_size);
+
+            // 2. 发送数据
+            n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
+            // 释放内存
+            if (send_data) {
+                free(send_data);
+                send_data = NULL;
+            }
+#pragma endregion client_send_data
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(cfd, &set);
+
+            ret = select(cfd + 1, &set, NULL, NULL, &tv);
+
+            if (ret == -1) {
+                printf("--------------------\n");
+                printf("| select cfd error |\n");
+                printf("--------------------\n");
+                // 出错就直接重新和server建立一个连接
+                close(cfd);
+                goto reconnect;
+            } else if (ret == 0) {
+#pragma region client_read_timeout  // 客户端等待server返回信息超时
+                printf("-----------------------\n");
+                printf("| select cfd time out |\n");
+                printf("-----------------------\n");
+
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
+
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                if (act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    if (!client_resources_takeover_status) {
+                        take_over_resources(virtual_ip, ethernet_name);
+                        client_resources_takeover_status = true;
+                        printf("-----------------------------\n");
+                        printf("| client take over resource |\n");
+                        printf("-----------------------------\n");
+                    } else {
+                        printf("-------------------------------------\n");
+                        printf("| client take over resource already |\n");
+                        printf("-------------------------------------\n");
+                    }
+
+                } else {
+                    // release
+                    if (!client_resources_takeover_status) {
+                        printf("-----------------------------------\n");
+                        printf("| client release resource already |\n");
+                        printf("-----------------------------------\n");
+                    } else {
+                        release_resources(virtual_ip, ethernet_name);
+                        client_resources_takeover_status = false;
+                        printf("---------------------------\n");
+                        printf("| client release resource |\n");
+                        printf("---------------------------\n");
+                    }
+
+                }
+                next_send_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
+                trans_data_set_none(next_send_data);
+                send_data = next_send_data;
+                continue;
+#pragma endregion client_read_timeout
+            } else {
+                bzero(buf, BUFSIZ);
+                n = Read(cfd, buf, BUFSIZ);
+
+                if (n == 0) {
+#pragma region server_closed_connect    // 客户端发现server关闭了连接
+                    // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
+                    printf("------------------------\n");
+                    printf("| server colse connect |\n");
+                    printf("------------------------\n");
+                    close(cfd);
+                    SERVER_STATUS_DATAS datas = {0};
+                    get_local_server_status_datas(&datas);
+
+                    int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 0);
+                    if (act == NOLINK_ACT_DO_NOTING) {
+                        // do nothing
+                    } else if (act == NOLINK_ACT_TAKEOVER) {
+                        if (!client_resources_takeover_status) {
+                            take_over_resources(virtual_ip, ethernet_name);
+                            client_resources_takeover_status = true;
+                            printf("-----------------------------\n");
+                            printf("| client take over resource |\n");
+                            printf("-----------------------------\n");
+                        } else {
+                            printf("-------------------------------------\n");
+                            printf("| client take over resource already |\n");
+                            printf("-------------------------------------\n");
+                        }
+
+                    } else {
+                        // release
+                        if (!client_resources_takeover_status) {
+                            printf("-----------------------------------\n");
+                            printf("| client release resource already |\n");
+                            printf("-----------------------------------\n");
+                        } else {
+                            release_resources(virtual_ip, ethernet_name);
+                            client_resources_takeover_status = false;
+                            printf("---------------------------\n");
+                            printf("| client release resource |\n");
+                            printf("---------------------------\n");
+                        }
+
+                    }
+                    goto reconnect;
+#pragma endregion server_closed_connect
+                } else if (n == -1) {
+                    perror("read error");
+                    close(cfd);
+                    goto reconnect;
+                } else {
+#pragma region client_read_success      // 客户端正常处理从server返回的数据
+                    // 开始处理从服务器返回的数据
+
+                    // 1. 反序列化数据
+                    unsigned char * parsed_buf;
+                    std::string sbuf;
+                    sbuf.assign(buf, n);
+                    parse_telegram(sbuf, n, (void **)(&parsed_buf));
+
+                    // 2. 根据收到的数据生成下次要发送的数据
+                    trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                    free(parsed_buf);
+
+                    if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
+                        none_package_send_times++;
+                    }
+
+                    if (none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
+                        trans_data_set_get_server_status(next_send_data);
+                        none_package_send_times = 0;
+                    }
+
+                    send_data = next_send_data;
+
+                    // 休眠 keepalive的时间再发
+                    sleep(keepalive);
+
+                    // 3. 转到while开始处序列化数据并发送
+#pragma endregion client_read_success
+                }
+
+            }
+        } else {
+            sleep(keepalive);
+        }
     }
 
     close(cfd);
@@ -341,116 +351,75 @@ int start_by_server_mode(void)
 #pragma endregion server_pre_create_connect
 
     while (1) {
-        fd_set set;
-        FD_ZERO(&set);
-        FD_SET(lfd, &set);
 
-        tv.tv_sec = deadtime;
-        ret = select(lfd + 1, &set, NULL, NULL, &tv);
+        if (!trouble) {
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(lfd, &set);
 
-        if (ret == -1) {
-            printf("select lfd error\n");
-            break;
-        } else if (ret == 0) {
+            tv.tv_sec = deadtime;
+            ret = select(lfd + 1, &set, NULL, NULL, &tv);
+
+            if (ret == -1) {
+                printf("select lfd error\n");
+                break;
+            } else if (ret == 0) {
 #pragma region server_create_connect_timeout
-            // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
-            printf("select lfd time out\n");
+                // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
+                printf("select lfd time out\n");
 
-            SERVER_STATUS_DATAS datas = {0};
-            get_local_server_status_datas(&datas);
+                SERVER_STATUS_DATAS datas = {0};
+                get_local_server_status_datas(&datas);
 
-            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
-            if (act == NOLINK_ACT_DO_NOTING) {
-                // do nothing
-            } else if (act == NOLINK_ACT_TAKEOVER) {
-                if (!server_resources_takeover_status) {
-                    take_over_resources(virtual_ip, ethernet_name);
-                    server_resources_takeover_status = true;
-                    printf("server take over resource\n");
-                } else {
-                    printf("server take over resource already\n");
-                }
-
-            } else {
-                // release
-                if (!server_resources_takeover_status) {
-                    printf("server release resource already\n");
-                } else {
-                    release_resources(virtual_ip, ethernet_name);
-                    server_resources_takeover_status = false;
-                    printf("server release resource\n");
-                }
-            }
-            continue;
-#pragma endregion server_create_connect_timeout
-        } else {
-#pragma region server_create_connect_success
-            // 在deadtime时间内建立连接
-            cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
-            inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
-
-            // 打印连入的客户端信息
-            printf("client addr: %s\n", buf);
-            printf("client port: %d\n", ntohs(client_addr.sin_port));
-
-            while (1) {
-
-                // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
-                FD_ZERO(&set);
-                FD_SET(cfd, &set);
-
-                tv.tv_sec = deadtime;
-                ret = select(cfd + 1, &set, NULL, NULL, &tv);
-
-                if (ret == -1) {
-                    close(cfd);
-                    break;
-                } else if (ret == 0) {
-#pragma region server_recv_timeout      // server等待从client来的信息超时
-                    printf("time out\n");
-                    SERVER_STATUS_DATAS datas = {0};
-                    get_local_server_status_datas(&datas);
-
-                    int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
-                    if (act == NOLINK_ACT_DO_NOTING) {
-                        // do nothing
-                    } else if (act == NOLINK_ACT_TAKEOVER) {
-                        if (!server_resources_takeover_status) {
-                            take_over_resources(virtual_ip, ethernet_name);
-                            server_resources_takeover_status = true;
-                            printf("server take over resource\n");
-                        } else {
-                            printf("server take over resource already\n");
-                        }
-
+                int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
+                if (act == NOLINK_ACT_DO_NOTING) {
+                    // do nothing
+                } else if (act == NOLINK_ACT_TAKEOVER) {
+                    if (!server_resources_takeover_status) {
+                        take_over_resources(virtual_ip, ethernet_name);
+                        server_resources_takeover_status = true;
+                        printf("server take over resource\n");
                     } else {
-                        // release
-                        if (!server_resources_takeover_status) {
-                            printf("server release resource already\n");
-                        } else {
-                            release_resources(virtual_ip, ethernet_name);
-                            server_resources_takeover_status = false;
-                            printf("server release resource\n");
-                        }
+                        printf("server take over resource already\n");
                     }
 
-                    close(cfd);
-                    break;
-#pragma endregion server_recv_timeout
                 } else {
-#pragma region server_recv      // server 正常收到从client来的数据
-                    bzero(buf, BUFSIZ);
-                    n = Read(cfd, buf, BUFSIZ);
-                    printf("------------------------------\n");
-                    printf("read num %d\n", n);
-                    printf("------------------------------\n");
+                    // release
+                    if (!server_resources_takeover_status) {
+                        printf("server release resource already\n");
+                    } else {
+                        release_resources(virtual_ip, ethernet_name);
+                        server_resources_takeover_status = false;
+                        printf("server release resource\n");
+                    }
+                }
+                continue;
+#pragma endregion server_create_connect_timeout
+            } else {
+#pragma region server_create_connect_success
+                // 在deadtime时间内建立连接
+                cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
+                inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
 
-                    if (n == 0) {
-#pragma region client_closed_connect        // server发现client关闭了连接
-                        // 如果客户端关闭的连接，也接管资源
-                        printf("-------------------------\n");
-                        printf("| client close connect! |\n");
-                        printf("-------------------------\n");
+                // 打印连入的客户端信息
+                printf("client addr: %s\n", buf);
+                printf("client port: %d\n", ntohs(client_addr.sin_port));
+
+                while (1) {
+
+                    // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
+                    FD_ZERO(&set);
+                    FD_SET(cfd, &set);
+
+                    tv.tv_sec = deadtime;
+                    ret = select(cfd + 1, &set, NULL, NULL, &tv);
+
+                    if (ret == -1) {
+                        close(cfd);
+                        break;
+                    } else if (ret == 0) {
+#pragma region server_recv_timeout      // server等待从client来的信息超时
+                        printf("time out\n");
                         SERVER_STATUS_DATAS datas = {0};
                         get_local_server_status_datas(&datas);
 
@@ -461,69 +430,115 @@ int start_by_server_mode(void)
                             if (!server_resources_takeover_status) {
                                 take_over_resources(virtual_ip, ethernet_name);
                                 server_resources_takeover_status = true;
-                                printf("-----------------------------\n");
-                                printf("| server take over resource |\n");
-                                printf("-----------------------------\n");
+                                printf("server take over resource\n");
                             } else {
-                                printf("-------------------------------------\n");
-                                printf("| server take over resource already |\n");
-                                printf("-------------------------------------\n");
+                                printf("server take over resource already\n");
                             }
 
                         } else {
                             // release
                             if (!server_resources_takeover_status) {
-                                printf("-----------------------------------\n");
-                                printf("| server release resource already |\n");
-                                printf("-----------------------------------\n");
+                                printf("server release resource already\n");
                             } else {
                                 release_resources(virtual_ip, ethernet_name);
                                 server_resources_takeover_status = false;
-                                printf("---------------------------\n");
-                                printf("| server release resource |\n");
-                                printf("---------------------------\n");
+                                printf("server release resource\n");
                             }
                         }
+
                         close(cfd);
                         break;
+#pragma endregion server_recv_timeout
+                    } else {
+#pragma region server_recv      // server 正常收到从client来的数据
+                        bzero(buf, BUFSIZ);
+                        n = Read(cfd, buf, BUFSIZ);
+                        printf("------------------------------\n");
+                        printf("read num %d\n", n);
+                        printf("------------------------------\n");
+
+                        if (n == 0) {
+#pragma region client_closed_connect        // server发现client关闭了连接
+                            // 如果客户端关闭的连接，也接管资源
+                            printf("-------------------------\n");
+                            printf("| client close connect! |\n");
+                            printf("-------------------------\n");
+                            SERVER_STATUS_DATAS datas = {0};
+                            get_local_server_status_datas(&datas);
+
+                            int act = policy_nolink_manager(datas.server_status, datas.have_virtual_ip, 1);
+                            if (act == NOLINK_ACT_DO_NOTING) {
+                                // do nothing
+                            } else if (act == NOLINK_ACT_TAKEOVER) {
+                                if (!server_resources_takeover_status) {
+                                    take_over_resources(virtual_ip, ethernet_name);
+                                    server_resources_takeover_status = true;
+                                    printf("-----------------------------\n");
+                                    printf("| server take over resource |\n");
+                                    printf("-----------------------------\n");
+                                } else {
+                                    printf("-------------------------------------\n");
+                                    printf("| server take over resource already |\n");
+                                    printf("-------------------------------------\n");
+                                }
+
+                            } else {
+                                // release
+                                if (!server_resources_takeover_status) {
+                                    printf("-----------------------------------\n");
+                                    printf("| server release resource already |\n");
+                                    printf("-----------------------------------\n");
+                                } else {
+                                    release_resources(virtual_ip, ethernet_name);
+                                    server_resources_takeover_status = false;
+                                    printf("---------------------------\n");
+                                    printf("| server release resource |\n");
+                                    printf("---------------------------\n");
+                                }
+                            }
+                            close(cfd);
+                            break;
 #pragma endregion client_closed_connect
-                    } else if (n == -1) {
-                        perror("read error");
-                        close(cfd);
-                        break;
+                        } else if (n == -1) {
+                            perror("read error");
+                            close(cfd);
+                            break;
+                        }
+
+                        // 服务端开始处理收到的数据
+                        TRANS_DATA *next_send_data;
+                        // 1. 反序列化数据
+                        unsigned char * parsed_buf;
+                        std::string sbuf;
+                        sbuf.assign(buf, n);
+                        parse_telegram(sbuf, n, (void **)(&parsed_buf));
+
+                        // 2. 根据收到的数据生成下次要发送的数据
+                        trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                        free(parsed_buf);
+
+                        // 3. 序列化数据
+                        std::string serialized_data;
+                        size_t serialized_data_size;
+                        make_telegram(next_send_data, serialized_data, &serialized_data_size);
+
+                        // 4. 发送数据
+                        n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
+                        // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
+
+                        printf("----------------------------------------\n");
+                        printf("| server send %d bytes datas to client |\n", n);
+                        printf("----------------------------------------\n");
+#pragma endregion server_recv
                     }
 
-                    // 服务端开始处理收到的数据
-                    TRANS_DATA *next_send_data;
-                    // 1. 反序列化数据
-                    unsigned char * parsed_buf;
-                    std::string sbuf;
-                    sbuf.assign(buf, n);
-                    parse_telegram(sbuf, n, (void **)(&parsed_buf));
-
-                    // 2. 根据收到的数据生成下次要发送的数据
-                    trans_data_generator(parsed_buf, (void **)(&next_send_data));
-                    free(parsed_buf);
-
-                    // 3. 序列化数据
-                    std::string serialized_data;
-                    size_t serialized_data_size;
-                    make_telegram(next_send_data, serialized_data, &serialized_data_size);
-
-                    // 4. 发送数据
-                    n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
-                    // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
-
-                    printf("----------------------------------------\n");
-                    printf("| server send %d bytes datas to client |\n", n);
-                    printf("----------------------------------------\n");
-#pragma endregion server_recv
                 }
-
-            }
 #pragma endregion server_create_connect_success
-        }
+            }
 
+        } else {
+            sleep(keepalive);
+        }
     }
 
     close(lfd);
@@ -531,6 +546,51 @@ int start_by_server_mode(void)
 
     return 0;
 }
+
+/*
+ * 手动切换的线程
+ */
+void * manual_switch(void *)
+{
+    int sfd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len;
+    char buf[BUFSIZ];
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons(694);
+
+    sfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    bind(sfd, (struct sockaddr*) &server_addr, sizeof(server_addr));
+
+    client_len = sizeof(client_addr);
+
+    while (1) {
+        bzero(buf, BUFSIZ);
+        int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *)&client_addr, &client_len);
+        if (n == -1) {
+            perror("recvfrom error");
+        }
+
+        printf("recvfrom buf = %s\n", buf);
+
+        if (strcmp(buf, "standby") == 0) {
+            trouble = true;
+            release_resources(virtual_ip, ethernet_name);
+        } else if (strcmp(buf, "takeover") == 0) {
+            trouble = true;
+            take_over_resources(virtual_ip, ethernet_name);
+        } else {
+            // do nothing
+        }
+
+    }
+
+    return NULL;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -649,6 +709,14 @@ int main(int argc, char *argv[])
     hb_extra.CloseFile();
 
 #pragma endregion main_read_config
+
+#pragma region start_thread
+
+    pthread_t tid;
+    int ret = pthread_create(&tid, NULL, manual_switch, NULL);
+
+#pragma endregion start_thread
+
 
 #pragma region start_mode // 启动方式
     bzero(mode, 0);
