@@ -24,7 +24,7 @@ int plug_init(void * data)
     memcpy(pdata->initStruct.pluginName, "icmp", strlen("icmp"));
 
 
-    hb_log(INFO_SOURCE_APP, INFO_LEVEL_GEN, "icmp plug init\n");
+    hb_log(INFO_SOURCE_APP, INFO_LEVEL_INFO, "icmp plug init\n");
 
 
     HBConfig hb;

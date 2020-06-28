@@ -16,9 +16,10 @@
 #define D_SUCCEED		0		/* 自定义正确状态值 */
 #define D_FAIL			1		/* 自定义错误状态值 */
 
-#define INFO_LEVEL_GEN	"log"	/* 普通信息 */
+#define INFO_LEVEL_INFO	"log"	/* 普通信息 */
 #define INFO_LEVEL_WARN	"warn"	/* 告警信息 */
-#define INFO_LEVEL_EXIT	"exit"	/* 严重警告 */
+#define INFO_LEVEL_ERROR	"error"	/* 严重警告 */
+#define INFO_LEVEL_NOTICE "noitce"
 
 #define INFO_SOURCE_APP	"app"	/* 进程自身产生的信息 */
 #define INFO_SOURCE_DB	"db"	/* 数据库产生的信息 */

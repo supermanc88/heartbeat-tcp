@@ -33,6 +33,7 @@ then
   mkdir "$policyPath"
 fi
 
+echo "copy files"
 cp ./build/bin/* $binPath
 cp ./build/lib/plugins/* $pluginsPath
 cp ./heartbeat-framework/ha.cf $rootPath
@@ -41,7 +42,10 @@ cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
 cp ./heartbeat-framework/resource-mgr/policy* $policyPath
+echo "copy complete!"
 
+echo "start pack files to tar.gz"
 cd /root/
 rm infosec-heartbeat.tar.gz
 tar -czvf infosec-heartbeat.tar.gz ./heartbeat/
+echo "pack complete!"

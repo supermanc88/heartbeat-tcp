@@ -50,4 +50,4 @@ cd /usr/local/lib
 ln -s libprotobuf.so.23.0.3 libprotobuf.so.23
 ln -s libprotobuf.so.23.0.3 libprotobuf.so
 ldconfig
-
+echo "install complete!"
