@@ -40,5 +40,8 @@ cp ./heartbeat-framework/haresources $rootPath
 cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
-cp ./heartbeat-framework/policy* $policyPath
+cp ./heartbeat-framework/resource-mgr/policy* $policyPath
 
+cd /root/
+rm infosec-heartbeat.tar.gz
+tar -czvf infosec-heartbeat.tar.gz ./heartbeat/
