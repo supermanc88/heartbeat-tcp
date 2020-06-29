@@ -50,5 +50,7 @@ cp ./runtimes/* /usr/local/lib/
 cd /usr/local/lib
 ln -s libprotobuf.so.23.0.3 libprotobuf.so.23
 ln -s libprotobuf.so.23.0.3 libprotobuf.so
+ln -s libstdc++.so.6.0.18 libstdc++.so.6
+echo "/usr/local/lib" >> /etc/ld.so.conf.d/hb_runtimes.conf
 ldconfig
 echo "install complete!"

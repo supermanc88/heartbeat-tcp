@@ -41,6 +41,7 @@ cp ./heartbeat-framework/haresources $rootPath
 cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
+cp /usr/local/lib64/libstdc++.so.6.0.18 $runtimes
 cp ./heartbeat-framework/resource-mgr/policy* $policyPath
 cp ./heartbeat-framework/manual-switch/*.sh $rootPath
 echo "copy complete!"
