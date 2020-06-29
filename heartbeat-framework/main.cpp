@@ -576,12 +576,12 @@ void * manual_switch(void *)
             perror("recvfrom error");
         }
 
-        printf("recvfrom buf = %s\n", buf);
-
         if (strcmp(buf, "standby") == 0) {
+            printf("recvfrom buf = %s\n", buf);
             trouble = true;
             release_resources(virtual_ip, ethernet_name);
         } else if (strcmp(buf, "takeover") == 0) {
+            printf("recvfrom buf = %s\n", buf);
             trouble = true;
             take_over_resources(virtual_ip, ethernet_name);
         } else {
@@ -683,9 +683,6 @@ int main(int argc, char *argv[])
 
     printf("server_addr = %s\n", server_addr);
     printf("-------------------------------------------------------------------\n");
-
-    printf("start mode %s\n", mode);
-    printf("---------------------------------------\n");
 
     /*************************/
     // 获取hostname 用户判断主备机

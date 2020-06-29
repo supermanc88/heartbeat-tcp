@@ -39,8 +39,9 @@ cp ./bin/* $binPath
 cp ./plugins/* $pluginsPath
 cp ha.cf $installRootPath
 cp ha.cf $hadir
-cp haresources $installRootPath
+cp haresources $hadir
 cp uninstall.sh $installRootPath
+cp hb_*.sh $installRootPath
 cp ./policy/* $policyPath
 
 

@@ -42,6 +42,7 @@ cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
 cp ./heartbeat-framework/resource-mgr/policy* $policyPath
+cp ./heartbeat-framework/manual-switch/*.sh $rootPath
 echo "copy complete!"
 
 echo "start pack files to tar.gz"
@@ -49,3 +50,5 @@ cd /root/
 rm infosec-heartbeat.tar.gz
 tar -czvf infosec-heartbeat.tar.gz ./heartbeat/
 echo "pack complete!"
+
+rm heartbeat -rf
