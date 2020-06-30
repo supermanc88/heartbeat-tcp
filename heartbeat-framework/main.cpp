@@ -630,41 +630,41 @@ int main(int argc, char *argv[])
 
 #pragma region main_read_config
     // 读取配置,不成功就使用默认配置
-    HBConfig hb;
+    HBConfig hb_config;
     char p_hostname[BUFSIZ];
     char b_hostname[BUFSIZ];
     char ping_target[BUFSIZ];
     char ucast[BUFSIZ];
-    if (RET_SUCCESS == hb.OpenFile(HACONFIG_FILE_PATH, "r")) {
+    if (RET_SUCCESS == hb_config.OpenFile(HACONFIG_FILE_PATH, "r")) {
         char value[BUFSIZ] = {0};
-        if (hb.GetValue("keepalive", value) == RET_SUCCESS)
+        if (hb_config.GetValue("keepalive", value) == RET_SUCCESS)
             keepalive = atoi(value);
-        if (hb.GetValue("deadtime", value) == RET_SUCCESS)
+        if (hb_config.GetValue("deadtime", value) == RET_SUCCESS)
             deadtime = atoi(value);
-        if (hb.GetValue("warntime", value) == RET_SUCCESS)
+        if (hb_config.GetValue("warntime", value) == RET_SUCCESS)
             warntime = atoi(value);
-        if (hb.GetValue("initdeat", value) == RET_SUCCESS)
+        if (hb_config.GetValue("initdeat", value) == RET_SUCCESS)
             initdead = atoi(value);
-        if (hb.GetValue("auto_failback", value) == RET_SUCCESS) {
+        if (hb_config.GetValue("auto_failback", value) == RET_SUCCESS) {
             if (strcmp(value, "on") == 0)
                 auto_failback = true;
             else
                 auto_failback = false;
         }
-        if (hb.GetValue("node", value) == RET_SUCCESS)
+        if (hb_config.GetValue("node", value) == RET_SUCCESS)
             strcpy(p_hostname, value);
-        if (hb.GetValue("node-backup", value) == RET_SUCCESS)
+        if (hb_config.GetValue("node-backup", value) == RET_SUCCESS)
             strcpy(b_hostname, value);
-        if (hb.GetValue("ping", value) == RET_SUCCESS)
+        if (hb_config.GetValue("ping", value) == RET_SUCCESS)
             strcpy(ping_target, value);
-        if (hb.GetValue("server_port", value) == RET_SUCCESS)
+        if (hb_config.GetValue("server_port", value) == RET_SUCCESS)
             server_port = atoi(value);
-        if (hb.GetValue("ucast", value) == RET_SUCCESS)
+        if (hb_config.GetValue("ucast", value) == RET_SUCCESS)
             strcpy(ucast, value);
-        if (hb.GetValue("plugins_dir", value) == RET_SUCCESS)
+        if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS)
             strcpy(plugins_dir, value);
     }
-    hb.CloseFile();
+    hb_config.CloseFile();
 
     printf("-------------------------------------------------------------------\n");
     printf("deadtime = %d, keepalive = %d\n", deadtime, keepalive);

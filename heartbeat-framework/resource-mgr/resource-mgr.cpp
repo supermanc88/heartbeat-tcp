@@ -357,7 +357,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 
     char * vip = virtual_ip;
     // 这里通过check-vip程序来获取本机是否有虚ip
-    sprintf(cmd_str, "./check-virtual-ip %s", vip);
+    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/check-virtual-ip %s", vip);
 
     ret = system(cmd_str);
 
@@ -449,7 +449,7 @@ int take_over_resources(const char *virtual_ip, const char *ethernet_name, int e
 
     bzero(cmd_str, 256);
     // 2. 发送免费arp
-    sprintf(cmd_str, "./send_arp -c 5 -s %s -w 5 -I %s %s", virtual_ip, ethernet_name, virtual_ip);
+    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", virtual_ip, ethernet_name, virtual_ip);
 
     my_system((const char *)cmd_str, "/tmp/send_arp.tmp");
     return 0;

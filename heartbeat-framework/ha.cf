@@ -64,7 +64,7 @@ server_port 8888
 #
 #	What interfaces to broadcast heartbeats over?
 #
-bcast	ens33		# Linux
+bcast	eth0		# Linux
 #bcast	eth1 eth2	# Linux
 #bcast	le0		# Solaris
 #bcast	le1 le2		# Solaris
@@ -94,7 +94,7 @@ bcast	ens33		# Linux
 #	[dev]		device to send/rcv heartbeats on
 #	[peer-ip-addr]	IP address of peer to send packets to
 #
-ucast ens33 192.168.231.148
+ucast eth0 192.168.231.148
 #	The default value for auto_failback is "legacy", which
 #	will issue a warning at startup.  So, make sure you put
 #	an auto_failback directive in your ha.cf file.
