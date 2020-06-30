@@ -18,6 +18,7 @@
 
 
 #define HACONFIG_FILE_PATH  "/etc/ha.d/ha.cf"
+#define HARESOURCES_FILE_PATH "/etc/ha.d/haresources"
 
 /**
  * 传输数据的类型

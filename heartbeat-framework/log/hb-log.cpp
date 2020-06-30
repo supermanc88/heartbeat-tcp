@@ -105,7 +105,7 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
         }
         fclose( fp );
         fp = NULL;
-        exit(1);
+//        exit(1);
     }
     if ( NULL != fp )
     {

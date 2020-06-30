@@ -22,6 +22,7 @@ extern bool auto_failback;
 extern char server_addr[BUFSIZ];
 extern char virtual_ip[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
+extern int eth_num;
 
 //int main(void)
 //{
@@ -92,7 +93,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == ACTION_TYPE_GET_RES) {
                 printf("server recv get res,so server start take over the resources\n");
-                take_over_resources(virtual_ip, ethernet_name);
+                take_over_resources(virtual_ip, ethernet_name, eth_num);
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
@@ -157,7 +158,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else if (action_type == ACTION_TYPE_FREED_RES) {
                 // 开始接管资源
                 printf("server reply freed resource,so client start take over the resources\n");
-                take_over_resources(virtual_ip, ethernet_name);
+                take_over_resources(virtual_ip, ethernet_name, eth_num);
                 client_resources_takeover_status = true;
             } else {
                 // nothing!
@@ -433,7 +434,7 @@ int policy_no_link_init()
     return 0;
 }
 
-int take_over_resources(const char *virtual_ip, const char *ethernet_name)
+int take_over_resources(const char *virtual_ip, const char *ethernet_name, int eth_num)
 {
     char cmd_str[256] = {0};
 
@@ -441,7 +442,7 @@ int take_over_resources(const char *virtual_ip, const char *ethernet_name)
     printf("Start taking over resources...\n");
 
     // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr add %s/24 dev %s label %s:0", virtual_ip, ethernet_name, ethernet_name);
+    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip, ethernet_name, ethernet_name, eth_num);
 
     my_system((const char *)cmd_str, "/tmp/takeover.tmp");
 
@@ -461,7 +462,7 @@ int release_resources(const char *virtual_ip, const char *ethernet_name)
     printf("Start to release resources...\n");
 
     // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr delete %s/24 dev %s", virtual_ip, ethernet_name);
+    sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip, ethernet_name);
 
     my_system((const char *)cmd_str, "/tmp/release_resources.tmp");
     return 0;

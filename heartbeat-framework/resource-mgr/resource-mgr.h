@@ -128,7 +128,7 @@ int policy_no_link_backup_init();
  * 接管资源
  * @return
  */
-int take_over_resources(const char *virtual_ip, const char *ethernet_name);
+int take_over_resources(const char *virtual_ip, const char *ethernet_name, int eth_num);
 
 /**
  * 释放资源

@@ -24,6 +24,10 @@ int main(int argc, char * argv[])
     char * port = argv[2];
     char * operation = argv[3];
 
+    if (operation[strlen(operation)] == '\n') {
+        operation[strlen(operation)] = '\0';
+    }
+
     printf("ip = %s, port = %s, operation = %s\n", ip, port, operation);
 
     sfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -34,7 +38,18 @@ int main(int argc, char * argv[])
     inet_pton(AF_INET, ip, &serv_addr.sin_addr.s_addr);
     serv_addr.sin_port = htons(atoi(port));
 
-    sendto(sfd, operation, strlen(operation), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if (strstr(operation, "takeover"))
+        operation = "takeover";
+    else
+        operation = "standby";
+
+    int ret = sendto(sfd, operation, strlen(operation), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
+    if (ret == -1) {
+        perror("sendto error");
+    } else {
+        printf("sendto %d bytes\n", ret);
+    }
 
     return 0;
 }
