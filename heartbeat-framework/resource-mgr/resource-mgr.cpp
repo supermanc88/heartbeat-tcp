@@ -449,6 +449,7 @@ int take_over_resources(const char *virtual_ip, const char *ethernet_name, int e
 
     bzero(cmd_str, 256);
     // 2. 发送免费arp
+    // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
     sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", virtual_ip, ethernet_name, virtual_ip);
 
     my_system((const char *)cmd_str, "/tmp/send_arp.tmp");
