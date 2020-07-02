@@ -33,7 +33,7 @@ int server_port = SERVERPORT;
 bool auto_failback = true;
 char server_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
-char ethernet_name[BUFSIZ] = "ens33";
+char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
@@ -79,7 +79,7 @@ int start_by_client_mode(void)
     inet_pton(AF_INET, server_addr, &i_addr);
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(5555);
+    serv_addr.sin_port = htons(server_port);
     serv_addr.sin_addr.s_addr = i_addr;
 
 
@@ -337,8 +337,7 @@ int start_by_server_mode(void)
 #pragma region server_pre_create_connect    // 设置端口复用等
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(5555);
-    unsigned int addr;
+    serv_addr.sin_port = htons(server_port);
 //    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
     serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -363,6 +362,7 @@ int start_by_server_mode(void)
             FD_SET(lfd, &set);
 
             tv.tv_sec = deadtime;
+            printf("select lfd wait %d seconds\n", tv.tv_sec);
             ret = select(lfd + 1, &set, NULL, NULL, &tv);
 
             if (ret == -1) {
@@ -542,6 +542,7 @@ int start_by_server_mode(void)
             }
 
         } else {
+            printf("sleep %d seconds\n", keepalive);
             sleep(keepalive);
         }
     }
@@ -743,18 +744,15 @@ int main(int argc, char *argv[])
     printf("start mode = %s\n", mode);
     printf("---------------------------------------\n");
 
-    if (b_mode_set) {
-// 只有两种启动方式，client server
-        if (strcmp(mode, "client") == 0)
-            start_by_client_mode();
-        else if (strcmp(mode, "server") == 0)
-            start_by_server_mode();
-        else {
-            usage();
-            exit(1);
-        }
-    } else          // 如果没有设置-m参数，则默认以client形式启动
+
+    if (strcmp(mode, "client") == 0)
         start_by_client_mode();
+    else if (strcmp(mode, "server") == 0)
+        start_by_server_mode();
+    else {
+        usage();
+        exit(1);
+    }
 #pragma endregion start_mode
 
     return 0;

@@ -77,8 +77,5 @@ int plug_run(void * data)
 
 int main(void)
 {
-//    PLUG_DATA data = {0};
-//    plug_init(&data);
-
     plug_run(NULL);
 }

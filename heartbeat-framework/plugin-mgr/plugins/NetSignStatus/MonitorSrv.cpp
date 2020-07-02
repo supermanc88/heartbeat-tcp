@@ -715,15 +715,15 @@ int monitor_srv_init()
 	}
 
 
-	//获取虚IP和HA主机的名称
-	Ret = GetVipAndMasterName(VIP, MasterName);
-	if(0 != Ret) 	
-	{
-		LOGERROR("%s\n","GetVipAndMasterName err");
-		goto EXIT;
-	}
-
 #pragma region comment
+
+//获取虚IP和HA主机的名称
+//	Ret = GetVipAndMasterName(VIP, MasterName);
+//	if(0 != Ret)
+//	{
+//		LOGERROR("%s\n","GetVipAndMasterName err");
+//		goto EXIT;
+//	}
 //	//如果mon_mode为0，则(监控程序仅在HA主机运行，主机监控本身服务，不正常则切换，正常则往主机回切)
 //	//如果mon_mode为1，则(如果虚IP不在本机则检测有虚IP的机器服务状态，如果在本机则什么都不做)
 //	//如果mon_mode为2，则(本机有虚IP->本机服务不正常->对端服务正常->切换过去)
@@ -980,7 +980,7 @@ int monitor_srv_init()
 #pragma endregion comment
 EXIT:
 
-	LOGINFO("%s\n","MonSrv exit");
+	LOGINFO("%s\n","MonSrv init");
 
 	printf("%s","-------------------------------------------------------------------\n");
 
