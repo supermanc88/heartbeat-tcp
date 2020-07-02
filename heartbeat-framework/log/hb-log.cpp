@@ -50,7 +50,7 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
                      tmpTime + 8,
                      tmpTime + 10,
                      tmpTime + 12,
-                    INFO_SOURCE_SYS, INFO_LEVEL_ERROR, "can not open file" );
+                    INFO_SOURCE_HBLOG, INFO_LEVEL_ERROR, "can not open file" );
 
             perror("fopen error");
             fclose( fp );
@@ -68,11 +68,11 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
             info_source, info_level );
     if ( fTorF )
     {
-        fprintf( fp, "%s", tmpBuf );
+        fprintf( fp, "%s\n", tmpBuf );
     }
     else
     {
-        fprintf( stdout, "%s", tmpBuf );
+        fprintf( stdout, "%s\n", tmpBuf );
     }
     va_start(vaList, fmt );
     if ( fTorF )
@@ -87,21 +87,21 @@ int hb_log(char* info_source, char* info_level, char* fmt, ... )
     va_end( vaList );
     if ( 0 == strcmp(info_level, INFO_LEVEL_ERROR ) )
     {
-        sprintf(tmpBuf, "[%4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s][%s][%s][%s]\n",
+        sprintf(tmpBuf, "[%4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s][%s][%s][%s]",
                 tmpTime,
                  tmpTime + 4,
                  tmpTime + 6,
                  tmpTime + 8,
                  tmpTime + 10,
                  tmpTime + 12,
-                INFO_SOURCE_SYS, INFO_LEVEL_ERROR, "exit with error\n" );
+                info_source, INFO_LEVEL_ERROR, "exit with error" );
         if( fTorF )
         {
-            fprintf( fp, "%s", tmpBuf );
+            fprintf( fp, "%s\n", tmpBuf );
         }
         else
         {
-            printf( "%s", tmpBuf );
+            printf( "%s\n", tmpBuf );
         }
         fclose( fp );
         fp = NULL;

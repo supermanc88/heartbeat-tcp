@@ -77,7 +77,7 @@ int GetIpByHost(char *hostname, char *master_ip)
 
 	if((fp = fopen(HA_HOST, "r")) == NULL)
 	{
-		LOGERROR("%s","Open hosts Err");
+		LOGERROR("%s\n","Open hosts Err");
 		return -1;
 	}
 
@@ -101,7 +101,7 @@ int GetIpByHost(char *hostname, char *master_ip)
 
 	if(NULL == name_bgn || 0 == strlen(master_ip))
 	{
-		LOGERROR("%s","GetIpByHost Err");
+		LOGERROR("%s\n","GetIpByHost Err");
 		fclose(fp);
 		return -1;
 	}
@@ -149,7 +149,7 @@ int GetHostRealIP(char *real_ip)
 
 	trim(host_ip);
 
-	LOGINFO("This node's real ip: %s", host_ip);
+	LOGINFO("This node's real ip: %s\n", host_ip);
 
 	strcpy(real_ip, host_ip);
 
@@ -173,11 +173,11 @@ int GetPeerHostName(char *perr_name)
 	char ThisHostName[BUFFSIZE] = {0x00};
 
 	GetHostName(ThisHostName);
-	LOGINFO("This node's host_name: %s", ThisHostName);
+	LOGINFO("This node's host_name: %s\n", ThisHostName);
 
 	if((fp = fopen(HA_CONFIG, "r")) == NULL)
 	{
-		LOGERROR("%s","Open ha.cf Err");
+		LOGERROR("%s\n","Open ha.cf Err");
 		return OPEN_CONFIG;
 	}
 
@@ -205,7 +205,7 @@ int GetPeerHostName(char *perr_name)
 
 	if (0 == nHostCount)
 	{
-		LOGERROR("%s","GetNode err");
+		LOGERROR("%s\n","GetNode err");
 		return GETPARAMETER;
 	}
 
@@ -223,7 +223,7 @@ int GetPeerHostName(char *perr_name)
 	}
 	else
 	{
-		LOGERROR("%s","GetPeerName err");
+		LOGERROR("%s\n","GetPeerName err");
 		return GET_PEERNAME_ERR;
 	}
 	return 0;
@@ -240,13 +240,13 @@ int GetPeerRealIP(char *perr_ip)
 	if (0 != iRet)
 		return iRet;
 
-	LOGINFO("Peer HostName: %s", peer_hostname);
+	LOGINFO("Peer HostName: %s\n", peer_hostname);
 
 	iRet = GetIpByHost(peer_hostname, perr_ip);
 	if (0 != iRet)
 		return iRet;
 
-	LOGINFO("Peer Ip: %s", perr_ip);
+	LOGINFO("Peer Ip: %s\n", perr_ip);
 
 	return 0;
 }
@@ -263,7 +263,7 @@ int GetPingTargets(char * PingTargets)
 
 	if((fp = fopen(HA_CONFIG, "r")) == NULL)
 	{
-		LOGERROR("%s","Open ha.cf Err");
+		LOGERROR("%s\n","Open ha.cf Err");
 		return OPEN_CONFIG;
 	}
 
@@ -290,7 +290,7 @@ int GetPingTargets(char * PingTargets)
 
 	if(NULL == PingBgn || NULL == PingBgn)
 	{
-		LOGERROR("%s","GetGwIP err");
+		LOGERROR("%s\n","GetGwIP err");
 		fclose(fp);
 		return GETPARAMETER;
 	}
@@ -318,7 +318,7 @@ int GetVipAndMasterName(char * VIP, char *MasterName)
 
 	if((fp = fopen(HA_RESOURCES, "r")) == NULL)
 	{
-		LOGERROR("%s","Open Haresources Err");
+		LOGERROR("%s\n","Open Haresources Err");
 		return -1;
 	}
 
@@ -338,19 +338,19 @@ int GetVipAndMasterName(char * VIP, char *MasterName)
 			pVIPEnd = strstr(Buff, "/");
 			if(NULL == pVIPEnd)
 			{
-				LOGERROR("%s","Get Visual Ip Err");
+				LOGERROR("%s\n","Get Visual Ip Err");
 				fclose(fp);
 				return -1;
 			}
 
 			memcpy(VIP, pVIPBgn, pVIPEnd - pVIPBgn);
 
-			LOGINFO("Visual ip: %s", VIP);
+			LOGINFO("Visual ip: %s\n", VIP);
 
 			memcpy(MasterName, Buff, pIPaddrStr - Buff);
 			trim(MasterName);
 
-			LOGINFO("HA MasterName: %s", MasterName);
+			LOGINFO("HA MasterName: %s\n", MasterName);
 
 			break;
 		}
@@ -359,7 +359,7 @@ int GetVipAndMasterName(char * VIP, char *MasterName)
 
 	if(NULL == pIPaddrStr || NULL == pVIPBgn || NULL == pVIPEnd)
 	{
-		LOGERROR("%s","Get Visual Ip Err");
+		LOGERROR("%s\n","Get Visual Ip Err");
 		fclose(fp);
 		return -1;
 	}
@@ -412,7 +412,7 @@ int IsMaster(char *HaMasterName)
 	trim(HostName);
 
 
-	LOGINFO("This node's hostname: %s", HostName);
+	LOGINFO("This node's hostname: %s\n", HostName);
 	if(0 == strcmp(HaMasterName, HostName))
 	{
 		return 0;
@@ -434,22 +434,22 @@ int DetectService(char * IpAddr, int Port, int TimeOut)
 	ret = DetectConnect(IpAddr, Port, TimeOut, &sockfd);
 	if(0 != ret)
 	{
-		LOGWARN("%s", "DetectConnect failed...");
+		LOGWARN("%s\n", "DetectConnect failed...");
 		return -1;
 	}
 	else
-		LOGINFO("%s", "DetectConnect success");
+		LOGINFO("%s\n", "DetectConnect success");
 
 	
 	ret = DetectResponse(sockfd, detect_string, detect_strLen);
 	if(0 != ret)
 	{
-		LOGWARN("%s", "DetectResponse failed...");
+		LOGWARN("%s\n", "DetectResponse failed...");
 		SocketClose(sockfd);
 		return -1;
 	}
 	else
-		LOGINFO("%s", "DetectResponse success");
+		LOGINFO("%s\n", "DetectResponse success");
 
 
 	SocketClose(sockfd);
@@ -471,7 +471,7 @@ int GetSrvStatus(char * RIP, char * VIP)
 	bool ld = readingDoc.loadFromFile(SRV_CONF_PATH);
 	if ( false == ld ) 
 	{
-		LOGERROR("%s","LOADXML_ERROR");
+		LOGERROR("%s\n","LOADXML_ERROR");
 		return LOADXML_ERROR;
 	}
 
@@ -479,7 +479,7 @@ int GetSrvStatus(char * RIP, char * VIP)
 	XmlNode* readingNode = readingDoc.findChild("service-config");
 	if ( NULL == readingNode)
 	{
-		LOGERROR("%s","GET_ROOTNODE_ERROR");
+		LOGERROR("%s\n","GET_ROOTNODE_ERROR");
 		return GET_ROOTNODE;
 	}
 	XmlNode* serviceNode = NULL;
@@ -504,7 +504,7 @@ int GetSrvStatus(char * RIP, char * VIP)
 			XmlAttribute *attr = serviceNode->findAttribute("name");
 			if ( attr == NULL ) 
 			{
-				LOGERROR("%s","GET_SRVNAME_ERROR");	
+				LOGERROR("%s\n","GET_SRVNAME_ERROR");
 				return GET_SRVNAME;
 			}
 
@@ -512,7 +512,7 @@ int GetSrvStatus(char * RIP, char * VIP)
 			XmlNode* portNode = serviceNode->findChild("port");
 			if ( portNode == NULL )
 			{
-				LOGERROR("%s","GET_PORTNODE_ERROR");	
+				LOGERROR("%s\n","GET_PORTNODE_ERROR");
 				return GET_PORTNODE;
 			}
 
@@ -539,7 +539,7 @@ int GetSrvStatus(char * RIP, char * VIP)
 
 			for(ConnectCount = 0; ConnectCount <= connect_retry; ConnectCount ++)
 			{
-				LOGINFO("Detect Service [%s]...", attr->getString());
+				LOGINFO("Detect Service [%s]...\n", attr->getString());
 
 				//探测服务状态
 				//Ret = Detect((char *)ipNode->getString(), atoi(portNode->getString()), connect_timeout);
@@ -564,13 +564,13 @@ int GetSrvStatus(char * RIP, char * VIP)
 
 			if(0 != Ret)
 			{
-				LOGERROR("Service [%s] status: invalid", attr->getString());
+				LOGERROR("Service [%s] status: invalid\n", attr->getString());
 				
 				return GOTO_STANDBY;
 			}
 			else
 			{
-				LOGINFO("Service [%s] status: normal", attr->getString());
+				LOGINFO("Service [%s] status: normal\n", attr->getString());
 		
 			}
 		}
@@ -591,7 +591,7 @@ int LoadMonSrvConf()
 	FILE * fp = fopen(MONSRVCONF, "r");
 	if(NULL == fp)
 	{
-		LOGERROR("%s", "Open monsrvconf err");
+		LOGERROR("%s\n", "Open monsrvconf err");
 		return -1;
 	}
 	char *pName  = NULL;
@@ -657,7 +657,7 @@ int LoadMonSrvConf()
 			}
 			else
 			{
-				LOGERROR("%s", "MonsrvConf Parameter Err");
+				LOGERROR("%s\n", "MonsrvConf Parameter Err");
 				fclose(fp);
 				return -1;
 			}
@@ -683,11 +683,11 @@ int LoadMonSrvConf()
 		{
 			mon_mode = atoi(trim(pValue));
 
-			LOGINFO("mon_mode = %d", mon_mode);
+			LOGINFO("mon_mode = %d\n", mon_mode);
 
 			if (mon_mode > 2 || mon_mode < 0)
 			{
-				LOGERROR("%s", "MonsrvConf Parameter Err");
+				LOGERROR("%s\n", "MonsrvConf Parameter Err");
 				fclose(fp);
 				return -1;
 			}
@@ -710,7 +710,7 @@ int monitor_srv_init()
 	//载入配置文件
 	if(0 != LoadMonSrvConf())
 	{
-		LOGERROR("%s","LoadMonSrvIni err");
+		LOGERROR("%s\n","LoadMonSrvIni err");
 		goto EXIT;
 	}
 
@@ -719,7 +719,7 @@ int monitor_srv_init()
 	Ret = GetVipAndMasterName(VIP, MasterName);
 	if(0 != Ret) 	
 	{
-		LOGERROR("%s","GetVipAndMasterName err");
+		LOGERROR("%s\n","GetVipAndMasterName err");
 		goto EXIT;
 	}
 
@@ -980,7 +980,7 @@ int monitor_srv_init()
 #pragma endregion comment
 EXIT:
 
-	LOGINFO("%s","MonSrv exit");
+	LOGINFO("%s\n","MonSrv exit");
 
 	printf("%s","-------------------------------------------------------------------\n");
 

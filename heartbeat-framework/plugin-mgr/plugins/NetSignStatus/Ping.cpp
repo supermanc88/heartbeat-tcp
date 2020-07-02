@@ -193,7 +193,7 @@ int Ping(char *ips, int timeout, int failretrytimes)
 	{
 		ret = RetyPing(ip, timeout, failretrytimes);
 
-		LOGINFO("PING target: %s Ret = %d", ip, ret);
+		LOGINFO("PING target: %s Ret = %d\n", ip, ret);
 
 		ip = strtok(NULL," ");
 

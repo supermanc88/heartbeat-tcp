@@ -36,6 +36,7 @@ char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "ens33";
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
+int udpport = 694;
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -563,7 +564,7 @@ void * manual_switch(void *)
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_addr.sin_port = htons(694);
+    server_addr.sin_port = htons(udpport);
 
     sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -663,6 +664,8 @@ int main(int argc, char *argv[])
             strcpy(ucast, value);
         if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS)
             strcpy(plugins_dir, value);
+        if (hb_config.GetValue("udpport", value) == RET_SUCCESS)
+            udpport = atoi(value);
     }
     hb_config.CloseFile();
 
@@ -671,6 +674,7 @@ int main(int argc, char *argv[])
     printf("primary hostname = %s, backup hostname = %s\n", p_hostname, b_hostname);
     printf("ping_target = %s, server_port = %d\n", ping_target, server_port);
     printf("ucast = %s\n", ucast);
+    printf("udpport = %d\n", udpport);
     printf("-------------------------------------------------------------------\n");
 
 

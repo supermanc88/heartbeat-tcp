@@ -24,7 +24,7 @@ int plug_init(void * data)
     memcpy(pdata->initStruct.pluginName, "icmp", strlen("icmp"));
 
 
-    hb_log(INFO_SOURCE_APP, INFO_LEVEL_INFO, "icmp plug init\n");
+    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug init\n");
 
 
     HBConfig hb;
@@ -59,15 +59,15 @@ int plug_run(void * data)
     else {
         if (WIFEXITED(ret)) {
             if (WEXITSTATUS(ret) == 0) {
-                printf("system ping success\n");
+                hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping success\n");
                 return 1;
             }
             else {
-                printf("system ping error\n");
+                hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping error\n");
                 return 0;
             }
         } else
-            printf("system error code = %d\n", WEXITSTATUS(ret));
+            hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system error code = %d\n", WEXITSTATUS(ret));
     }
 
     return 0;
