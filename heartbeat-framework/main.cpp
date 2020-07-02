@@ -32,7 +32,7 @@ int initdead = INITDEAD;
 int server_port = SERVERPORT;
 bool auto_failback = true;
 char server_addr[BUFSIZ] = SERVER_IP;
-char virtual_ip[BUFSIZ] = VIRTUAL_IP;
+char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "ens33";
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
@@ -105,7 +105,7 @@ int start_by_client_mode(void)
                     // do nothing
                 } else if (act == NOLINK_ACT_TAKEOVER) {
                     if (!client_resources_takeover_status) {
-                        take_over_resources(virtual_ip, ethernet_name, eth_num);
+                        take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
                         printf("-----------------------------\n");
                         printf("| client take over resource |\n");
@@ -123,7 +123,7 @@ int start_by_client_mode(void)
                         printf("| client release resource already |\n");
                         printf("-----------------------------------\n");
                     } else {
-                        release_resources(virtual_ip, ethernet_name);
+                        release_resources(virtual_ip_segment, ethernet_name);
                         client_resources_takeover_status = false;
                         printf("---------------------------\n");
                         printf("| client release resource |\n");
@@ -199,7 +199,7 @@ int start_by_client_mode(void)
                     // do nothing
                 } else if (act == NOLINK_ACT_TAKEOVER) {
                     if (!client_resources_takeover_status) {
-                        take_over_resources(virtual_ip, ethernet_name, eth_num);
+                        take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
                         printf("-----------------------------\n");
                         printf("| client take over resource |\n");
@@ -217,7 +217,7 @@ int start_by_client_mode(void)
                         printf("| client release resource already |\n");
                         printf("-----------------------------------\n");
                     } else {
-                        release_resources(virtual_ip, ethernet_name);
+                        release_resources(virtual_ip_segment, ethernet_name);
                         client_resources_takeover_status = false;
                         printf("---------------------------\n");
                         printf("| client release resource |\n");
@@ -249,7 +249,7 @@ int start_by_client_mode(void)
                         // do nothing
                     } else if (act == NOLINK_ACT_TAKEOVER) {
                         if (!client_resources_takeover_status) {
-                            take_over_resources(virtual_ip, ethernet_name, eth_num);
+                            take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                             client_resources_takeover_status = true;
                             printf("-----------------------------\n");
                             printf("| client take over resource |\n");
@@ -267,7 +267,7 @@ int start_by_client_mode(void)
                             printf("| client release resource already |\n");
                             printf("-----------------------------------\n");
                         } else {
-                            release_resources(virtual_ip, ethernet_name);
+                            release_resources(virtual_ip_segment, ethernet_name);
                             client_resources_takeover_status = false;
                             printf("---------------------------\n");
                             printf("| client release resource |\n");
@@ -380,7 +380,7 @@ int start_by_server_mode(void)
                     // do nothing
                 } else if (act == NOLINK_ACT_TAKEOVER) {
                     if (!server_resources_takeover_status) {
-                        take_over_resources(virtual_ip, ethernet_name, eth_num);
+                        take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         server_resources_takeover_status = true;
                         printf("server take over resource\n");
                     } else {
@@ -392,7 +392,7 @@ int start_by_server_mode(void)
                     if (!server_resources_takeover_status) {
                         printf("server release resource already\n");
                     } else {
-                        release_resources(virtual_ip, ethernet_name);
+                        release_resources(virtual_ip_segment, ethernet_name);
                         server_resources_takeover_status = false;
                         printf("server release resource\n");
                     }
@@ -432,7 +432,7 @@ int start_by_server_mode(void)
                             // do nothing
                         } else if (act == NOLINK_ACT_TAKEOVER) {
                             if (!server_resources_takeover_status) {
-                                take_over_resources(virtual_ip, ethernet_name, eth_num);
+                                take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                                 server_resources_takeover_status = true;
                                 printf("server take over resource\n");
                             } else {
@@ -444,7 +444,7 @@ int start_by_server_mode(void)
                             if (!server_resources_takeover_status) {
                                 printf("server release resource already\n");
                             } else {
-                                release_resources(virtual_ip, ethernet_name);
+                                release_resources(virtual_ip_segment, ethernet_name);
                                 server_resources_takeover_status = false;
                                 printf("server release resource\n");
                             }
@@ -475,7 +475,7 @@ int start_by_server_mode(void)
                                 // do nothing
                             } else if (act == NOLINK_ACT_TAKEOVER) {
                                 if (!server_resources_takeover_status) {
-                                    take_over_resources(virtual_ip, ethernet_name, eth_num);
+                                    take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                                     server_resources_takeover_status = true;
                                     printf("-----------------------------\n");
                                     printf("| server take over resource |\n");
@@ -493,7 +493,7 @@ int start_by_server_mode(void)
                                     printf("| server release resource already |\n");
                                     printf("-----------------------------------\n");
                                 } else {
-                                    release_resources(virtual_ip, ethernet_name);
+                                    release_resources(virtual_ip_segment, ethernet_name);
                                     server_resources_takeover_status = false;
                                     printf("---------------------------\n");
                                     printf("| server release resource |\n");
@@ -580,10 +580,10 @@ void * manual_switch(void *)
         printf("recvfrom buf = %s\n", buf);
         if (strcmp(buf, "standby") == 0) {
             trouble = true;
-            release_resources(virtual_ip, ethernet_name);
+            release_resources(virtual_ip_segment, ethernet_name);
         } else if (strcmp(buf, "takeover") == 0) {
             trouble = true;
-            take_over_resources(virtual_ip, ethernet_name, eth_num);
+            take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
         } else {
             // do nothing
         }
@@ -709,11 +709,11 @@ int main(int argc, char *argv[])
 
     HBRes hb_res;
     hb_res.open_file(HARESOURCES_FILE_PATH);
-    hb_res.get_virtual_ip(virtual_ip);
+    hb_res.get_virtual_ip(virtual_ip_segment);
     hb_res.get_ethernet_name(ethernet_name, &eth_num);
     hb_res.close_file();
 
-    printf("virtual_ip = %s\n", virtual_ip);
+    printf("virtual_ip = %s\n", virtual_ip_segment);
     printf("ethernet_name = %s\n", ethernet_name);
     printf("eth_num = %d\n", eth_num);
     printf("---------------------------------------\n");
