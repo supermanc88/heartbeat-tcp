@@ -31,6 +31,7 @@ int warntime = WARNTIME;
 int initdead = INITDEAD;
 int server_port = SERVERPORT;
 bool auto_failback = true;
+char ping_target[BUFSIZ] = "192.168.231.1";
 char server_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "eth0";
@@ -635,7 +636,6 @@ int main(int argc, char *argv[])
     HBConfig hb_config;
     char p_hostname[BUFSIZ];
     char b_hostname[BUFSIZ];
-    char ping_target[BUFSIZ];
     char ucast[BUFSIZ];
     if (RET_SUCCESS == hb_config.OpenFile(HACONFIG_FILE_PATH, "r")) {
         char value[BUFSIZ] = {0};
