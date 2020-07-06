@@ -119,6 +119,7 @@ int policy_no_link_primary_init();
 
 /**
  * 初始化备机在不连通状态下的策略
+ * 此函数已不再使用，未连通状态下的策略由policy_primary.dat提供
  * @return
  */
 int policy_no_link_backup_init();

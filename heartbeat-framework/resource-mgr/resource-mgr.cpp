@@ -432,7 +432,7 @@ int policy_link_init()
 int policy_no_link_init()
 {
     policy_no_link_primary_init();
-    policy_no_link_backup_init();
+//    policy_no_link_backup_init();
 
     return 0;
 }
