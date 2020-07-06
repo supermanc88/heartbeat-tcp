@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 #include_directories(protobuf-src)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
 set(SRC_PATH
         main.cpp

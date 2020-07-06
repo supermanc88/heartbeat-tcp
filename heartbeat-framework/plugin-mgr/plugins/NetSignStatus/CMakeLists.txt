@@ -13,7 +13,7 @@ link_libraries(${LIBRARY_DIRECTORY})
 
 project(plug_netsignstatus)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
 include_directories(../../../log)
 

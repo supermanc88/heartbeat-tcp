@@ -341,7 +341,7 @@ int start_by_server_mode(void)
     serv_addr.sin_port = htons(server_port);
 //    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     // 设置端口重用
     setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, &serv_addr, sizeof(serv_addr));
 
@@ -361,9 +361,8 @@ int start_by_server_mode(void)
             fd_set set;
             FD_ZERO(&set);
             FD_SET(lfd, &set);
-
-            tv.tv_sec = deadtime;
-            printf("select lfd wait %d seconds\n", tv.tv_sec);
+            tv.tv_sec = 1;
+            printf("select lfd wait %d seconds, lfd = %d\n", tv.tv_sec, lfd);
             ret = select(lfd + 1, &set, NULL, NULL, &tv);
 
             if (ret == -1) {
@@ -403,6 +402,7 @@ int start_by_server_mode(void)
 #pragma endregion server_create_connect_timeout
             } else {
 #pragma region server_create_connect_success
+                printf("a read comming!\n");
                 // 在deadtime时间内建立连接
                 cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
                 inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
@@ -735,11 +735,19 @@ int main(int argc, char *argv[])
 
 #pragma region start_mode // 启动方式
     bzero(mode, 0);
+//    if (strcmp(hostname, p_hostname) == 0) {
+//        strcpy(mode, "client");
+//    } else if (strcmp(hostname, b_hostname) == 0){
+//        strcpy(mode, "server");
+//    } else {
+//        printf("Configuration error, hostname does not match\n");
+//        return 0;
+//    }
+
     if (strcmp(hostname, p_hostname) == 0) {
         strcpy(mode, "client");
-    } else {
+    } else
         strcpy(mode, "server");
-    }
 
     printf("start mode = %s\n", mode);
     printf("---------------------------------------\n");

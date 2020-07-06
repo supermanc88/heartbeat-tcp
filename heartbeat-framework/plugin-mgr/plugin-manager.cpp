@@ -93,7 +93,7 @@ PLUG_RET plugin_manager_init()
 
     list_plug_directory(plugins_dir);
 
-    printf("----------------------------\n");
+    printf("plugins_path.size = %d\n", plugins_path.size());
 
     for (i = 0; i < plugins_path.size(); i++)
         printf("%s\n", plugins_path[i].c_str());
