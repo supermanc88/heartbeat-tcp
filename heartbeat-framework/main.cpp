@@ -71,6 +71,7 @@ int start_by_client_mode(void)
 
     int try_time_sum = 0;
     struct timeval tv;
+    bzero(&tv, sizeof(struct timeval));
     tv.tv_sec = deadtime;
 
 #pragma region client_create_connect    //客户端创建连接
@@ -361,7 +362,8 @@ int start_by_server_mode(void)
             fd_set set;
             FD_ZERO(&set);
             FD_SET(lfd, &set);
-            tv.tv_sec = 1;
+            bzero(&tv, sizeof(struct timeval));
+            tv.tv_sec = deadtime;
             printf("select lfd wait %d seconds, lfd = %d\n", tv.tv_sec, lfd);
             ret = select(lfd + 1, &set, NULL, NULL, &tv);
 
@@ -416,7 +418,7 @@ int start_by_server_mode(void)
                     // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
                     FD_ZERO(&set);
                     FD_SET(cfd, &set);
-
+                    bzero(&tv, sizeof(struct timeval));
                     tv.tv_sec = deadtime;
                     ret = select(cfd + 1, &set, NULL, NULL, &tv);
 
