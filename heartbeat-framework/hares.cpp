@@ -22,12 +22,14 @@ HBRes::~HBRes()
 
 void HBRes::get_virtual_ip(char *vip)
 {
-    strcpy(vip, this->vip);
+    if (this->vip)
+        strcpy(vip, this->vip);
 }
 
 void HBRes::get_ethernet_name(char *eth, int *eth_num)
 {
-    strcpy(eth, this->eth);
+    if (this->eth)
+        strcpy(eth, this->eth);
     *eth_num = this->eth_num;
 }
 

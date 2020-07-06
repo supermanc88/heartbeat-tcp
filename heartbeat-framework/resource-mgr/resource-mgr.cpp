@@ -382,6 +382,9 @@ int policy_link_init()
 
     fp = fopen(POLICY_LINK_PATH, "r");
 
+    if (fp == NULL)
+        return 0;
+
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
         if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
@@ -516,6 +519,8 @@ int policy_no_link_primary_init()
     int space_pos = -1;
 
     fp = fopen(POLICY_NOLINK_PRIMARY_PATH, "r");
+    if (fp == NULL)
+        return 0;
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
@@ -570,6 +575,8 @@ int policy_no_link_backup_init()
     int space_pos = -1;
 
     fp = fopen(POLICY_NOLINK_BACKUP_PATH, "r");
+    if (fp == NULL)
+        return 0;
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行

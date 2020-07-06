@@ -104,9 +104,6 @@ HB_RET HBConfig::ParseFile() {
             }
         }
 
-
-//        std::cout << sline << std::endl;
-
     }
 
 
