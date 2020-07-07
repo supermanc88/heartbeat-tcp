@@ -612,7 +612,7 @@ void * manual_switch(void *)
         if (n == -1) {
             perror("recvfrom error");
         }
-        printf("recvfrom buf = %s\n", buf);
+        printf("manual_switch thread : recvfrom buf = %s\n", buf);
         if (strcmp(buf, "standby") == 0) {
             trouble = true;
             release_resources(virtual_ip_segment, ethernet_name);
