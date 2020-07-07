@@ -52,7 +52,7 @@ int plug_run(void * data)
 
     sprintf(cmdstr, "ping -c 5 %s", ping_target);
 
-    ret = system(cmdstr);
+    ret = my_system(cmdstr);
 
     if( ret == -1 )
         return 0;
@@ -73,6 +73,16 @@ int plug_run(void * data)
     return 0;
 }
 
+
+int my_system(const char *cmd_string)
+{
+    char my_cmd_str[CMD_STRING_LEN];
+    char * tmp_file = MY_TMP_FILENAME;
+
+    sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
+
+    return system(my_cmd_str);
+}
 
 
 int main(void)

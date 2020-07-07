@@ -26,8 +26,9 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...)
 
     ret = makedir(log_path);
 
-    if (!ret)
-        printf("create dir success\n");
+    if (!ret) {
+        //        printf("create dir success\n");
+    }
     else {
 //            perror("mkdir error");
         if (errno != EEXIST)
@@ -124,10 +125,10 @@ int makedir(const char *dir_path)
     ret = mkdir(dir_path, 0666);
 
     if (!ret) {
-        printf("create dir success\n");
+//        printf("create dir success\n");
     } else {
         if (errno == EEXIST) {
-            printf("dir already exist\n");
+//            printf("dir already exist\n");
             return 0;
         } else {
 //            perror("mkdir error");
