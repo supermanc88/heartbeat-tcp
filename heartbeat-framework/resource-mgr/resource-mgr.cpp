@@ -83,7 +83,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
     switch (trans_type) {
         case TRANS_TYPE_ACTION: {
 
-            printf("recv data type: TRANS_TYPE_ACTION\n");
+            printf("-------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_ACTION |\n");
+            printf("-------------------------------------\n");
 
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
@@ -92,7 +94,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
               */
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == ACTION_TYPE_GET_RES) {
-                printf("server recv get res,so server start take over the resources\n");
+                printf("---------------------------------------------------------------\n");
+                printf("| server recv get res,so server start take over the resources |\n");
+                printf("---------------------------------------------------------------\n");
+
                 take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
@@ -102,7 +107,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 p_next_data->trans_action_data.result = 1;
 
             } else if (action_type == ACTION_TYPE_FREE_RES) {
-                printf("server recv free res,so server start release the resources\n");
+                printf("--------------------------------------------------------------\n");
+                printf("| server recv free res,so server start release the resources |\n");
+                printf("--------------------------------------------------------------\n");
+
                 release_resources(virtual_ip_segment, ethernet_name);
                 server_resources_takeover_status = false;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
@@ -113,12 +121,18 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else {
 
             }
-            printf("send data type: TRANS_TYPE_REPLY_ACTION\n");
+            printf("-------------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_REPLY_ACTION |\n");
+            printf("-------------------------------------------\n");
+
             *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
-            printf("recv data type: TRANS_TYPE_GET_SERVER_STATUS\n");
+            printf("------------------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_GET_SERVER_STATUS |\n");
+            printf("------------------------------------------------\n");
+
 
             // 此类回复没有其它数据
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
@@ -128,12 +142,18 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
             get_local_server_status_datas(&p_next_data->server_status_datas);
 
-            printf("send data type: TRANS_TYPE_REPLY_SERVER_STATUS\n");
+            printf("--------------------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
+            printf("--------------------------------------------------\n");
+
             *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_GET_DATA: {
-            printf("recv data type: TRANS_TYPE_GET_DATA\n");
+            printf("---------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_GET_DATA |\n");
+            printf("---------------------------------------\n");
+
             // 备机收到，向TRANS_DATA中填充数据
             // 1. 通过插件拿到数据
             // 2. 根据数据大小malloc内存并拷贝
@@ -142,12 +162,18 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_DATA;
-            printf("send data type: TRANS_TYPE_REPLY_DATA\n");
+            printf("-----------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_REPLY_DATA |\n");
+            printf("-----------------------------------------\n");
+
             *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
-            printf("recv data type: TRANS_TYPE_REPLY_ACTION\n");
+            printf("-------------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_REPLY_ACTION |\n");
+            printf("-------------------------------------------\n");
+
             /*
              * 只有主机会收到此类信息
              */
@@ -157,20 +183,27 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 // nothing!
             } else if (action_type == ACTION_TYPE_FREED_RES) {
                 // 开始接管资源
-                printf("server reply freed resource,so client start take over the resources\n");
+                printf("-----------------------------------------------------------------------\n");
+                printf("| server reply freed resource,so client start take over the resources |\n");
+                printf("-----------------------------------------------------------------------\n");
+
                 take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                 client_resources_takeover_status = true;
             } else {
                 // nothing!
             }
-            printf("send data type: TRANS_TYPE_HEARTBEAT\n");
+            printf("----------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            printf("----------------------------------------\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
-            printf("recv data type: TRANS_TYPE_REPLY_SERVER_STATUS\n");
+            printf("--------------------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
+            printf("--------------------------------------------------\n");
             // 这里根据决策开始操作,先把结构体填充成无操作
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
@@ -178,41 +211,60 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             policy = resource_manager(recved_data, p_next_data);
 
             if (policy == LINK_ACT_DO_NOTHING) {
-                printf("send data type: TRANS_TYPE_HEARTBEAT\n");
+                printf("----------------------------------------\n");
+                printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+                printf("----------------------------------------\n");
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
                 release_resources(virtual_ip_segment, ethernet_name);
                 client_resources_takeover_status = false;
-                printf("send data type: TRANS_TYPE_ACTION\n");
+                printf("-------------------------------------\n");
+                printf("| send data type: TRANS_TYPE_ACTION |\n");
+                printf("-------------------------------------\n");
             } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
                 // 需要向备机发包，让备机先释放，我再拿
-                printf("send data type: TRANS_TYPE_ACTION\n");
+                printf("-------------------------------------\n");
+                printf("| send data type: TRANS_TYPE_ACTION |\n");
+                printf("-------------------------------------\n");
             }
 
             *next_send_data = (void *)p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
-            printf("recv data type: TRANS_TYPE_REPLY_DATA\n");
+            printf("----------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_REPLY_DATA |\n");
+            printf("----------------------------------------\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
-            printf("send data type: TRANS_TYPE_HEARTBEAT\n");
+            printf("----------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            printf("----------------------------------------\n");
         }
             break;
         case TRANS_TYPE_HEARTBEAT: {
-            printf("recv data type: TRANS_TYPE_HEARTBEAT\n");
+            printf("----------------------------------------\n");
+            printf("| recv data type: TRANS_TYPE_HEARTBEAT |\n");
+            printf("----------------------------------------\n");
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
-            printf("send data type: TRANS_TYPE_HEARTBEAT\n");
+            printf("----------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            printf("----------------------------------------\n");
         }
             break;
         default: {
-            printf("recv data type: default\n");
+            printf("---------------------------\n");
+            printf("| recv data type: default |\n");
+            printf("---------------------------\n");
+
             p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *)p_next_data;
-            printf("send data type: TRANS_TYPE_HEARTBEAT\n");
+            printf("----------------------------------------\n");
+            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            printf("----------------------------------------\n");
         }
             break;
     }

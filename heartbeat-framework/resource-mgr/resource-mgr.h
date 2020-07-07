@@ -57,7 +57,7 @@ int trans_data_set_none(void * data);
 
 
 /**
- * 根据收到的数据，结合本机的服务状态，开始对资源进行操作
+ * 根据收到的数据，结合本机的服务状态，开始对资源进行操作,并填充下个要发送的数据包
  * @param recved_data
  * @param next_data
  * @return
