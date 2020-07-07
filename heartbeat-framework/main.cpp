@@ -32,7 +32,7 @@ int initdead = INITDEAD;
 int server_port = SERVERPORT;
 bool auto_failback = true;
 char ping_target[BUFSIZ] = "192.168.231.1";
-char server_addr[BUFSIZ] = SERVER_IP;
+char peer_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
@@ -50,10 +50,7 @@ bool trouble = false;
 
 void usage(void)
 {
-    printf("heart help\n"
-           "heartbeat [-m mode]\n"
-           "if no argument, default started by client mode\n"
-           "-m mode : start mode client or server\n");
+    printf("The startup method is related to whether node and hostname match\n");
 }
 
 int start_by_client_mode(void)
@@ -80,7 +77,7 @@ int start_by_client_mode(void)
     reconnect:
     cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-    inet_pton(AF_INET, server_addr, &i_addr);
+    inet_pton(AF_INET, peer_addr, &i_addr);
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(server_port);
@@ -424,6 +421,12 @@ int start_by_server_mode(void)
                 printf("client addr: %s\n", buf);
                 printf("client port: %d\n", ntohs(client_addr.sin_port));
 
+                // 连入的客户端不是ha.cf中的对端ip，直接丢弃
+                if (strcmp(buf, peer_addr) != 0) {
+                    close(cfd);
+                    continue;
+                }
+
                 while (1) {
 
                     // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
@@ -628,22 +631,6 @@ int main(int argc, char *argv[])
 
     bzero(mode, 20);
 
-#pragma region main_parse_parameters
-    while ((opt = getopt(argc, argv, "m:")) != -1) {
-        switch (opt) {
-            case 'm':
-                b_mode_set = true;
-                memcpy(mode, optarg, strlen(optarg));
-                break;
-            case '?':
-            default:
-                usage();
-                exit(1);
-                break;
-        }
-    }
-#pragma endregion main_parse_parameters
-
 #pragma region main_read_config
     // 读取配置,不成功就使用默认配置
     HBConfig hb_config;
@@ -696,10 +683,10 @@ int main(int argc, char *argv[])
     saddr.assign(ucast);
     int offset = saddr.find(" ");
     if( offset != std::string::npos) {
-        strcpy(server_addr, saddr.substr(offset+1).c_str());
+        strcpy(peer_addr, saddr.substr(offset + 1).c_str());
     }
 
-    printf("server_addr = %s\n", server_addr);
+    printf("peer_addr = %s\n", peer_addr);
     printf("-------------------------------------------------------------------\n");
 
     /*************************/
@@ -732,6 +719,10 @@ int main(int argc, char *argv[])
 
     pthread_t tid;
     int ret = pthread_create(&tid, NULL, manual_switch, NULL);
+    if (ret != 0) {
+        perror("pthread_create error");
+        return -1;
+    }
 
 #pragma endregion start_thread
 

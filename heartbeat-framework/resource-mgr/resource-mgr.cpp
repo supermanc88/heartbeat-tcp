@@ -19,7 +19,7 @@ bool client_resources_takeover_status = false;
 bool server_resources_takeover_status = false;
 
 extern bool auto_failback;
-extern char server_addr[BUFSIZ];
+extern char peer_addr[BUFSIZ];
 extern char virtual_ip_segment[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
 extern int eth_num;
