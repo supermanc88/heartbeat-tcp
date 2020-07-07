@@ -36,7 +36,7 @@ char peer_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
-//char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
+char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
 
 
@@ -109,27 +109,27 @@ int start_by_client_mode(void)
                     if (!client_resources_takeover_status) {
                         take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
-                        printf("-----------------------------\n");
-                        printf("| client take over resource |\n");
-                        printf("-----------------------------\n");
+                        printf("*****************************\n");
+                        printf("* client take over resource *\n");
+                        printf("*****************************\n");
                     } else {
-                        printf("-------------------------------------\n");
-                        printf("| client take over resource already |\n");
-                        printf("-------------------------------------\n");
+                        printf("*************************************\n");
+                        printf("* client take over resource already *\n");
+                        printf("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
-                        printf("-----------------------------------\n");
-                        printf("| client release resource already |\n");
-                        printf("-----------------------------------\n");
+                        printf("***********************************\n");
+                        printf("* client release resource already *\n");
+                        printf("***********************************\n");
                     } else {
                         release_resources(virtual_ip_segment, ethernet_name);
                         client_resources_takeover_status = false;
-                        printf("---------------------------\n");
-                        printf("| client release resource |\n");
-                        printf("---------------------------\n");
+                        printf("***************************\n");
+                        printf("* client release resource *\n");
+                        printf("***************************\n");
                     }
 
                 }
@@ -203,27 +203,27 @@ int start_by_client_mode(void)
                     if (!client_resources_takeover_status) {
                         take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
-                        printf("-----------------------------\n");
-                        printf("| client take over resource |\n");
-                        printf("-----------------------------\n");
+                        printf("*****************************\n");
+                        printf("* client take over resource *\n");
+                        printf("*****************************\n");
                     } else {
-                        printf("-------------------------------------\n");
-                        printf("| client take over resource already |\n");
-                        printf("-------------------------------------\n");
+                        printf("*************************************\n");
+                        printf("* client take over resource already *\n");
+                        printf("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
-                        printf("-----------------------------------\n");
-                        printf("| client release resource already |\n");
-                        printf("-----------------------------------\n");
+                        printf("***********************************\n");
+                        printf("* client release resource already *\n");
+                        printf("***********************************\n");
                     } else {
                         release_resources(virtual_ip_segment, ethernet_name);
                         client_resources_takeover_status = false;
-                        printf("---------------------------\n");
-                        printf("| client release resource |\n");
-                        printf("---------------------------\n");
+                        printf("***************************\n");
+                        printf("* client release resource *\n");
+                        printf("***************************\n");
                     }
 
                 }
@@ -253,27 +253,27 @@ int start_by_client_mode(void)
                         if (!client_resources_takeover_status) {
                             take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                             client_resources_takeover_status = true;
-                            printf("-----------------------------\n");
-                            printf("| client take over resource |\n");
-                            printf("-----------------------------\n");
+                            printf("*****************************\n");
+                            printf("* client take over resource *\n");
+                            printf("*****************************\n");
                         } else {
-                            printf("-------------------------------------\n");
-                            printf("| client take over resource already |\n");
-                            printf("-------------------------------------\n");
+                            printf("*************************************\n");
+                            printf("* client take over resource already *\n");
+                            printf("*************************************\n");
                         }
 
                     } else {
                         // release
                         if (!client_resources_takeover_status) {
-                            printf("-----------------------------------\n");
-                            printf("| client release resource already |\n");
-                            printf("-----------------------------------\n");
+                            printf("***********************************\n");
+                            printf("* client release resource already *\n");
+                            printf("***********************************\n");
                         } else {
                             release_resources(virtual_ip_segment, ethernet_name);
                             client_resources_takeover_status = false;
-                            printf("---------------------------\n");
-                            printf("| client release resource |\n");
-                            printf("---------------------------\n");
+                            printf("***************************\n");
+                            printf("* client release resource *\n");
+                            printf("***************************\n");
                         }
 
                     }
@@ -393,19 +393,27 @@ int start_by_server_mode(void)
                     if (!server_resources_takeover_status) {
                         take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                         server_resources_takeover_status = true;
-                        printf("server take over resource\n");
+                        printf("*****************************\n");
+                        printf("* server take over resource *\n");
+                        printf("*****************************\n");
                     } else {
-                        printf("server take over resource already\n");
+                        printf("*************************************\n");
+                        printf("* server take over resource already *\n");
+                        printf("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!server_resources_takeover_status) {
-                        printf("server release resource already\n");
+                        printf("***********************************\n");
+                        printf("* server release resource already *\n");
+                        printf("***********************************\n");
                     } else {
                         release_resources(virtual_ip_segment, ethernet_name);
                         server_resources_takeover_status = false;
-                        printf("server release resource\n");
+                        printf("***************************\n");
+                        printf("* server release resource *\n");
+                        printf("***************************\n");
                     }
                 }
                 continue;
@@ -452,19 +460,27 @@ int start_by_server_mode(void)
                             if (!server_resources_takeover_status) {
                                 take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                                 server_resources_takeover_status = true;
-                                printf("server take over resource\n");
+                                printf("*****************************\n");
+                                printf("* server take over resource *\n");
+                                printf("*****************************\n");
                             } else {
-                                printf("server take over resource already\n");
+                                printf("*************************************\n");
+                                printf("* server take over resource already *\n");
+                                printf("*************************************\n");
                             }
 
                         } else {
                             // release
                             if (!server_resources_takeover_status) {
-                                printf("server release resource already\n");
+                                printf("***********************************\n");
+                                printf("* server release resource already *\n");
+                                printf("***********************************\n");
                             } else {
                                 release_resources(virtual_ip_segment, ethernet_name);
                                 server_resources_takeover_status = false;
-                                printf("server release resource\n");
+                                printf("***************************\n");
+                                printf("* server release resource *\n");
+                                printf("***************************\n");
                             }
                         }
 
@@ -495,27 +511,27 @@ int start_by_server_mode(void)
                                 if (!server_resources_takeover_status) {
                                     take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
                                     server_resources_takeover_status = true;
-                                    printf("-----------------------------\n");
-                                    printf("| server take over resource |\n");
-                                    printf("-----------------------------\n");
+                                    printf("*****************************\n");
+                                    printf("* server take over resource *\n");
+                                    printf("*****************************\n");
                                 } else {
-                                    printf("-------------------------------------\n");
-                                    printf("| server take over resource already |\n");
-                                    printf("-------------------------------------\n");
+                                    printf("*************************************\n");
+                                    printf("* server take over resource already *\n");
+                                    printf("*************************************\n");
                                 }
 
                             } else {
                                 // release
                                 if (!server_resources_takeover_status) {
-                                    printf("-----------------------------------\n");
-                                    printf("| server release resource already |\n");
-                                    printf("-----------------------------------\n");
+                                    printf("***********************************\n");
+                                    printf("* server release resource already *\n");
+                                    printf("***********************************\n");
                                 } else {
                                     release_resources(virtual_ip_segment, ethernet_name);
                                     server_resources_takeover_status = false;
-                                    printf("---------------------------\n");
-                                    printf("| server release resource |\n");
-                                    printf("---------------------------\n");
+                                    printf("***************************\n");
+                                    printf("* server release resource *\n");
+                                    printf("***************************\n");
                                 }
                             }
                             close(cfd);
