@@ -36,7 +36,7 @@ char server_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_segment[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
-char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
+//char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
 
 
@@ -73,6 +73,8 @@ int start_by_client_mode(void)
     struct timeval tv;
     bzero(&tv, sizeof(struct timeval));
     tv.tv_sec = deadtime;
+
+    printf("enter start by client\n");
 
 #pragma region client_create_connect    //客户端创建连接
     reconnect:
@@ -336,6 +338,7 @@ int start_by_server_mode(void)
     struct sockaddr_in client_addr;
     struct timeval tv;
 
+    printf("enter start by server\n");
 #pragma region server_pre_create_connect    // 设置端口复用等
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
@@ -348,7 +351,15 @@ int start_by_server_mode(void)
 
     ret = Bind(lfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
+    if (ret == -1) {
+        return -1;
+    }
+
     ret = Listen(lfd, 128);
+
+    if (ret == -1) {
+        return -1;
+    }
 
     socklen_t addr_len = sizeof(serv_addr);
 
@@ -665,8 +676,8 @@ int main(int argc, char *argv[])
             server_port = atoi(value);
         if (hb_config.GetValue("ucast", value) == RET_SUCCESS)
             strcpy(ucast, value);
-        if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS)
-            strcpy(plugins_dir, value);
+//        if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS)
+//            strcpy(plugins_dir, value);
         if (hb_config.GetValue("udpport", value) == RET_SUCCESS)
             udpport = atoi(value);
     }
@@ -700,19 +711,9 @@ int main(int argc, char *argv[])
     printf("---------------------------------------\n");
 
 
-    printf("plugins_dir = %s\n", plugins_dir);
-    printf("---------------------------------------\n");
+//    printf("plugins_dir = %s\n", plugins_dir);
+//    printf("---------------------------------------\n");
     /*************************/
-
-
-    // 读取补充配置
-    HBConfig hb_extra;
-    if (RET_SUCCESS == hb_extra.OpenFile("./ha-extra.cf", "r")) {
-        char value[20] = {0};
-        if (hb_extra.GetValue("mode", value) == RET_SUCCESS)
-            strcpy(mode, value);
-    }
-    hb_extra.CloseFile();
 
     HBRes hb_res;
     hb_res.open_file(HARESOURCES_FILE_PATH);
@@ -737,19 +738,19 @@ int main(int argc, char *argv[])
 
 #pragma region start_mode // 启动方式
     bzero(mode, 0);
-//    if (strcmp(hostname, p_hostname) == 0) {
-//        strcpy(mode, "client");
-//    } else if (strcmp(hostname, b_hostname) == 0){
-//        strcpy(mode, "server");
-//    } else {
-//        printf("Configuration error, hostname does not match\n");
-//        return 0;
-//    }
-
     if (strcmp(hostname, p_hostname) == 0) {
         strcpy(mode, "client");
-    } else
+    } else if (strcmp(hostname, b_hostname) == 0){
         strcpy(mode, "server");
+    } else {
+        printf("Configuration error, hostname does not match\n");
+        return 0;
+    }
+
+//    if (strcmp(hostname, p_hostname) == 0) {
+//        strcpy(mode, "client");
+//    } else
+//        strcpy(mode, "server");
 
     printf("start mode = %s\n", mode);
     printf("---------------------------------------\n");
