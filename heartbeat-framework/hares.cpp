@@ -59,11 +59,42 @@ void HBRes::open_file(char *filename)
 
         std::string seth, seth_num;
         pos = seth_and_num.find(":");
-        seth = seth_and_num.substr(0, pos);
-        seth_num = seth_and_num.substr(pos+1, sline.length() - pos - 1);
-        strcpy(eth, seth.c_str());
-        strcpy(vip, svip.c_str());
-        eth_num = atoi(seth_num.c_str());
+        if (pos != std::string::npos) {
+            seth = seth_and_num.substr(0, pos);
+            seth_num = seth_and_num.substr(pos+1, sline.length() - pos - 1);
+            strcpy(eth, seth.c_str());
+            strcpy(vip, svip.c_str());
+            eth_num = atoi(seth_num.c_str());
+        } else {
+            // 没有找到冒号分隔，则整个就是网卡名
+            strcpy(eth, seth_and_num.c_str());
+
+            // 自己通过ifconfig找一个可以用的eth_num
+            char my_cmd_str[256];
+            sprintf(my_cmd_str, "%s %s > %s", "ifconfig | grep", eth, "/tmp/ifconfig.tmp");
+            system(my_cmd_str);
+
+            FILE * fp = fopen("/tmp/ifconfig.tmp", "r");
+
+            if(fp == NULL) {
+                eth_num = 0;
+                break;
+            }
+            char str_line[256];
+            while(fgets(str_line, 256, fp)) {
+                sline.clear();
+                sline.assign(str_line);
+                std::string se = sline.substr(0, sline.find(" "));
+
+                if (se.find(":") == std::string::npos)
+                    continue;
+                seth_num = se.substr(se.find(":")+1);
+                if( atoi(seth_num.c_str()) > eth_num )
+                    eth_num = atoi(seth_num.c_str());
+            }
+            eth_num++;
+            fclose(fp);
+        }
         break;
     }
 }

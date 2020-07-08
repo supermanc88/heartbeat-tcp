@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <string.h>
 
 #include "resource-mgr.h"
 #include "../plugin-mgr/plugin-manager.h"
@@ -20,7 +21,7 @@ bool server_resources_takeover_status = false;
 
 extern bool auto_failback;
 extern char peer_addr[BUFSIZ];
-extern char virtual_ip_segment[BUFSIZ];
+extern char virtual_ip_with_mask[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
 extern int eth_num;
 
@@ -98,7 +99,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 printf("| server recv get res,so server start take over the resources |\n");
                 printf("---------------------------------------------------------------\n");
 
-                take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
+                take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                 server_resources_takeover_status = true;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
@@ -111,7 +112,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 printf("| server recv free res,so server start release the resources |\n");
                 printf("--------------------------------------------------------------\n");
 
-                release_resources(virtual_ip_segment, ethernet_name);
+                release_resources(virtual_ip_with_mask, ethernet_name);
                 server_resources_takeover_status = false;
                 p_next_data->type = TRANS_TYPE_REPLY_ACTION;
                 p_next_data->size = sizeof(TRANS_DATA);
@@ -187,7 +188,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 printf("| server reply freed resource,so client start take over the resources |\n");
                 printf("-----------------------------------------------------------------------\n");
 
-                take_over_resources(virtual_ip_segment, ethernet_name, eth_num);
+                take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                 client_resources_takeover_status = true;
             } else {
                 // nothing!
@@ -215,7 +216,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
                 printf("----------------------------------------\n");
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
-                release_resources(virtual_ip_segment, ethernet_name);
+                release_resources(virtual_ip_with_mask, ethernet_name);
                 client_resources_takeover_status = false;
                 printf("-------------------------------------\n");
                 printf("| send data type: TRANS_TYPE_ACTION |\n");
@@ -404,10 +405,15 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
     char cmd_str[256] = {0};
     int ret;
     int check_vip_ret;
+    char vip[BUFSIZ];
     // 这里运行一次本地的插件获取状态
     printf("get_local_server_status_datas...\n");
 
-    char * vip = virtual_ip_segment;
+    std::string svirtual_ip, svirtual_ip_with_mask;
+    svirtual_ip_with_mask.assign(virtual_ip_with_mask);
+    svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
+
+    strcpy(vip, svirtual_ip.c_str());
     // 这里通过check-vip程序来获取本机是否有虚ip
     sprintf(cmd_str, "/opt/infosec-heartbeat/bin/check-virtual-ip %s", vip);
 
@@ -489,7 +495,7 @@ int policy_no_link_init()
     return 0;
 }
 
-int take_over_resources(const char *virtual_ip_segment, const char *ethernet_name, int eth_num)
+int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_name, int eth_num)
 {
     char cmd_str[256] = {0};
 
@@ -497,7 +503,7 @@ int take_over_resources(const char *virtual_ip_segment, const char *ethernet_nam
     printf("Start taking over resources...\n");
 
     // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_segment, ethernet_name, ethernet_name, eth_num);
+    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name, eth_num);
 
     my_system((const char *)cmd_str, "/tmp/takeover.tmp");
 
@@ -505,23 +511,23 @@ int take_over_resources(const char *virtual_ip_segment, const char *ethernet_nam
     bzero(cmd_str, 256);
     // 2. 发送免费arp
     // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
-    std::string svirtual_ip, svirtual_ip_segment;
-    svirtual_ip_segment.assign(virtual_ip_segment);
-    svirtual_ip = svirtual_ip_segment.substr(0, svirtual_ip_segment.find_last_of("/"));
+    std::string svirtual_ip, svirtual_ip_with_mask;
+    svirtual_ip_with_mask.assign(virtual_ip_with_mask);
+    svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
     sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", svirtual_ip.c_str(), ethernet_name, svirtual_ip.c_str());
 
     my_system((const char *)cmd_str, "/tmp/send_arp.tmp");
     return 0;
 }
 
-int release_resources(const char *virtual_ip, const char *ethernet_name)
+int release_resources(const char *virtual_ip_with_mask, const char *ethernet_name)
 {
     char cmd_str[256] = {0};
     // 开始释放资源
     printf("Start to release resources...\n");
 
     // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip, ethernet_name);
+    sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
 
     my_system((const char *)cmd_str, "/tmp/release_resources.tmp");
     return 0;
