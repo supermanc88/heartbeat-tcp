@@ -97,6 +97,7 @@ void HBRes::open_file(char *filename)
                 eth_num = 0;
                 break;
             }
+            eth_num = -1;
             char str_line[256];
             while(fgets(str_line, 256, fp)) {
                 sline.clear();

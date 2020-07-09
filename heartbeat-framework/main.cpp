@@ -38,6 +38,7 @@ char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
+char primary_node[BUFSIZ] = "netsign";         // haresources中主机名
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -635,16 +636,6 @@ int main(int argc, char *argv[])
     char mode[20];
     bool b_mode_set = false;
 
-
-    // 初始化所有的策略文件
-    policy_link_init();
-    policy_no_link_init();
-
-
-    // 初始化插件管理器
-    plugin_manager_init();
-    load_all_plugin();
-
     bzero(mode, 20);
 
 #pragma region main_read_config
@@ -704,29 +695,19 @@ int main(int argc, char *argv[])
 
     printf("peer_addr = %s\n", peer_addr);
     printf("-------------------------------------------------------------------\n");
-
-    /*************************/
-    // 获取hostname 用户判断主备机
-    char hostname[BUFSIZ];
-    gethostname(hostname, BUFSIZ);
-
-    printf("hostname = %s\n", hostname);
-    printf("---------------------------------------\n");
-
-
-//    printf("plugins_dir = %s\n", plugins_dir);
-//    printf("---------------------------------------\n");
-    /*************************/
+    
 
     HBRes hb_res;
     hb_res.open_file(HARESOURCES_FILE_PATH);
     hb_res.get_virtual_ip(virtual_ip_with_mask);
     hb_res.get_ethernet_name(ethernet_name, &eth_num);
+    hb_res.get_primary_node(primary_node);
     hb_res.close_file();
 
     printf("virtual_ip_with_mask = %s\n", virtual_ip_with_mask);
     printf("ethernet_name = %s\n", ethernet_name);
     printf("eth_num = %d\n", eth_num);
+    printf("primary_node = %s\n", primary_node);
     printf("---------------------------------------\n");
 
 #pragma endregion main_read_config
@@ -742,26 +723,56 @@ int main(int argc, char *argv[])
 
 #pragma endregion start_thread
 
+    // 启动之前检查hostname是否匹配
 
-#pragma region start_mode // 启动方式
+    // 获取hostname 用户判断主备机
+    char hostname[BUFSIZ];
+    gethostname(hostname, BUFSIZ);
+
+    printf("hostname = %s\n", hostname);
+    printf("---------------------------------------\n");
+
     bzero(mode, 0);
-    if (strcmp(hostname, p_hostname) == 0) {
-        strcpy(mode, "client");
-    } else if (strcmp(hostname, b_hostname) == 0){
-        strcpy(mode, "server");
-    } else {
-        printf("Configuration error, hostname does not match\n");
-        return 0;
-    }
-
 //    if (strcmp(hostname, p_hostname) == 0) {
 //        strcpy(mode, "client");
-//    } else
+//    } else if (strcmp(hostname, b_hostname) == 0){
 //        strcpy(mode, "server");
+//    } else {
+//        printf("Configuration error, hostname does not match\n");
+//        return 0;
+//    }
+
+    // 如果所有node和primary_node都不匹配，则不能成功启动
+    if( strcmp(p_hostname, primary_node) != 0 &&
+        strcmp(b_hostname, primary_node) != 0) {
+        printf("ha.cf node and haresources node not match!\n");
+        return -1;
+    }
+
+    // 如果本机hostname和ha.cf中所有的节点都不匹配的话，也不能启动
+    if (strcmp(p_hostname, hostname) != 0 &&
+        strcmp(b_hostname, hostname) != 0) {
+        printf("localhost name and ha.cf node not match!\n");
+        return -1;
+    }
+
+    if (strcmp(hostname, primary_node) == 0) {
+        strcpy(mode, "client");
+    } else
+        strcpy(mode, "server");
 
     printf("start mode = %s\n", mode);
     printf("---------------------------------------\n");
 
+#pragma region start // 启动
+    // 初始化所有的策略文件
+    policy_link_init();
+    policy_no_link_init();
+
+
+    // 初始化插件管理器
+    plugin_manager_init();
+    load_all_plugin();
 
     if (strcmp(mode, "client") == 0)
         start_by_client_mode();
@@ -771,7 +782,7 @@ int main(int argc, char *argv[])
         usage();
         exit(1);
     }
-#pragma endregion start_mode
+#pragma endregion start
 
     return 0;
 }
