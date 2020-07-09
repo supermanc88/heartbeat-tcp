@@ -1,2 +1,1 @@
-# example 192.168.231.155/24 eth0:0
-192.168.231.155/24 eth0:0
+netsign1 IPaddr::192.168.0.153/24/eth0 SendArp::192.168.0.153/eth0 netsignscript.dat

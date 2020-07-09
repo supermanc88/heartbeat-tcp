@@ -21,6 +21,12 @@ public:
  */
     void get_ethernet_name(char *eth, int *eth_num);
 
+/**
+ * 获取主节点名
+ * @param node_name
+ */
+    void get_primary_node(char * node_name);
+
     void open_file(char * filename);
     void close_file();
 
@@ -28,6 +34,7 @@ private:
 
     char vip[BUFSIZ];
     char eth[BUFSIZ];
+    char node_name[BUFSIZ];
     int eth_num;
     FILE * fp;
 };

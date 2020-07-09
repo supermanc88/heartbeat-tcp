@@ -9,6 +9,7 @@ HBRes::HBRes()
     fp = NULL;
     bzero(vip, BUFSIZ);
     bzero(eth, BUFSIZ);
+    bzero(node_name, BUFSIZ);
     eth_num = 0;
 }
 
@@ -49,19 +50,35 @@ void HBRes::open_file(char *filename)
         std::string sline;
         sline.assign(readlnbuf);
 
+        // 读出来的类似 netsign1 IPaddr::192.168.0.153/24/eth0 SendArp::192.168.0.153/eth0 netsignscript.dat
+        // 现在要把 netsign1 和 192.168.0.153/24/eth0 拿出来
+
+        // 解析出node
+        std::string snode;
+        snode = sline.substr(0, sline.find(" "));
+        strcpy(node_name, snode.c_str());
+
+        // 解析IPaddr
+        std::string slaststring = sline.substr(sline.find(" ")+1);
+        std::string spartofipaddr = slaststring.substr(0, slaststring.find(" "));
+
+        std::string sipaddr = spartofipaddr.substr(spartofipaddr.find_last_of(":")+1);
+
+
+#pragma region parse_IPaddr
         std::string svip;
         std::string seth_and_num;
 
-        int pos = sline.find(" ");
+        int pos = sipaddr.find_last_of("/");
 
-        svip = sline.substr(0, pos);
-        seth_and_num = sline.substr(pos+1, sline.length() - pos - 1);
+        svip = sipaddr.substr(0, pos);
+        seth_and_num = sipaddr.substr(pos+1, sipaddr.length() - pos - 1);
 
         std::string seth, seth_num;
         pos = seth_and_num.find(":");
         if (pos != std::string::npos) {
             seth = seth_and_num.substr(0, pos);
-            seth_num = seth_and_num.substr(pos+1, sline.length() - pos - 1);
+            seth_num = seth_and_num.substr(pos+1, sipaddr.length() - pos - 1);
             strcpy(eth, seth.c_str());
             strcpy(vip, svip.c_str());
             eth_num = atoi(seth_num.c_str());
@@ -96,6 +113,7 @@ void HBRes::open_file(char *filename)
             fclose(fp);
         }
         break;
+#pragma endregion parse_IPaddr
     }
 }
 
@@ -104,5 +122,12 @@ void HBRes::close_file()
     if(fp != NULL) {
         fclose(fp);
         fp = NULL;
+    }
+}
+
+void HBRes::get_primary_node(char *node_name)
+{
+    if (node_name[0]) {
+        strcpy(node_name, this->node_name);
     }
 }
