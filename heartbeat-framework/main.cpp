@@ -289,13 +289,13 @@ int start_by_client_mode(void)
                     // 开始处理从服务器返回的数据
 
                     // 1. 反序列化数据
-                    unsigned char * parsed_buf;
+                    unsigned char *parsed_buf;
                     std::string sbuf;
                     sbuf.assign(buf, n);
-                    parse_telegram(sbuf, n, (void **)(&parsed_buf));
+                    parse_telegram(sbuf, n, (void **) (&parsed_buf));
 
                     // 2. 根据收到的数据生成下次要发送的数据
-                    trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                    trans_data_generator(parsed_buf, (void **) (&next_send_data));
                     free(parsed_buf);
 
                     if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
@@ -547,13 +547,13 @@ int start_by_server_mode(void)
                         // 服务端开始处理收到的数据
                         TRANS_DATA *next_send_data;
                         // 1. 反序列化数据
-                        unsigned char * parsed_buf;
+                        unsigned char *parsed_buf;
                         std::string sbuf;
                         sbuf.assign(buf, n);
-                        parse_telegram(sbuf, n, (void **)(&parsed_buf));
+                        parse_telegram(sbuf, n, (void **) (&parsed_buf));
 
                         // 2. 根据收到的数据生成下次要发送的数据
-                        trans_data_generator(parsed_buf, (void **)(&next_send_data));
+                        trans_data_generator(parsed_buf, (void **) (&next_send_data));
                         free(parsed_buf);
 
                         // 3. 序列化数据
@@ -590,7 +590,7 @@ int start_by_server_mode(void)
 /*
  * 手动切换的线程
  */
-void * manual_switch(void *)
+void *manual_switch(void *)
 {
     int sfd;
     struct sockaddr_in server_addr, client_addr;
@@ -603,13 +603,13 @@ void * manual_switch(void *)
 
     sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    bind(sfd, (struct sockaddr*) &server_addr, sizeof(server_addr));
+    bind(sfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
 
     client_len = sizeof(client_addr);
 
     while (1) {
         bzero(buf, BUFSIZ);
-        int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *)&client_addr, &client_len);
+        int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *) &client_addr, &client_len);
         if (n == -1) {
             perror("recvfrom error");
         }
@@ -689,13 +689,13 @@ int main(int argc, char *argv[])
     std::string saddr;
     saddr.assign(ucast);
     int offset = saddr.find(" ");
-    if( offset != std::string::npos) {
+    if (offset != std::string::npos) {
         strcpy(peer_addr, saddr.substr(offset + 1).c_str());
     }
 
     printf("peer_addr = %s\n", peer_addr);
     printf("-------------------------------------------------------------------\n");
-    
+
 
     HBRes hb_res;
     hb_res.open_file(HARESOURCES_FILE_PATH);
@@ -743,7 +743,7 @@ int main(int argc, char *argv[])
 //    }
 
     // 如果所有node和primary_node都不匹配，则不能成功启动
-    if( strcmp(p_hostname, primary_node) != 0 &&
+    if (strcmp(p_hostname, primary_node) != 0 &&
         strcmp(b_hostname, primary_node) != 0) {
         printf("ha.cf node and haresources node not match!\n");
         return -1;

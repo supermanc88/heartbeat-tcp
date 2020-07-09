@@ -84,7 +84,7 @@ int parse_telegram(std::string telegram_data, size_t t_data_size, void **data)
     TransData transdata;
     transdata.ParseFromString(telegram_data);
 
-    TRANS_DATA * pdata = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+    TRANS_DATA *pdata = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
     bzero(pdata, sizeof(TRANS_DATA));
 
     switch (transdata.type()) {

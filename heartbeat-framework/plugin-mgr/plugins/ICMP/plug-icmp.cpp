@@ -12,10 +12,10 @@
 
 char ping_target[BUFSIZ] = "192.168.1.1";
 
-int plug_init(void * data)
+int plug_init(void *data)
 {
 
-    PLUG_DATA * pdata = (PLUG_DATA *) data;
+    PLUG_DATA *pdata = (PLUG_DATA *) data;
 
     pdata->initStruct.sdkVersion = 1;
     pdata->initStruct.pluginVersion = 1;
@@ -44,7 +44,7 @@ int plug_stop(void)
     return 0;
 }
 
-int plug_run(void * data)
+int plug_run(void *data)
 {
     int ret;
 
@@ -54,15 +54,14 @@ int plug_run(void * data)
 
     ret = my_system(cmdstr);
 
-    if( ret == -1 )
+    if (ret == -1)
         return 0;
     else {
         if (WIFEXITED(ret)) {
             if (WEXITSTATUS(ret) == 0) {
                 hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping success\n");
                 return 1;
-            }
-            else {
+            } else {
                 hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping error\n");
                 return 0;
             }
@@ -77,7 +76,7 @@ int plug_run(void * data)
 int my_system(const char *cmd_string)
 {
     char my_cmd_str[CMD_STRING_LEN];
-    char * tmp_file = MY_TMP_FILENAME;
+    char *tmp_file = MY_TMP_FILENAME;
 
     sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
 

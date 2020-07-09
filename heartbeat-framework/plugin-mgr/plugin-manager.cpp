@@ -31,8 +31,8 @@ PLUG_RET load_all_plugin()
 
     printf("plugins_path.size = %d\n", plugins_path.size());
 
-    for ( i = 0; i < plugins_path.size(); i++) {
-        load_plugin((char *)plugins_path[i].c_str());
+    for (i = 0; i < plugins_path.size(); i++) {
+        load_plugin((char *) plugins_path[i].c_str());
     }
 
     return PLUG_RET_SUCCESS;
@@ -42,7 +42,7 @@ PLUG_RET load_plugin(char *plugin_path)
 {
     void *dl = NULL;
 
-    dl  = dlopen(plugin_path, RTLD_NOW);
+    dl = dlopen(plugin_path, RTLD_NOW);
 
     if (!dl) {
         printf("load plugin error\n");
@@ -59,9 +59,9 @@ PLUG_RET load_plugin(char *plugin_path)
     memcpy(data.plugname, plugin_path, strlen(plugin_path));
 
 
-    PLUGINIT plug_init = (PLUGINIT)dlsym(dl, "plug_init");
-    PLUGSTOP plug_stop = (PLUGSTOP)dlsym(dl, "plug_stop");
-    PLUGRUN  plug_run = (PLUGRUN)dlsym(dl, "plug_run");
+    PLUGINIT plug_init = (PLUGINIT) dlsym(dl, "plug_init");
+    PLUGSTOP plug_stop = (PLUGSTOP) dlsym(dl, "plug_stop");
+    PLUGRUN plug_run = (PLUGRUN) dlsym(dl, "plug_run");
 
     data.plug_init = plug_init;
     data.plug_stop = plug_stop;
@@ -97,7 +97,6 @@ PLUG_RET plugin_manager_init()
 
     for (i = 0; i < plugins_path.size(); i++)
         printf("%s\n", plugins_path[i].c_str());
-
 
 
     return PLUG_RET_SUCCESS;
@@ -162,7 +161,8 @@ int list_plug_directory(char *dir_path)
     return 0;
 }
 
-int run_all_plugin() {
+int run_all_plugin()
+{
 
     int result = 1;
     int i = 0;
@@ -175,7 +175,7 @@ int run_all_plugin() {
 //        result & iter->second.plug_run(NULL);
 //    }
 
-    for( i= 0; i < plug_data_vector.size(); i++) {
+    for (i = 0; i < plug_data_vector.size(); i++) {
         int tmp = plug_data_vector[i].plug_run(NULL);
         printf("current runing plug:%s, and result = %d\n", plug_data_vector[i].plugname, tmp);
 

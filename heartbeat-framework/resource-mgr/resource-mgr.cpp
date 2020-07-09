@@ -62,14 +62,14 @@ extern int eth_num;
 
 int trans_data_generator(void *recved_data, void **next_send_data)
 {
-    TRANS_DATA * p_trans_data;
+    TRANS_DATA *p_trans_data;
     TRANS_TYPE trans_type;
     ACTION_TYPE action_type;
     bool backup_server_status;
-    char * content;
+    char *content;
     int policy;
 
-    TRANS_DATA * p_next_data;
+    TRANS_DATA *p_next_data;
 
     size_t size, content_size;
 
@@ -88,7 +88,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| recv data type: TRANS_TYPE_ACTION |\n");
             printf("-------------------------------------\n");
 
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
             /*
               * 只有备机会收到此类信息
@@ -126,7 +126,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| send data type: TRANS_TYPE_REPLY_ACTION |\n");
             printf("-------------------------------------------\n");
 
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
@@ -136,7 +136,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
 
             // 此类回复没有其它数据
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_SERVER_STATUS;
@@ -147,7 +147,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
             printf("--------------------------------------------------\n");
 
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_GET_DATA: {
@@ -159,7 +159,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             // 1. 通过插件拿到数据
             // 2. 根据数据大小malloc内存并拷贝
             // 3. 填充其它数据元素
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_DATA;
@@ -167,7 +167,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| send data type: TRANS_TYPE_REPLY_DATA |\n");
             printf("-----------------------------------------\n");
 
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
@@ -196,9 +196,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("----------------------------------------\n");
             printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
             printf("----------------------------------------\n");
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
@@ -206,7 +206,7 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| recv data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
             printf("--------------------------------------------------\n");
             // 这里根据决策开始操作,先把结构体填充成无操作
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
 
             policy = resource_manager(recved_data, p_next_data);
@@ -228,16 +228,16 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 printf("-------------------------------------\n");
             }
 
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
             printf("----------------------------------------\n");
             printf("| recv data type: TRANS_TYPE_REPLY_DATA |\n");
             printf("----------------------------------------\n");
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
             printf("----------------------------------------\n");
             printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
             printf("----------------------------------------\n");
@@ -247,9 +247,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("----------------------------------------\n");
             printf("| recv data type: TRANS_TYPE_HEARTBEAT |\n");
             printf("----------------------------------------\n");
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
             printf("----------------------------------------\n");
             printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
             printf("----------------------------------------\n");
@@ -260,9 +260,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             printf("| recv data type: default |\n");
             printf("---------------------------\n");
 
-            p_next_data = (TRANS_DATA *)malloc(sizeof(TRANS_DATA));
+            p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
-            *next_send_data = (void *)p_next_data;
+            *next_send_data = (void *) p_next_data;
             printf("----------------------------------------\n");
             printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
             printf("----------------------------------------\n");
@@ -273,9 +273,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
     return 0;
 }
 
-int trans_data_set_action(void *data, ACTION_TYPE type) {
+int trans_data_set_action(void *data, ACTION_TYPE type)
+{
 
-    TRANS_DATA * pdata = (TRANS_DATA *) data;
+    TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     bzero(pdata, sizeof(TRANS_DATA));
 
@@ -288,9 +289,10 @@ int trans_data_set_action(void *data, ACTION_TYPE type) {
     return 0;
 }
 
-int trans_data_set_get_server_status(void *data) {
+int trans_data_set_get_server_status(void *data)
+{
 
-    TRANS_DATA * pdata = (TRANS_DATA *) data;
+    TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     bzero(pdata, sizeof(TRANS_DATA));
 
@@ -300,9 +302,10 @@ int trans_data_set_get_server_status(void *data) {
     return 0;
 }
 
-int trans_data_set_get_data(void *data) {
+int trans_data_set_get_data(void *data)
+{
 
-    TRANS_DATA * pdata = (TRANS_DATA *) data;
+    TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     bzero(pdata, sizeof(TRANS_DATA));
 
@@ -314,7 +317,7 @@ int trans_data_set_get_data(void *data) {
 
 int trans_data_set_none(void *data)
 {
-    TRANS_DATA * pdata = (TRANS_DATA *) data;
+    TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     bzero(pdata, sizeof(TRANS_DATA));
 
@@ -327,10 +330,10 @@ int resource_manager(void *recved_data, void *next_data)
 {
 
     TRANS_TYPE type;
-    TRANS_DATA * pdata;
+    TRANS_DATA *pdata;
     bool backup_server_status;
     bool backup_have_virtual_ip;
-    char * data;
+    char *data;
     SERVER_STATUS_DATAS local_server_status_datas;
 
     int policy;
@@ -350,12 +353,11 @@ int resource_manager(void *recved_data, void *next_data)
             get_local_server_status_datas(&local_server_status_datas);
 
 
-
             policy = policy_link_manager(local_server_status_datas.server_status,
                                          local_server_status_datas.have_virtual_ip, auto_failback,
                                          backup_server_status, backup_have_virtual_ip);
 
-            if(policy == LINK_ACT_DO_NOTHING ) {
+            if (policy == LINK_ACT_DO_NOTHING) {
                 trans_data_set_none(next_data);
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
                 trans_data_set_action(next_data, ACTION_TYPE_GET_RES);
@@ -389,7 +391,7 @@ int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip
 
     spolicy.assign(policy_str);
 
-    if(policy_link_map.count(spolicy) > 0) {
+    if (policy_link_map.count(spolicy) > 0) {
 
         // 返回0 1 2
         return policy_link_map[spolicy];
@@ -419,20 +421,19 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 
     ret = system(cmd_str);
 
-    if(WIFEXITED(ret)) {
+    if (WIFEXITED(ret)) {
         check_vip_ret = WEXITSTATUS(ret);
     }
 
-    data->have_virtual_ip = (check_vip_ret==1) ? true: false;
-    data->server_status = (bool)run_all_plugin();
+    data->have_virtual_ip = (check_vip_ret == 1) ? true : false;
+    data->server_status = (bool) run_all_plugin();
     return 0;
 }
 
 
-
 int policy_link_init()
 {
-    FILE * fp;
+    FILE *fp;
     char str_line[256] = {0};
     std::string sline;
     int tail_pos = -1;
@@ -445,22 +446,22 @@ int policy_link_init()
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
             continue;
 
         sline.assign(str_line);
 
         tail_pos = sline.find("\n");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
         tail_pos = sline.find("\r");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
-        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+        if (space_pos = sline.find("="), std::string::npos != space_pos) {
             std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
 
             skey.erase(0, skey.find_first_not_of(" "));
             skey.erase(skey.find_last_not_of(" ") + 1);
@@ -472,14 +473,13 @@ int policy_link_init()
         }
     }
 
-    if(fp == NULL) {
+    if (fp == NULL) {
         perror("fopen error");
         return 0;
     }
 
 
-
-    if( fp != NULL ) {
+    if (fp != NULL) {
         fclose(fp);
         fp = NULL;
     }
@@ -503,9 +503,10 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     printf("Start taking over resources...\n");
 
     // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name, eth_num);
+    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
+            eth_num);
 
-    my_system((const char *)cmd_str, "/tmp/takeover.tmp");
+    my_system((const char *) cmd_str, "/tmp/takeover.tmp");
 
 
     bzero(cmd_str, 256);
@@ -514,9 +515,10 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     std::string svirtual_ip, svirtual_ip_with_mask;
     svirtual_ip_with_mask.assign(virtual_ip_with_mask);
     svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
-    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", svirtual_ip.c_str(), ethernet_name, svirtual_ip.c_str());
+    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", svirtual_ip.c_str(), ethernet_name,
+            svirtual_ip.c_str());
 
-    my_system((const char *)cmd_str, "/tmp/send_arp.tmp");
+    my_system((const char *) cmd_str, "/tmp/send_arp.tmp");
     return 0;
 }
 
@@ -529,7 +531,7 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
     // 1. 绑定ip到网卡
     sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
 
-    my_system((const char *)cmd_str, "/tmp/release_resources.tmp");
+    my_system((const char *) cmd_str, "/tmp/release_resources.tmp");
     return 0;
 }
 
@@ -548,10 +550,10 @@ int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_typ
     std::string spolicy;
 
     // primary
-    if(node_type == 0) {
+    if (node_type == 0) {
         sprintf(policy_str, "p_ss:%d|p_vip:%d", server_status, have_virtual_ip);
         spolicy.assign(policy_str);
-        if(policy_nolink_primary_map.count(spolicy) > 0) {
+        if (policy_nolink_primary_map.count(spolicy) > 0) {
             return policy_nolink_primary_map[spolicy];
         } else
             return NOLINK_ACT_DO_NOTING;
@@ -560,7 +562,7 @@ int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_typ
         // backup
         sprintf(policy_str, "b_ss:%d|b_vip:%d", server_status, have_virtual_ip);
         spolicy.assign(policy_str);
-        if(policy_nolink_primary_map.count(spolicy) > 0) {
+        if (policy_nolink_primary_map.count(spolicy) > 0) {
             return policy_nolink_primary_map[spolicy];
         } else
             return NOLINK_ACT_DO_NOTING;
@@ -570,7 +572,7 @@ int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_typ
 
 int policy_no_link_primary_init()
 {
-    FILE * fp;
+    FILE *fp;
     char str_line[256] = {0};
     std::string sline;
     int tail_pos = -1;
@@ -582,22 +584,22 @@ int policy_no_link_primary_init()
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
             continue;
 
         sline.assign(str_line);
 
         tail_pos = sline.find("\n");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
         tail_pos = sline.find("\r");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
-        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+        if (space_pos = sline.find("="), std::string::npos != space_pos) {
             std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
 
             skey.erase(0, skey.find_first_not_of(" "));
             skey.erase(skey.find_last_not_of(" ") + 1);
@@ -609,14 +611,13 @@ int policy_no_link_primary_init()
         }
     }
 
-    if(fp == NULL) {
+    if (fp == NULL) {
         perror("fopen error");
         return 0;
     }
 
 
-
-    if( fp != NULL ) {
+    if (fp != NULL) {
         fclose(fp);
         fp = NULL;
     }
@@ -626,7 +627,7 @@ int policy_no_link_primary_init()
 
 int policy_no_link_backup_init()
 {
-    FILE * fp;
+    FILE *fp;
     char str_line[256] = {0};
     std::string sline;
     int tail_pos = -1;
@@ -638,22 +639,22 @@ int policy_no_link_backup_init()
 
     while (fgets(str_line, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if(str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
             continue;
 
         sline.assign(str_line);
 
         tail_pos = sline.find("\n");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
         tail_pos = sline.find("\r");
-        if(std::string::npos != tail_pos)
+        if (std::string::npos != tail_pos)
             sline.erase(tail_pos, 1);
 
-        if(space_pos = sline.find("="), std::string::npos != space_pos) {
+        if (space_pos = sline.find("="), std::string::npos != space_pos) {
             std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos+1, sline.length()-space_pos-1);
+            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
 
             skey.erase(0, skey.find_first_not_of(" "));
             skey.erase(skey.find_last_not_of(" ") + 1);
@@ -665,14 +666,13 @@ int policy_no_link_backup_init()
         }
     }
 
-    if(fp == NULL) {
+    if (fp == NULL) {
         perror("fopen error");
         return 0;
     }
 
 
-
-    if( fp != NULL ) {
+    if (fp != NULL) {
         fclose(fp);
         fp = NULL;
     }

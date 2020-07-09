@@ -11,10 +11,10 @@
 #include "MonitorSrv.h"
 
 
-int plug_init(void * data)
+int plug_init(void *data)
 {
 
-    PLUG_DATA * pdata = (PLUG_DATA *) data;
+    PLUG_DATA *pdata = (PLUG_DATA *) data;
 
     pdata->initStruct.sdkVersion = 1;
     pdata->initStruct.pluginVersion = 1;
@@ -34,7 +34,7 @@ int plug_stop(void)
     return 0;
 }
 
-int plug_run(void * data)
+int plug_run(void *data)
 {
     monitor_srv_init();
 
