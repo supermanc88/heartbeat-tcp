@@ -9,6 +9,7 @@
 
 char log_path[512] = LOG_FILE_PATH;            /* 日志文件存放路径 */
 char log_prefix[128] = "hblog";        /* 日志文件前缀 */
+int max_keep_day = 30;
 
 int hb_log(char *info_source, char *info_level, char *fmt, ...)
 {
