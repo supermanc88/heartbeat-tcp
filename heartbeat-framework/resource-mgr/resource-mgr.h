@@ -137,13 +137,4 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
  */
 int release_resources(const char *virtual_ip_with_mask, const char *ethernet_name);
 
-
-/**
- * 封装一层system函数，重定向写文件，不在屏幕打印
- * @param cmd_string
- * @param tmp_file
- * @return
- */
-int my_system(const char *cmd_string, const char * tmp_file);
-
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H

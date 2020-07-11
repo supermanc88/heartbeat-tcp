@@ -9,6 +9,7 @@
 
 #include "resource-mgr.h"
 #include "../plugin-mgr/plugin-manager.h"
+#include "../common/custom-functions.h"
 
 std::map<std::string, int> policy_link_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
@@ -506,7 +507,7 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
             eth_num);
 
-    my_system((const char *) cmd_str, "/tmp/takeover.tmp");
+    system_to_file((const char *) cmd_str, "/tmp/takeover.tmp");
 
 
     bzero(cmd_str, 256);
@@ -518,7 +519,7 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", svirtual_ip.c_str(), ethernet_name,
             svirtual_ip.c_str());
 
-    my_system((const char *) cmd_str, "/tmp/send_arp.tmp");
+    system_to_file((const char *) cmd_str, "/tmp/send_arp.tmp");
     return 0;
 }
 
@@ -531,16 +532,8 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
     // 1. 绑定ip到网卡
     sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
 
-    my_system((const char *) cmd_str, "/tmp/release_resources.tmp");
+    system_to_file((const char *) cmd_str, "/tmp/release_resources.tmp");
     return 0;
-}
-
-int my_system(const char *cmd_string, const char *tmp_file)
-{
-    char my_cmd_str[256];
-    sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
-
-    return system(my_cmd_str);
 }
 
 int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_type)

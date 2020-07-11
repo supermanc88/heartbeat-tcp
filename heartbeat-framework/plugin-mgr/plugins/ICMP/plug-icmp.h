@@ -11,9 +11,6 @@ extern "C"{
 
     int plug_run(void * data);
 
-    int my_system(const char *cmd_string);
-
-
 #define CMD_STRING_LEN 256
 #define MY_TMP_FILENAME "/tmp/icmp.tmp"
 

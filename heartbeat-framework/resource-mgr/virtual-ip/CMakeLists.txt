@@ -6,4 +6,7 @@ project(check-virtual-ip)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
-add_executable(check-virtual-ip check-vip.cpp check-vip.h)
+set(CHECKVIP_SRC check-vip.cpp check-vip.h
+        ../../common/custom-functions.cpp ../../common/custom-functions.h)
+
+add_executable(check-virtual-ip ${CHECKVIP_SRC})

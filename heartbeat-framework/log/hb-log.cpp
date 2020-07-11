@@ -6,6 +6,10 @@
 
 #include "hb-log.h"
 
+#include "../common/custom-functions.h"
+
+#define DAYS_AGO_TIME_FILE  "/tmp/getndaysagotime.tmp"
+
 
 char log_path[512] = LOG_FILE_PATH;            /* 日志文件存放路径 */
 char log_prefix[128] = "hblog";        /* 日志文件前缀 */
@@ -160,25 +164,15 @@ int makedir(const char *dir_path)
     return ret;
 }
 
-int mmy_system(const char *cmd)
-{
-    char my_cmd_str[256];
-    char *tmp_file = "/tmp/getndaysagotime.tmp";
-
-    sprintf(my_cmd_str, "%s > %s", cmd, tmp_file);
-
-    return system(my_cmd_str);
-}
-
 int get_n_days_ago_time(int num, char *outtime)
 {
 
     char cmdstr[BUFSIZ] = {0};
     sprintf(cmdstr, "date -d \"$(date) -%dday\" +%%Y%%m%%d", num);
 
-    mmy_system(cmdstr);
+    system_to_file(cmdstr, DAYS_AGO_TIME_FILE);
 
-    FILE * fp = fopen("/tmp/getndaysagotime.tmp", "r");
+    FILE * fp = fopen(DAYS_AGO_TIME_FILE, "r");
 
     if (fp == NULL) {
         return -1;

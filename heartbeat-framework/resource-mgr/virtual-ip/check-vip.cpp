@@ -3,18 +3,7 @@
 #include <string>
 
 #include "check-vip.h"
-
-
-int my_system(const char *cmd_string)
-{
-    char my_cmd_str[CMD_STRING_LEN];
-    char * tmp_file = MY_TMP_FILENAME;
-
-    sprintf(my_cmd_str, "%s > %s", cmd_string, tmp_file);
-
-    return system(my_cmd_str);
-}
-
+#include "../../common/custom-functions.h"
 
 
 /**
@@ -31,7 +20,7 @@ int main(int argc, char * argv[])
     std::string sline;
 
     // 命令行运行 ip addr，在内容中查找virtual_ip
-    my_system("ip addr");
+    system_to_file("ip addr", MY_TMP_FILENAME);
 
     FILE * fp = fopen(MY_TMP_FILENAME, "r");
 

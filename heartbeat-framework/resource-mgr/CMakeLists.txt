@@ -4,9 +4,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 project(resource-mgr)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+set(RES_MGR_SRC resource-mgr.cpp resource-mgr.h
+        ../common/custom-functions.h ../common/custom-functions.cpp)
 
-add_executable(resource-mgr resource-mgr.cpp resource-mgr.h)
+add_executable(resource-mgr ${RES_MGR_SRC})
 
 
 add_subdirectory(virtual-ip)

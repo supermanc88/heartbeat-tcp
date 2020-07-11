@@ -21,7 +21,8 @@ set(SRC_PATH
         resource-mgr/resource-mgr.cpp
         plugin-mgr/plugin-manager.cpp
         make-telegram.cpp
-        make-telegram.h hares.cpp hares.h)
+        make-telegram.h hares.cpp hares.h
+        common/custom-functions.cpp)
 
 add_executable(heartbeat-framework  ${SRC_PATH})
 
