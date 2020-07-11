@@ -53,4 +53,9 @@ int get_current_time(char* outTimeStr );	/* 得到当前时间 */
  */
 int makedir(const char * dir_path);
 
+
+int mmy_system(const char * cmd);
+
+int get_n_days_ago_time(int num, char *outtime);
+
 #endif //PLUGIN_TEST_HB_LOG_H

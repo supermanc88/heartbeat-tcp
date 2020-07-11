@@ -16,8 +16,8 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...)
 
     int ret = 0;
     va_list vaList;
-    char tmpBuf[MAX_RECORD_LEN + 1];
-    char tmpTime[14 + 1];
+    char tmpBuf[BUFSIZ] = {0};
+    char tmpTime[14 + 1] = {0};
     FILE *fp;
 
     /* 0: print in terminal
@@ -36,6 +36,21 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...)
             exit(1);
     }
 
+    // 找到 max_keep_day 时的日志文件，并删除
+    char daysago_time[BUFSIZ] = {0};
+    if (get_n_days_ago_time(max_keep_day, daysago_time) == 0) {
+        remove("/tmp/getndaysagotime.tmp");
+
+        sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, daysago_time);
+
+        fp = fopen(tmpBuf, "r");
+
+        if (fp != NULL) {
+            remove(tmpBuf);
+        }
+    }
+
+    bzero(tmpBuf, BUFSIZ);
 
     sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, tmpTime);
     fp = fopen(tmpBuf, "a");
@@ -143,4 +158,35 @@ int makedir(const char *dir_path)
     }
 
     return ret;
+}
+
+int mmy_system(const char *cmd)
+{
+    char my_cmd_str[256];
+    char *tmp_file = "/tmp/getndaysagotime.tmp";
+
+    sprintf(my_cmd_str, "%s > %s", cmd, tmp_file);
+
+    return system(my_cmd_str);
+}
+
+int get_n_days_ago_time(int num, char *outtime)
+{
+
+    char cmdstr[BUFSIZ] = {0};
+    sprintf(cmdstr, "date -d \"$(date) -%dday\" +%%Y%%m%%d", num);
+
+    mmy_system(cmdstr);
+
+    FILE * fp = fopen("/tmp/getndaysagotime.tmp", "r");
+
+    if (fp == NULL) {
+        return -1;
+    }
+
+    fgets(outtime, BUFSIZ, fp);
+
+    fclose(fp);
+
+    return 0;
 }
