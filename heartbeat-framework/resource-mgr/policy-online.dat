@@ -1,10 +1,16 @@
-# p_ 开头为主机状态 primary
-# b_ 开关为备机状态 backup
-# ss:serverstatus
-# vip:virtual ip
-# afk:auto_failback
-# 0:什么也不做 1：备机接管 2：主机接管
-# 0:release 1:takeover
+# 本策略为主备机可以探测到对方时所采取的决策(联机策略)
+# 策略格式解释：
+# 主机设备状态|备机设备状态 = 资源动作
+# 设备状态包括：
+#   前缀：p_ 代表主机(primary) b_ 代表备机(backup)
+#   服务状态或当前配置：
+#       ss : serverstatus 表示当前主机是否可以对外提供NetSign签名服务，是插件检测结果的交集 &
+#       vip : virtual ip 表示当前主机是否有虚拟ip
+#       afk : auto_failback ha.cf中的配置项，用来表示是否回切
+# 资源动作：
+#   0 : 什么也不做，主备机对当前的资源(虚ip)维持现状
+#   1 : 备机接管虚ip
+#   2 : 主机接管虚ip
 
 p_ss:1|p_vip:1|p_afk:1|b_ss:1|b_vip:1 = 2
 p_ss:1|p_vip:1|p_afk:1|b_ss:1|b_vip:1 = 2

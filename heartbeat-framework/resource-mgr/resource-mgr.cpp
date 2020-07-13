@@ -28,7 +28,7 @@ extern int eth_num;
 
 //int main(void)
 //{
-//    policy_link_init();
+//    policy_online_init();
 //    printf("resource manager\n");
 //    printf("---------------------------\n");
 //
@@ -354,9 +354,9 @@ int resource_manager(void *recved_data, void *next_data)
             get_local_server_status_datas(&local_server_status_datas);
 
 
-            policy = policy_link_manager(local_server_status_datas.server_status,
-                                         local_server_status_datas.have_virtual_ip, auto_failback,
-                                         backup_server_status, backup_have_virtual_ip);
+            policy = policy_online_manager(local_server_status_datas.server_status,
+                                           local_server_status_datas.have_virtual_ip, auto_failback,
+                                           backup_server_status, backup_have_virtual_ip);
 
             if (policy == LINK_ACT_DO_NOTHING) {
                 trans_data_set_none(next_data);
@@ -377,8 +377,8 @@ int resource_manager(void *recved_data, void *next_data)
     return policy;
 }
 
-int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
-                        bool backup_server_status, bool backup_have_virtual_ip)
+int policy_online_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
+                          bool backup_server_status, bool backup_have_virtual_ip)
 {
     char policy_str[256] = {0};
     std::string spolicy;
@@ -432,7 +432,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 }
 
 
-int policy_link_init()
+int policy_online_init()
 {
     FILE *fp;
     char str_line[256] = {0};
@@ -490,7 +490,7 @@ int policy_link_init()
 
 int policy_no_link_init()
 {
-    policy_no_link_primary_init();
+    policy_stand_alone_init();
 //    policy_no_link_backup_init();
 
     return 0;
@@ -536,7 +536,7 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
     return 0;
 }
 
-int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_type)
+int policy_stand_alone_manager(bool server_status, bool have_virtual_ip, int node_type)
 {
 
     char policy_str[256] = {0};
@@ -563,7 +563,7 @@ int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_typ
         return NOLINK_ACT_DO_NOTING;
 }
 
-int policy_no_link_primary_init()
+int policy_stand_alone_init()
 {
     FILE *fp;
     char str_line[256] = {0};
@@ -618,58 +618,10 @@ int policy_no_link_primary_init()
     return 0;
 }
 
-int policy_no_link_backup_init()
+int policy_init()
 {
-    FILE *fp;
-    char str_line[256] = {0};
-    std::string sline;
-    int tail_pos = -1;
-    int space_pos = -1;
-
-    fp = fopen(POLICY_NOLINK_BACKUP_PATH, "r");
-    if (fp == NULL)
-        return 0;
-
-    while (fgets(str_line, 256, fp)) {
-        // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
-            continue;
-
-        sline.assign(str_line);
-
-        tail_pos = sline.find("\n");
-        if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
-
-        tail_pos = sline.find("\r");
-        if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
-
-        if (space_pos = sline.find("="), std::string::npos != space_pos) {
-            std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
-
-            skey.erase(0, skey.find_first_not_of(" "));
-            skey.erase(skey.find_last_not_of(" ") + 1);
-
-            svalue.erase(0, svalue.find_first_not_of(" "));
-            svalue.erase(svalue.find_last_not_of(" ") + 1);
-
-            policy_nolink_backup_map[skey] = atoi(svalue.c_str());
-        }
-    }
-
-    if (fp == NULL) {
-        perror("fopen error");
-        return 0;
-    }
-
-
-    if (fp != NULL) {
-        fclose(fp);
-        fp = NULL;
-    }
-
+    policy_online_init();
+    policy_stand_alone_init();
     return 0;
 }
 

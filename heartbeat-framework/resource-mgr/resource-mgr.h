@@ -3,10 +3,8 @@
 
 #include "../heartbeat-config.h"
 
-#define POLICY_LINK_PATH "/etc/ha.d/policy/policy.dat"
-#define POLICY_NOLINK_PATH "/etc/ha.d/policy/policy2.dat"
-#define POLICY_NOLINK_PRIMARY_PATH "/etc/ha.d/policy/policy_primary.dat"
-#define POLICY_NOLINK_BACKUP_PATH "/etc/ha.d/policy/policy_backup.dat"
+#define POLICY_LINK_PATH "/etc/ha.d/policy/policy-online.dat"
+#define POLICY_NOLINK_PRIMARY_PATH "/etc/ha.d/policy/policy-stand-alone.dat"
 
 #define LINK_ACT_DO_NOTHING 0
 #define LINK_ACT_BACKUP_NODE_TAKEOVER 1
@@ -75,8 +73,8 @@ int resource_manager(void * recved_data, void * next_data);
  * 1 主机让备机拿资源
  * 2 主机让备机释放资源
  */
-int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
-                        bool backup_server_status, bool backup_have_virtual_ip);
+int policy_online_manager(bool primary_server_status, bool primary_have_virtual_ip, bool primary_auto_fail_back,
+                          bool backup_server_status, bool backup_have_virtual_ip);
 
 
 
@@ -87,7 +85,7 @@ int policy_link_manager(bool primary_server_status, bool primary_have_virtual_ip
  * @param node_type 主机0 or 备机1
  * @return 动作类型
  */
-int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_type);
+int policy_stand_alone_manager(bool server_status, bool have_virtual_ip, int node_type);
 
 
 /**
@@ -98,31 +96,24 @@ int policy_nolink_manager(bool server_status, bool have_virtual_ip, int node_typ
 int get_local_server_status_datas(SERVER_STATUS_DATAS * data);
 
 /**
- * 初始化策略表，连通状态的策略
+ * 初始化联机策略
  * @return
  */
-int policy_link_init();
+int policy_online_init();
 
 
 /**
- * 初始化策略表，不连通状态的策略
+ * 初始化单机策略
  * @return
  */
-int policy_no_link_init();
-
-/**
- * 初始化主机在不连通状态下的策略
- * @return
- */
-int policy_no_link_primary_init();
+int policy_stand_alone_init();
 
 
 /**
- * 初始化备机在不连通状态下的策略
- * 此函数已不再使用，未连通状态下的策略由policy_primary.dat提供
+ * 策略初始化
  * @return
  */
-int policy_no_link_backup_init();
+int policy_init();
 
 
 /**

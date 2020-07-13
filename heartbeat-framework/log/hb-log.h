@@ -9,7 +9,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#define LOG_FILE_PATH "/var/log/hb-log"
+#define LOG_FILE_PATH "/opt/infosec/NetSignServer52/NetSignServer/haplugin/log"
 
 
 #define MAX_RECORD_LEN	2048	/* 记录最大长度 */
