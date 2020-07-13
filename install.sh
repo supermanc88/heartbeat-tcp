@@ -27,6 +27,13 @@ then
   mkdir "$hadir"
 fi
 
+# 检查ha.cf是否存在，如果存在，改名备份
+
+if [ -f "$hadir/ha.cf" ]
+then
+  mv "$hadir/ha.cf" "$hadir/ha.cf.bak"
+fi
+
 policyPath=$hadir/"policy"
 
 if [ ! -d "$policyPath" ]

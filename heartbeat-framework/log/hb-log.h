@@ -2,14 +2,15 @@
 #define PLUGIN_TEST_HB_LOG_H
 
 
-#define LOG_FILE_PATH "/var/log/hb-log"
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
 #include <sys/time.h>
 #include <stdlib.h>
+
+#define LOG_FILE_PATH "/var/log/hb-log"
+
 
 #define MAX_RECORD_LEN	2048	/* 记录最大长度 */
 

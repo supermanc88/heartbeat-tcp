@@ -139,6 +139,8 @@ int start_by_client_mode(void)
 
                 goto reconnect;
             }
+        } else {
+            printf("Generated faults manually\n");
         }
 
         sleep(keepalive);
@@ -318,6 +320,7 @@ int start_by_client_mode(void)
 
             }
         } else {
+            printf("Generated faults manually\n");
             sleep(keepalive);
         }
     }
@@ -576,6 +579,7 @@ int start_by_server_mode(void)
             }
 
         } else {
+            printf("Generated faults manually\n");
             printf("sleep %d seconds\n", keepalive);
             sleep(keepalive);
         }
