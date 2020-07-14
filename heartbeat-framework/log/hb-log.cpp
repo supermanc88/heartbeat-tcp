@@ -168,7 +168,7 @@ int get_n_days_ago_time(int num, char *outtime)
 {
 
     char cmdstr[BUFSIZ] = {0};
-    sprintf(cmdstr, "date -d \"$(date) -%dday\" +%%Y%%m%%d", num);
+    sprintf(cmdstr, "date -d \"-%d day\" +%%Y%%m%%d", num);
 
     system_to_file(cmdstr, DAYS_AGO_TIME_FILE);
 

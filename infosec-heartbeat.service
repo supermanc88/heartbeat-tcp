@@ -17,6 +17,10 @@ BIN="/opt/infosec-heartbeat/bin/heartbeat-framework"
 PID_FILE="/var/run/infosec-heartbeat.pid"
 start()
 {
+  if [ -f "$PID_FILE" ]
+  then
+    rm $PID_FILE
+  fi
   [ -x $BIN ] || exit 5
   HBRUNNING=0
   if [ -f "$PID_FILE" ]
@@ -34,8 +38,13 @@ start()
   else
     echo "infosec heartbeat start"
     $BIN &
-
-    success
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ]
+    then
+      failure
+    else
+      success
+    fi
   fi
   echo 'this is my service, start commond'
   echo ''
@@ -44,6 +53,10 @@ stop()
 {
   echo 'this is my service, stop commond'
   killproc -p $PID_FILE
+  if [ -f "$PID_FILE" ]
+  then
+    rm $PID_FILE
+  fi
   echo ''
 }
 restart()

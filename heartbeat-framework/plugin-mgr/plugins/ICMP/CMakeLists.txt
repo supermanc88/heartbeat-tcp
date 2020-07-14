@@ -14,6 +14,8 @@ set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH}/../)
 
 set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
 message(${LIBRARY_DIRECTORY})
 
 link_libraries(${LIBRARY_DIRECTORY})
@@ -21,7 +23,9 @@ link_libraries(${LIBRARY_DIRECTORY})
 set(ICMP_SRC plug-icmp.cpp plug-icmp.h
         ../../../heartbeat-config.h
         ../../../hbconf.cpp ../../../hbconf.h
-        ../../../common/custom-functions.cpp ../../../common/custom-functions.h)
+        ../../../common/custom-functions.cpp ../../../common/custom-functions.h
+        MonitorSrv.h MonitorSrv.cpp
+        MyLog.h MyLog.cpp)
 
 #add_executable(plug_icmp plug-icmp.cpp plug-icmp.h)
 add_library(plug_icmp SHARED ${ICMP_SRC})

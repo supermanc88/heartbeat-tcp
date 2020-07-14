@@ -2,16 +2,19 @@
 #include <unistd.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <string>
 
 #include "plug-icmp.h"
 #include "../../hb-plugin.h"
-#include "hb-log.h"
 
 #include "../../../heartbeat-config.h"
 #include "../../../hbconf.h"
 #include "../../../common/custom-functions.h"
+#include "MonitorSrv.h"
 
 char ping_target[BUFSIZ] = "192.168.1.1";
+int ping_timeout = 1000;
+int ping_retry = 10;
 
 int plug_init(void *data)
 {
@@ -36,6 +39,13 @@ int plug_init(void *data)
     }
     hb.CloseFile();
 
+
+    LoadMonSrvConf();
+
+    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout, ping_retry);
+
+    ping_timeout = ping_timeout / 1000;
+
     return 0;
 }
 
@@ -51,7 +61,11 @@ int plug_run(void *data)
 
     char cmdstr[BUFSIZ] = {0};
 
-    sprintf(cmdstr, "ping -c 5 %s", ping_target);
+    if (ping_timeout > 0) {
+        sprintf(cmdstr, "ping -c %d -W %d %s", ping_retry, ping_timeout, ping_target);
+    } else {
+        sprintf(cmdstr, "ping -c %d %s", ping_retry, ping_target);
+    }
 
     ret = system_to_file(cmdstr, MY_TMP_FILENAME);
 
