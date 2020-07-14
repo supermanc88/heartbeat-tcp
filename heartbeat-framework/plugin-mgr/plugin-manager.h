@@ -16,10 +16,10 @@ PLUG_RET plugin_manager_init();
 PLUG_RET load_all_plugin();
 
 // 按照指定文件名加载插件
-PLUG_RET load_plugin(char * plugin_path);
+PLUG_RET load_plugin(char *plugin_path);
 
 // 遍历插件目录
-int list_plug_directory(char * dir_path);
+int list_plug_directory(char *dir_path);
 
 
 // 运行所有的插件 获取结果

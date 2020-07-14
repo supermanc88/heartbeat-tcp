@@ -17,8 +17,7 @@ char ping_target[BUFSIZ] = "192.168.1.1";
 extern int ping_timeout;
 extern int ping_retry;
 
-int plug_init(void *data)
-{
+int plug_init(void *data) {
 
     PLUG_DATA *pdata = (PLUG_DATA *) data;
 
@@ -43,7 +42,8 @@ int plug_init(void *data)
 
     loadconfig();
 
-    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout, ping_retry);
+    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout,
+           ping_retry);
 
     ping_timeout = ping_timeout / 1000;
 
@@ -51,13 +51,11 @@ int plug_init(void *data)
 }
 
 
-int plug_stop(void)
-{
+int plug_stop(void) {
     return 0;
 }
 
-int plug_run(void *data)
-{
+int plug_run(void *data) {
     int ret;
 
     char cmdstr[BUFSIZ] = {0};
@@ -89,7 +87,6 @@ int plug_run(void *data)
 }
 
 
-int main(void)
-{
+int main(void) {
     plug_run(NULL);
 }

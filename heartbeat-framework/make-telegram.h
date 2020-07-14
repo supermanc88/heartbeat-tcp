@@ -24,6 +24,6 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size);
  * @param data              反序列化的结果，数据结构体
  * @return
  */
-int parse_telegram(std::string telegram_data, size_t t_data_size, void ** data);
+int parse_telegram(std::string telegram_data, size_t t_data_size, void **data);
 
 #endif //HEARTBEAT_TCP_MAKE_TELEGRAM_H

@@ -5,15 +5,13 @@
 #include "hb-plugin.h"
 
 
-int test_add(int a, int b)
-{
+int test_add(int a, int b) {
     return a + b;
 }
 
-int plug_init(void *data)
-{
+int plug_init(void *data) {
 
-    PLUG_DATA * pdata = (PLUG_DATA *) data;
+    PLUG_DATA *pdata = (PLUG_DATA *) data;
 
     pdata->initStruct.sdkVersion = 1;
     pdata->initStruct.pluginVersion = 1;
@@ -25,14 +23,12 @@ int plug_init(void *data)
     return 0;
 }
 
-int plug_stop(void)
-{
+int plug_stop(void) {
     write(STDOUT_FILENO, "hello plug stop", strlen("hello plug stop"));
     return 0;
 }
 
-int plug_run(void *data)
-{
+int plug_run(void *data) {
 
     write(STDOUT_FILENO, "hello plug run", strlen("hello plug run"));
     return 0;

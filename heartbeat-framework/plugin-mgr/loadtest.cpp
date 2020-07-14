@@ -3,16 +3,15 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 
-int main()
-{
-    void * dl;
+int main() {
+    void *dl;
     dl = dlopen("/tmp/heartbeat-tcp/build/lib/plugins/libplug_icmp.so", RTLD_NOW);
 
     if (!dl) {
         fprintf(stderr, "%s\n", dlerror());
     }
 
-    void * dl1;
+    void *dl1;
     dl1 = dlopen("/tmp/heartbeat-tcp/build/lib/plugins/libplug_netsignstatus.so", RTLD_NOW);
 
     if (!dl1) {

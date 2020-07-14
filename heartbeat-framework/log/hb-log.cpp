@@ -15,8 +15,7 @@ char log_path[512] = LOG_FILE_PATH;            /* 日志文件存放路径 */
 char log_prefix[128] = "hblog";        /* 日志文件前缀 */
 int max_keep_day = 30;
 
-int hb_log(char *info_source, char *info_level, char *fmt, ...)
-{
+int hb_log(char *info_source, char *info_level, char *fmt, ...) {
 
     int ret = 0;
     va_list vaList;
@@ -33,8 +32,7 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...)
 
     if (!ret) {
         //        printf("create dir success\n");
-    }
-    else {
+    } else {
 //            perror("mkdir error");
         if (errno != EEXIST)
             exit(1);
@@ -114,8 +112,7 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...)
 }
 
 
-int get_current_time(char *outTimeStr)
-{
+int get_current_time(char *outTimeStr) {
     int ret = 0;
     time_t tTime;
     struct tm *tmTime;
@@ -131,8 +128,7 @@ int get_current_time(char *outTimeStr)
     return ret;
 }
 
-int makedir(const char *dir_path)
-{
+int makedir(const char *dir_path) {
     int ret;
 
     std::string tmp_string;
@@ -164,15 +160,14 @@ int makedir(const char *dir_path)
     return ret;
 }
 
-int get_n_days_ago_time(int num, char *outtime)
-{
+int get_n_days_ago_time(int num, char *outtime) {
 
     char cmdstr[BUFSIZ] = {0};
     sprintf(cmdstr, "date -d \"-%d day\" +%%Y%%m%%d", num);
 
     system_to_file(cmdstr, DAYS_AGO_TIME_FILE);
 
-    FILE * fp = fopen(DAYS_AGO_TIME_FILE, "r");
+    FILE *fp = fopen(DAYS_AGO_TIME_FILE, "r");
 
     if (fp == NULL) {
         return -1;

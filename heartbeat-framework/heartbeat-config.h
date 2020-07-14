@@ -61,7 +61,6 @@ struct TRANS_ACTION_DATA {
 };
 
 
-
 struct SERVER_STATUS_DATAS {
     bool server_status;
     bool have_virtual_ip;
@@ -95,7 +94,6 @@ struct TRANS_DATA {
     };
 //    char extra_data[1];
 };
-
 
 
 #endif //INFOSEC_HEARTBEAT_HEARTBEAT_CONFIG_H

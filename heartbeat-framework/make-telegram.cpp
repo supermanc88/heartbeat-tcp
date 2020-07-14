@@ -7,8 +7,7 @@
 #include "heartbeat-config.h"
 
 
-int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size)
-{
+int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
     TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     TransData telegram_transdata;
@@ -79,8 +78,7 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size)
     return 0;
 }
 
-int parse_telegram(std::string telegram_data, size_t t_data_size, void **data)
-{
+int parse_telegram(std::string telegram_data, size_t t_data_size, void **data) {
     TransData transdata;
     transdata.ParseFromString(telegram_data);
 

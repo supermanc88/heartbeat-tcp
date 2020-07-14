@@ -24,8 +24,7 @@ std::vector<PLUG_DATA> plug_data_vector;
 
 extern char plugins_dir[BUFSIZ];
 
-PLUG_RET load_all_plugin()
-{
+PLUG_RET load_all_plugin() {
     int i;
 //    list_plug_directory(PLUGINS_DIRECTORY);
 
@@ -38,8 +37,7 @@ PLUG_RET load_all_plugin()
     return PLUG_RET_SUCCESS;
 }
 
-PLUG_RET load_plugin(char *plugin_path)
-{
+PLUG_RET load_plugin(char *plugin_path) {
     void *dl = NULL;
 
     dl = dlopen(plugin_path, RTLD_NOW);
@@ -76,8 +74,7 @@ PLUG_RET load_plugin(char *plugin_path)
     return PLUG_RET_SUCCESS;
 }
 
-PLUG_RET plugin_manager_init()
-{
+PLUG_RET plugin_manager_init() {
 
     int i;
     plugins_path.clear();
@@ -102,8 +99,7 @@ PLUG_RET plugin_manager_init()
     return PLUG_RET_SUCCESS;
 }
 
-int list_plug_directory(char *dir_path)
-{
+int list_plug_directory(char *dir_path) {
     if (dir_path == NULL) {
         printf("dir path is NULL\n");
         return -1;
@@ -161,8 +157,7 @@ int list_plug_directory(char *dir_path)
     return 0;
 }
 
-int run_all_plugin()
-{
+int run_all_plugin() {
 
     int result = 1;
     int i = 0;

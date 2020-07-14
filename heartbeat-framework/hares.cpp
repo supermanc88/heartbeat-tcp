@@ -4,8 +4,7 @@
 
 #include "hares.h"
 
-HBRes::HBRes()
-{
+HBRes::HBRes() {
     fp = NULL;
     bzero(vip, BUFSIZ);
     bzero(eth, BUFSIZ);
@@ -13,29 +12,25 @@ HBRes::HBRes()
     eth_num = 0;
 }
 
-HBRes::~HBRes()
-{
+HBRes::~HBRes() {
     if (fp != NULL) {
         fclose(fp);
         fp = NULL;
     }
 }
 
-void HBRes::get_virtual_ip(char *vip)
-{
+void HBRes::get_virtual_ip(char *vip) {
     if (this->vip[0])
         strcpy(vip, this->vip);
 }
 
-void HBRes::get_ethernet_name(char *eth, int *eth_num)
-{
+void HBRes::get_ethernet_name(char *eth, int *eth_num) {
     if (this->eth[0])
         strcpy(eth, this->eth);
     *eth_num = this->eth_num;
 }
 
-void HBRes::open_file(char *filename)
-{
+void HBRes::open_file(char *filename) {
     fp = fopen(filename, "r");
 
     if (fp == NULL)
@@ -118,16 +113,14 @@ void HBRes::open_file(char *filename)
     }
 }
 
-void HBRes::close_file()
-{
+void HBRes::close_file() {
     if (fp != NULL) {
         fclose(fp);
         fp = NULL;
     }
 }
 
-void HBRes::get_primary_node(char *node_name)
-{
+void HBRes::get_primary_node(char *node_name) {
     if (node_name[0]) {
         strcpy(node_name, this->node_name);
     }

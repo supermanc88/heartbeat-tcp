@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-class HBRes{
+class HBRes {
 public:
     HBRes();
+
     ~HBRes();
 
 public:
@@ -13,7 +14,7 @@ public:
  * 从 haresources中读取vip
  * @param vip
  */
-    void get_virtual_ip(char * vip);
+    void get_virtual_ip(char *vip);
 
 /**
  * 从 haresources中读取网卡名
@@ -25,9 +26,10 @@ public:
  * 获取主节点名
  * @param node_name
  */
-    void get_primary_node(char * node_name);
+    void get_primary_node(char *node_name);
 
-    void open_file(char * filename);
+    void open_file(char *filename);
+
     void close_file();
 
 private:
@@ -36,7 +38,7 @@ private:
     char eth[BUFSIZ];
     char node_name[BUFSIZ];
     int eth_num;
-    FILE * fp;
+    FILE *fp;
 };
 
 #endif //HEARTBEAT_TCP_HARES_H

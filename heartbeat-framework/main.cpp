@@ -49,13 +49,11 @@ bool local_resource_takeover_status;
 
 bool trouble = false;
 
-void usage(void)
-{
+void usage(void) {
     printf("The startup method is related to whether node and hostname match\n");
 }
 
-int start_by_client_mode(void)
-{
+int start_by_client_mode(void) {
     int cfd;
     int none_package_send_times = 0;
 
@@ -331,8 +329,7 @@ int start_by_client_mode(void)
     return 0;
 }
 
-int start_by_server_mode(void)
-{
+int start_by_server_mode(void) {
     int lfd, cfd;
     int n, i, ret;
     struct sockaddr_in serv_addr;
@@ -594,8 +591,7 @@ int start_by_server_mode(void)
 /*
  * 手动切换的线程
  */
-void *manual_switch(void *)
-{
+void *manual_switch(void *) {
     int sfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len;
@@ -634,8 +630,7 @@ void *manual_switch(void *)
 }
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     char opt;
     char mode[20];
     bool b_mode_set = false;
@@ -644,7 +639,7 @@ int main(int argc, char *argv[])
 
     // 写pid到/var/run/infosec-heartbeat.pid
 
-    FILE * pid_fp = fopen("/var/run/infosec-heartbeat.pid", "a");
+    FILE *pid_fp = fopen("/var/run/infosec-heartbeat.pid", "a");
 
     if (pid_fp == NULL) {
         return -1;

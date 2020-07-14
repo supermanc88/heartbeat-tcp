@@ -5,11 +5,11 @@
 #include <stdio.h>
 
 
-typedef int (* PLUGINIT)(void * data) ;
+typedef int (*PLUGINIT)(void *data);
 
-typedef int (* PLUGSTOP)(void ) ;
+typedef int (*PLUGSTOP)(void);
 
-typedef int (* PLUGRUN)(void * data) ;
+typedef int (*PLUGRUN)(void *data);
 
 
 

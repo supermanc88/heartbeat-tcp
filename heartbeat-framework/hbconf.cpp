@@ -2,14 +2,12 @@
 #include <string.h>
 #include "hbconf.h"
 
-HBConfig::HBConfig()
-{
+HBConfig::HBConfig() {
     keymap.clear();
     fp = NULL;
 }
 
-HBConfig::~HBConfig()
-{
+HBConfig::~HBConfig() {
     keymap.clear();
     if (fp != NULL) {
         fclose(fp);
@@ -17,8 +15,7 @@ HBConfig::~HBConfig()
     }
 }
 
-HB_RET HBConfig::OpenFile(const char *file_path, const char *type)
-{
+HB_RET HBConfig::OpenFile(const char *file_path, const char *type) {
     HB_RET ret = RET_OPENFILE_ERROR;
 
     fp = fopen(file_path, type);
@@ -33,8 +30,7 @@ HB_RET HBConfig::OpenFile(const char *file_path, const char *type)
     return ret;
 }
 
-HB_RET HBConfig::CloseFile()
-{
+HB_RET HBConfig::CloseFile() {
     if (fp != NULL) {
         fclose(fp);
         fp = NULL;
@@ -42,8 +38,7 @@ HB_RET HBConfig::CloseFile()
     return RET_SUCCESS;
 }
 
-HB_RET HBConfig::ParseFile()
-{
+HB_RET HBConfig::ParseFile() {
     HB_RET ret = RET_SUCCESS;
     char str_line[256] = {0};
     std::string sline;
@@ -111,8 +106,7 @@ HB_RET HBConfig::ParseFile()
     return ret;
 }
 
-std::string &HBConfig::ClearHeadTailSpace(std::string &str)
-{
+std::string &HBConfig::ClearHeadTailSpace(std::string &str) {
     if (str.empty()) {
         return str;
     }
@@ -121,8 +115,7 @@ std::string &HBConfig::ClearHeadTailSpace(std::string &str)
     return str;
 }
 
-HB_RET HBConfig::GetValue(const char *key, char *value)
-{
+HB_RET HBConfig::GetValue(const char *key, char *value) {
     bzero(value, BUFSIZ);
     if (keymap.count(key) > 0) {
         std::string tmp = keymap[key];

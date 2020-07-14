@@ -14,8 +14,7 @@
 
 #define HACONFIG_FILE_PATH  "/etc/ha.d/ha.cf"
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char *argv[]) {
     int sfd;
     char buf[BUFSIZ];
     char ip_addr[BUFSIZ];
@@ -23,9 +22,9 @@ int main(int argc, char * argv[])
     if (argc != 4)
         exit(1);
 
-    char * ip = argv[1];
-    char * port = argv[2];
-    char * operation = argv[3];
+    char *ip = argv[1];
+    char *port = argv[2];
+    char *operation = argv[3];
 
     if (operation[strlen(operation)] == '\n') {
         operation[strlen(operation)] = '\0';
@@ -47,8 +46,8 @@ int main(int argc, char * argv[])
         std::string saddr;
         saddr.assign(ucast);
         int offset = saddr.find(" ");
-        if( offset != std::string::npos) {
-            strcpy(ip_addr, saddr.substr(offset+1).c_str());
+        if (offset != std::string::npos) {
+            strcpy(ip_addr, saddr.substr(offset + 1).c_str());
         }
         hb_config.CloseFile();
 
@@ -71,7 +70,7 @@ int main(int argc, char * argv[])
     else
         operation = "standby";
 
-    int ret = sendto(sfd, operation, strlen(operation), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    int ret = sendto(sfd, operation, strlen(operation), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
     if (ret == -1) {
         perror("sendto error");
