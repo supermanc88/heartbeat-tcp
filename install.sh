@@ -55,9 +55,9 @@ cp ./policy/* $policyPath
 # dependent libraries
 cp ./runtimes/* /usr/local/lib/
 cd /usr/local/lib
-ln -s libprotobuf.so.23.0.3 libprotobuf.so.23
-ln -s libprotobuf.so.23.0.3 libprotobuf.so
-ln -s libstdc++.so.6.0.18 libstdc++.so.6
+ln -s libprotobuf.so.23.0.3 libprotobuf.so.23 > /dev/null
+ln -s libprotobuf.so.23.0.3 libprotobuf.so > /dev/null
+ln -s libstdc++.so.6.0.18 libstdc++.so.6 > /dev/null
 echo "/usr/local/lib" > /etc/ld.so.conf.d/hb_runtimes.conf
 ldconfig > /dev/null
 
