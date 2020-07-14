@@ -1,0 +1,74 @@
+#!/bin/bash
+#
+# infosec-heartbeat         start up
+#
+# chkconfig: 2345 55 25
+# description: High-availability detection software based on TCP
+#
+#
+#
+# processname: heartbeat-framework
+#
+#
+# source function library
+. /etc/rc.d/init.d/functions
+
+BIN="/opt/infosec-heartbeat/bin/heartbeat-framework"
+PID_FILE="/var/run/infosec-heartbeat.pid"
+start()
+{
+  [ -x $BIN ] || exit 5
+  HBRUNNING=0
+  if [ -f "$PID_FILE" ]
+  then
+    PID='cat "$PID_FILE" 2>/dev/null'
+    if [ -n "$PID" ]
+    then
+      HBRUNNING=1
+    fi
+  fi
+  if [ $HBRUNNING = 1 ]
+  then
+    echo "infosec heartbeat already start"
+    success
+  else
+    echo "infosec heartbeat start"
+    $BIN &
+
+    success
+  fi
+  echo 'this is my service, start commond'
+  echo ''
+}
+stop()
+{
+  echo 'this is my service, stop commond'
+  killproc -p $PID_FILE
+  echo ''
+}
+restart()
+{
+  stop
+  start
+  echo 'this is my service, restart commond'
+  echo ''
+}
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  status)
+    status -p $PID_FILE infosec-heartbeat-daemon
+    ;;
+  *)
+    echo 'usage: service myservice {start|stop|status|restart}'
+    echo ''
+    exit 1
+esac
+exit 0
