@@ -642,6 +642,16 @@ int main(int argc, char *argv[])
 
     bzero(mode, 20);
 
+    // 写pid到/var/run/infosec-heartbeat.pid
+
+    FILE * pid_fp = fopen("/var/run/infosec-heartbeat.pid", "a");
+
+    if (pid_fp == NULL) {
+        return -1;
+    }
+    fprintf(pid_fp, "%d", getpid());
+    fclose(pid_fp);
+
 #pragma region main_read_config
     // 读取配置,不成功就使用默认配置
     HBConfig hb_config;
