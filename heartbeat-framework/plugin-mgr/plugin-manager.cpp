@@ -45,7 +45,7 @@ PLUG_RET load_plugin(char *plugin_path)
     dl = dlopen(plugin_path, RTLD_NOW);
 
     if (!dl) {
-        printf("load plugin error\n");
+        printf("load plugin error, %s\n", dlerror());
         return PLUG_RET_ERROR;
     }
 

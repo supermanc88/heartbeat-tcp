@@ -2,32 +2,30 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(../../../log)
-
-project(plug_icmp)
 
 
-#link_libraries(/tmp/heartbeat/build/lib)
-#link_libraries(${LIBRARY_OUTPUT_PATH}/../)
-
-set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH}/../)
+set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH})
 
 set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
 
+link_directories(${LIBRARY_DIRECTORY})
+
+project(plug_icmp)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-message(${LIBRARY_DIRECTORY})
+message("lib dir: ${LIBRARY_DIRECTORY}")
 
-link_libraries(${LIBRARY_DIRECTORY})
+include_directories(../../../log)
 
-set(ICMP_SRC plug-icmp.cpp plug-icmp.h
+set(ICMP_SRC loadconfig.h loadconfig.cpp
+        plug-icmp.cpp plug-icmp.h
         ../../../heartbeat-config.h
         ../../../hbconf.cpp ../../../hbconf.h
         ../../../common/custom-functions.cpp ../../../common/custom-functions.h
-        MonitorSrv.h MonitorSrv.cpp
-        MyLog.h MyLog.cpp)
+        )
 
-#add_executable(plug_icmp plug-icmp.cpp plug-icmp.h)
+
 add_library(plug_icmp SHARED ${ICMP_SRC})
 
 target_link_libraries(plug_icmp hb-log)

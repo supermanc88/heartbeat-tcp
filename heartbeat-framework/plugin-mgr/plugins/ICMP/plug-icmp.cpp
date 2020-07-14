@@ -10,11 +10,12 @@
 #include "../../../heartbeat-config.h"
 #include "../../../hbconf.h"
 #include "../../../common/custom-functions.h"
-#include "MonitorSrv.h"
+#include "loadconfig.h"
+#include "hb-log.h"
 
 char ping_target[BUFSIZ] = "192.168.1.1";
-int ping_timeout = 1000;
-int ping_retry = 10;
+extern int ping_timeout;
+extern int ping_retry;
 
 int plug_init(void *data)
 {
@@ -40,7 +41,7 @@ int plug_init(void *data)
     hb.CloseFile();
 
 
-    LoadMonSrvConf();
+    loadconfig();
 
     hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout, ping_retry);
 

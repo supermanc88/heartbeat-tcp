@@ -52,6 +52,7 @@ add_subdirectory(manual-switch)
 #
 #add_subdirectory(log)
 #
-#add_subdirectory(plugin-mgr)
+# 用来测试动态库加载
+add_subdirectory(plugin-mgr)
 #
 #add_subdirectory(resource-mgr)

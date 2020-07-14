@@ -4,7 +4,6 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-#include "hb-log.h"
 
     int plug_init(void * data);
 

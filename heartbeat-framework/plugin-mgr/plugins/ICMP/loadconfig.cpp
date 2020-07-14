@@ -1,5 +1,8 @@
-#include "MonitorSrv.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "loadconfig.h"
 
 using namespace std;
 
@@ -12,12 +15,12 @@ int ping_retry = 3;
 int if_chk_detect_ret = 0;
 
 int detect_strLen = 0;
-char detect_string[FILEBUFFSIZE] = {0x00};
+char detect_string[BUFSIZ] = {0x00};
 
 int base64_detect_strLen = 0;
-char base64_detect_string[FILEBUFFSIZE] = {0x00};
+char base64_detect_string[BUFSIZ] = {0x00};
 int b64_det_str_no_trash_len = 0;
-char b64_det_str_no_trash[FILEBUFFSIZE] = {0x00};
+char b64_det_str_no_trash[BUFSIZ] = {0x00};
 
 int debug_mode = 0;
 #define IF_DEBUG if(0 != debug_mode)
@@ -33,11 +36,11 @@ int mon_mode = 0;
 
 
 //	从conf.ini中读取配置参数
-int LoadMonSrvConf()
+int loadconfig()
 {
-    char Buff[FILEBUFFSIZE] = {0x00};
+    char Buff[BUFSIZ] = {0x00};
 
-    char ConfBuff[FILEBUFFSIZE] = {0x00};
+    char ConfBuff[BUFSIZ] = {0x00};
 
     FILE *fp = fopen(MONSRVCONF, "r");
     if (NULL == fp) {
@@ -48,8 +51,8 @@ int LoadMonSrvConf()
     char *pValue = NULL;
 
     while (!feof(fp)) {
-        memset(Buff, 0x00, FILEBUFFSIZE);
-        fgets(Buff, FILEBUFFSIZE, fp);
+        memset(Buff, 0x00, BUFSIZ);
+        fgets(Buff, BUFSIZ, fp);
 
         pName = strtok(Buff, "=");
         if (NULL == pName) continue;
@@ -58,50 +61,22 @@ int LoadMonSrvConf()
         if (NULL == pValue) continue;
 
         if (0 == strcmp(pName, "connecttimeout")) {
-            connect_timeout = atoi(trim(pValue));
+            connect_timeout = atoi(trim_str(pValue));
         } else if (0 == strcmp(pName, "connectretrytimes")) {
-            connect_retry = atoi(trim(pValue));
+            connect_retry = atoi(trim_str(pValue));
         }
         if (0 == strcmp(pName, "pingtimeout")) {
-            ping_timeout = atoi(trim(pValue));
+            ping_timeout = atoi(trim_str(pValue));
         } else if (0 == strcmp(pName, "pingretrytimes")) {
-            ping_retry = atoi(trim(pValue));
+            ping_retry = atoi(trim_str(pValue));
         } else if (0 == strcmp(pName, "checkdetectret")) {
-            if (0 == strcmp("YES", trim(pValue))) {
+            if (0 == strcmp("YES", trim_str(pValue))) {
                 //	LOGINFO("CheckDetectRet:%s","YES");
                 if_chk_detect_ret = 1;
-            } else if (0 == strcmp("NO", trim(pValue))) {
+            } else if (0 == strcmp("NO", trim_str(pValue))) {
                 //	LOGINFO("CheckDetectRet:%s","NO");
                 if_chk_detect_ret = 0;
             } else {
-                LOGERROR("%s\n", "MonsrvConf Parameter Err");
-                fclose(fp);
-                return -1;
-            }
-        }
-            /*	else if( 0 == strcmp(pName, "monswitch"))
-                {
-                    if(0 == strcmp("OFF", trim(pValue)))
-                    {
-                        mon_mode = 0;
-                    }
-                    else if(0 == strcmp("ON", trim(pValue)))
-                    {
-                        mon_mode = 1;
-                    }
-                    else
-                    {
-                        LOGERROR("%s", "MonsrvConf Parameter Err");
-                        fclose(fp);
-                        return -1;
-                    }
-                }*/
-        else if (0 == strcmp(pName, "mon_mode")) {
-            mon_mode = atoi(trim(pValue));
-
-            LOGINFO("mon_mode = %d\n", mon_mode);
-
-            if (mon_mode > 2 || mon_mode < 0) {
                 LOGERROR("%s\n", "MonsrvConf Parameter Err");
                 fclose(fp);
                 return -1;
@@ -112,4 +87,22 @@ int LoadMonSrvConf()
     return 0;
 }
 
+//	去除字符串首尾不可见字符
+char * trim_str(char *str)
+{
+    int index=0,i=0;
 
+    //去除串首空格
+    while(str[index]==' ') index++;
+    for(i=0; i<strlen(str)-index; i++) str[i] = str[i+index];
+    str[i]='\0';
+
+    //去除串尾空格
+    index= strlen(str);
+    //while(index>0 && (str[index-1]==' '))  index--;
+    while(index>0 && ( 0x20 >= (unsigned char)str[index-1]))
+        index --;
+    str[index]='\0';
+
+    return str;
+}
