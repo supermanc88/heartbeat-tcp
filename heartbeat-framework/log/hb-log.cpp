@@ -11,8 +11,8 @@
 #define DAYS_AGO_TIME_FILE  "/tmp/getndaysagotime.tmp"
 
 
-char log_path[512] = LOG_FILE_PATH;            /* 日志文件存放路径 */
-char log_prefix[128] = "hblog";        /* 日志文件前缀 */
+char log_path[512] = LOG_FILE_PATH;                     // 日志文件存放路径
+char log_prefix[128] = "hblog";                         // 日志文件前缀
 int max_keep_day = 30;
 
 int hb_log(char *info_source, char *info_level, char *fmt, ...) {
@@ -23,8 +23,6 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...) {
     char tmpTime[14 + 1] = {0};
     FILE *fp;
 
-    /* 0: print in terminal
-     * 1: print in log file */
     memset(tmpTime, 0, sizeof(tmpTime));
     get_current_time(tmpTime);
 
@@ -87,22 +85,7 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...) {
     vfprintf(fp, fmt, vaList);
 
     va_end(vaList);
-//    if (0 == strcmp(info_level, INFO_LEVEL_ERROR)) {
-//        sprintf(tmpBuf, "%4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s [%s][%s] %s",
-//                tmpTime,
-//                tmpTime + 4,
-//                tmpTime + 6,
-//                tmpTime + 8,
-//                tmpTime + 10,
-//                tmpTime + 12,
-//                info_source, INFO_LEVEL_ERROR, "exit with error");
-//
-//        fprintf(fp, "%s", tmpBuf);
-//
-//        fclose(fp);
-//        fp = NULL;
-////        exit(1);
-//    }
+
     if (NULL != fp) {
         fclose(fp);
         fp = NULL;

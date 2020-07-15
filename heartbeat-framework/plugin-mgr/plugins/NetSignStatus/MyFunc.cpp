@@ -1,28 +1,5 @@
 #include "MyFunc.h"
 
-//	写文件
-int WtFile(char * filename, unsigned char * pbData,int nDataLen)
-{
-	FILE *stream = NULL;
-	if( ( stream = fopen( filename, "w+" ) ) == NULL )
-		return -1;
-	fwrite(pbData, 1, nDataLen, stream);
-	fclose( stream );
-	
-	return 0;
-}
-
-//将内存中数据以十六进制方式打印在字符串中
-void SprtHex(char * Deststr,unsigned char * str,int len)
-{
-	int i=0;
-	for(i=0;i<len;i++)
-	{
-		sprintf(Deststr+i*5,"0x%02x ",str[i]);
-	}
-	printf("\n");
-}
-
 //	打印十六进制数组
 void ViewMem(const char * str, unsigned char * p, int len)
 {
@@ -36,27 +13,6 @@ void ViewMem(const char * str, unsigned char * p, int len)
 	}
 	printf("\n");
 }
-
-//	去除字符串首尾不可见字符
-void Trim(char *str)
-{
-	int index=0,i=0;
-
-	//去除串首空格 
-	while(str[index]==' ') index++;
-	for(i=0; i<strlen(str)-index; i++) str[i] = str[i+index]; 
-	str[i]='\0';
-
-	//去除串尾空格 
-	index= strlen(str);
-	//while(index>0 && (str[index-1]==' '))  index--;
-	while(index>0 && ( 0x20 >= (unsigned char)str[index-1]))  
-		index --;
-	str[index]='\0';
-
-}
-
-
 
 
 int IsLegalChar(unsigned char i)
