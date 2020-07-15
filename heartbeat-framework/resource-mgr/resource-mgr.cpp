@@ -10,6 +10,7 @@
 #include "resource-mgr.h"
 #include "../plugin-mgr/plugin-manager.h"
 #include "../common/custom-functions.h"
+#include "../common/log2file.h"
 
 std::map<std::string, int> policy_link_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;
@@ -85,9 +86,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
     switch (trans_type) {
         case TRANS_TYPE_ACTION: {
 
-            printf("-------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_ACTION |\n");
-            printf("-------------------------------------\n");
+            P2FILE("-------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_ACTION |\n");
+            P2FILE("-------------------------------------\n");
 
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             bzero(p_next_data, sizeof(TRANS_DATA));
@@ -96,9 +97,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
               */
             action_type = p_trans_data->trans_action_data.type;
             if (action_type == ACTION_TYPE_GET_RES) {
-                printf("---------------------------------------------------------------\n");
-                printf("| server recv get res,so server start take over the resources |\n");
-                printf("---------------------------------------------------------------\n");
+                P2FILE("---------------------------------------------------------------\n");
+                P2FILE("| server recv get res,so server start take over the resources |\n");
+                P2FILE("---------------------------------------------------------------\n");
 
                 take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                 server_resources_takeover_status = true;
@@ -109,9 +110,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 p_next_data->trans_action_data.result = 1;
 
             } else if (action_type == ACTION_TYPE_FREE_RES) {
-                printf("--------------------------------------------------------------\n");
-                printf("| server recv free res,so server start release the resources |\n");
-                printf("--------------------------------------------------------------\n");
+                P2FILE("--------------------------------------------------------------\n");
+                P2FILE("| server recv free res,so server start release the resources |\n");
+                P2FILE("--------------------------------------------------------------\n");
 
                 release_resources(virtual_ip_with_mask, ethernet_name);
                 server_resources_takeover_status = false;
@@ -123,17 +124,17 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else {
 
             }
-            printf("-------------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_REPLY_ACTION |\n");
-            printf("-------------------------------------------\n");
+            P2FILE("-------------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_REPLY_ACTION |\n");
+            P2FILE("-------------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
-            printf("------------------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_GET_SERVER_STATUS |\n");
-            printf("------------------------------------------------\n");
+            P2FILE("------------------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_GET_SERVER_STATUS |\n");
+            P2FILE("------------------------------------------------\n");
 
 
             // 此类回复没有其它数据
@@ -144,17 +145,17 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
             get_local_server_status_datas(&p_next_data->server_status_datas);
 
-            printf("--------------------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
-            printf("--------------------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
+            P2FILE("--------------------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_GET_DATA: {
-            printf("---------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_GET_DATA |\n");
-            printf("---------------------------------------\n");
+            P2FILE("---------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_GET_DATA |\n");
+            P2FILE("---------------------------------------\n");
 
             // 备机收到，向TRANS_DATA中填充数据
             // 1. 通过插件拿到数据
@@ -164,17 +165,17 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_DATA;
-            printf("-----------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_REPLY_DATA |\n");
-            printf("-----------------------------------------\n");
+            P2FILE("-----------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_REPLY_DATA |\n");
+            P2FILE("-----------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
-            printf("-------------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_REPLY_ACTION |\n");
-            printf("-------------------------------------------\n");
+            P2FILE("-------------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_REPLY_ACTION |\n");
+            P2FILE("-------------------------------------------\n");
 
             /*
              * 只有主机会收到此类信息
@@ -185,27 +186,27 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 // nothing!
             } else if (action_type == ACTION_TYPE_FREED_RES) {
                 // 开始接管资源
-                printf("-----------------------------------------------------------------------\n");
-                printf("| server reply freed resource,so client start take over the resources |\n");
-                printf("-----------------------------------------------------------------------\n");
+                P2FILE("-----------------------------------------------------------------------\n");
+                P2FILE("| server reply freed resource,so client start take over the resources |\n");
+                P2FILE("-----------------------------------------------------------------------\n");
 
                 take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                 client_resources_takeover_status = true;
             } else {
                 // nothing!
             }
-            printf("----------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("----------------------------------------\n");
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
-            printf("--------------------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
-            printf("--------------------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
+            P2FILE("--------------------------------------------------\n");
             // 这里根据决策开始操作,先把结构体填充成无操作
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
@@ -213,60 +214,60 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             policy = resource_manager(recved_data, p_next_data);
 
             if (policy == LINK_ACT_DO_NOTHING) {
-                printf("----------------------------------------\n");
-                printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-                printf("----------------------------------------\n");
+                P2FILE("----------------------------------------\n");
+                P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+                P2FILE("----------------------------------------\n");
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
                 release_resources(virtual_ip_with_mask, ethernet_name);
                 client_resources_takeover_status = false;
-                printf("-------------------------------------\n");
-                printf("| send data type: TRANS_TYPE_ACTION |\n");
-                printf("-------------------------------------\n");
+                P2FILE("-------------------------------------\n");
+                P2FILE("| send data type: TRANS_TYPE_ACTION |\n");
+                P2FILE("-------------------------------------\n");
             } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
                 // 需要向备机发包，让备机先释放，我再拿
-                printf("-------------------------------------\n");
-                printf("| send data type: TRANS_TYPE_ACTION |\n");
-                printf("-------------------------------------\n");
+                P2FILE("-------------------------------------\n");
+                P2FILE("| send data type: TRANS_TYPE_ACTION |\n");
+                P2FILE("-------------------------------------\n");
             }
 
             *next_send_data = (void *) p_next_data;
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
-            printf("----------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_REPLY_DATA |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_REPLY_DATA |\n");
+            P2FILE("----------------------------------------\n");
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            printf("----------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("----------------------------------------\n");
         }
             break;
         case TRANS_TYPE_HEARTBEAT: {
-            printf("----------------------------------------\n");
-            printf("| recv data type: TRANS_TYPE_HEARTBEAT |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| recv data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("----------------------------------------\n");
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            printf("----------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("----------------------------------------\n");
         }
             break;
         default: {
-            printf("---------------------------\n");
-            printf("| recv data type: default |\n");
-            printf("---------------------------\n");
+            P2FILE("---------------------------\n");
+            P2FILE("| recv data type: default |\n");
+            P2FILE("---------------------------\n");
 
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            printf("----------------------------------------\n");
-            printf("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            printf("----------------------------------------\n");
+            P2FILE("----------------------------------------\n");
+            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("----------------------------------------\n");
         }
             break;
     }
@@ -388,7 +389,7 @@ int policy_online_manager(bool primary_server_status, bool primary_have_virtual_
             primary_server_status, primary_have_virtual_ip, primary_auto_fail_back,
             backup_server_status, backup_have_virtual_ip);
 
-    printf("construct string: %s\n", policy_str);
+    P2FILE("construct string: %s\n", policy_str);
 
     spolicy.assign(policy_str);
 
@@ -410,7 +411,7 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
     int check_vip_ret;
     char vip[BUFSIZ];
     // 这里运行一次本地的插件获取状态
-    printf("get_local_server_status_datas...\n");
+    P2FILE("get_local_server_status_datas...\n");
 
     std::string svirtual_ip, svirtual_ip_with_mask;
     svirtual_ip_with_mask.assign(virtual_ip_with_mask);
@@ -501,7 +502,7 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     char cmd_str[256] = {0};
 
     // 开始接管资源
-    printf("Start taking over resources...\n");
+    P2FILE("Start taking over resources...\n");
 
     // 1. 绑定ip到网卡
     sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
@@ -527,7 +528,7 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
 {
     char cmd_str[256] = {0};
     // 开始释放资源
-    printf("Start to release resources...\n");
+    P2FILE("Start to release resources...\n");
 
     // 1. 绑定ip到网卡
     sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);

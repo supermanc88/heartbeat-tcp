@@ -10,6 +10,12 @@ set(CMAKE_CXX_STANDARD 11)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+set(LIBRARY_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+
+message("hb framework ${LIBRARY_DIRECTORY}")
+
+link_directories(${LIBRARY_DIRECTORY})
+
 set(SRC_PATH
         main.cpp
         wrap.cpp
@@ -22,13 +28,14 @@ set(SRC_PATH
         plugin-mgr/plugin-manager.cpp
         make-telegram.cpp
         make-telegram.h hares.cpp hares.h
-        common/custom-functions.cpp)
+        common/custom-functions.cpp
+        common/log2file.cpp)
 
 add_executable(heartbeat-framework  ${SRC_PATH})
 
 target_link_libraries(heartbeat-framework dl)
 
-target_link_libraries(heartbeat-framework protobuf pthread)
+target_link_libraries(heartbeat-framework protobuf pthread hb-log)
 
 #add_executable(hbconf hbconf.cpp hbconf.h)
 

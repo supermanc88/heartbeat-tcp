@@ -13,6 +13,7 @@
 
 #include "plugin-manager.h"
 #include "hb-plugin.h"
+#include "../common/log2file.h"
 
 
 std::vector<std::string> plugins_path;       // 用来存储插件的所有路径
@@ -28,7 +29,7 @@ PLUG_RET load_all_plugin() {
     int i;
 //    list_plug_directory(PLUGINS_DIRECTORY);
 
-    printf("plugins_path.size = %d\n", plugins_path.size());
+    P2FILE("plugins_path.size = %d\n", plugins_path.size());
 
     for (i = 0; i < plugins_path.size(); i++) {
         load_plugin((char *) plugins_path[i].c_str());
@@ -43,11 +44,11 @@ PLUG_RET load_plugin(char *plugin_path) {
     dl = dlopen(plugin_path, RTLD_NOW);
 
     if (!dl) {
-        printf("load plugin error, %s\n", dlerror());
+        P2FILE("load plugin error, %s\n", dlerror());
         return PLUG_RET_ERROR;
     }
 
-    printf("load plugin: %s\n", plugin_path);
+    P2FILE("load plugin: %s\n", plugin_path);
 
     struct PLUG_DATA data;
 
@@ -90,10 +91,10 @@ PLUG_RET plugin_manager_init() {
 
     list_plug_directory(plugins_dir);
 
-    printf("plugins_path.size = %d\n", plugins_path.size());
+    P2FILE("plugins_path.size = %d\n", plugins_path.size());
 
     for (i = 0; i < plugins_path.size(); i++)
-        printf("%s\n", plugins_path[i].c_str());
+        P2FILE("%s\n", plugins_path[i].c_str());
 
 
     return PLUG_RET_SUCCESS;
@@ -101,7 +102,7 @@ PLUG_RET plugin_manager_init() {
 
 int list_plug_directory(char *dir_path) {
     if (dir_path == NULL) {
-        printf("dir path is NULL\n");
+        P2FILE("dir path is NULL\n");
         return -1;
     }
 
@@ -112,7 +113,7 @@ int list_plug_directory(char *dir_path) {
     lstat(dir_path, &st);
 
     if (!S_ISDIR(st.st_mode)) {
-        printf("path is not a directory\n");
+        P2FILE("path is not a directory\n");
         return -1;
     }
 
@@ -122,7 +123,7 @@ int list_plug_directory(char *dir_path) {
     dir = opendir(dir_path);
 
     if (dir == NULL) {
-        printf("can not open dir\n");
+        P2FILE("can not open dir\n");
         return -1;
     }
 
@@ -132,7 +133,7 @@ int list_plug_directory(char *dir_path) {
         if (strcmp(filename->d_name, ".") == 0 ||
             strcmp(filename->d_name, "..") == 0)
             continue;
-        printf("file name : %s\n", filename->d_name);
+        P2FILE("file name : %s\n", filename->d_name);
 
         bzero(plug_path_obs, 256);
         strcpy(plug_path_obs, dir_path);
@@ -172,13 +173,13 @@ int run_all_plugin() {
 
     for (i = 0; i < plug_data_vector.size(); i++) {
         int tmp = plug_data_vector[i].plug_run(NULL);
-        printf("current runing plug:%s, and result = %d\n", plug_data_vector[i].plugname, tmp);
+        P2FILE("current runing plug:%s, and result = %d\n", plug_data_vector[i].plugname, tmp);
 
 //        result &= plug_data_vector[i].plug_run(NULL);
         result &= tmp;
     }
 
-    printf("result = %d\n", result);
+    P2FILE("result = %d\n", result);
 
     return result;
 }

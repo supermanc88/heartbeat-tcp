@@ -18,7 +18,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "ErrMsg.h"
-#include "Ping.h"
 #include "MyLog.h"
 #include "Detect.h"
 #include "SlimXml.h"

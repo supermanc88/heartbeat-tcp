@@ -1,10 +1,6 @@
 #ifndef HEARTBEAT_TCP_CUSTOM_FUNCTIONS_H
 #define HEARTBEAT_TCP_CUSTOM_FUNCTIONS_H
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 /**
  * 将system的执行结果写到文件中
  * @param cmd_string

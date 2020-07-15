@@ -26,6 +26,7 @@
 #define INFO_SOURCE_DB    "db"    /* 数据库产生的信息 */
 #define INFO_SOURCE_SYS    "sys"    /* 除进程自身、数据库以外的信息, 如因进程调度等其他原因产生的信息 */
 #define INFO_SOURCE_HBLOG   "HBLOG"
+#define INFO_SOURCE_HEARTBEAT   "HEARTBEAT"
 #define INFO_SOURCE_ICMP    "ICMP"
 #define INFO_SOURCE_NETSIGN "NETSIGN"
 

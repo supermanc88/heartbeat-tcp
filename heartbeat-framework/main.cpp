@@ -16,6 +16,7 @@
 #include "plugin-mgr/plugin-manager.h"
 #include "make-telegram.h"
 #include "hares.h"
+#include "common/log2file.h"
 
 
 #define SERVER_IP "192.168.231.133"
@@ -52,7 +53,7 @@ bool local_resource_takeover_status;
 bool trouble = false;
 
 void usage(void) {
-    printf("The startup method is related to whether node and hostname match\n");
+    P2FILE("The startup method is related to whether node and hostname match\n");
 }
 
 int start_by_client_mode(void) {
@@ -72,7 +73,7 @@ int start_by_client_mode(void) {
     bzero(&tv, sizeof(struct timeval));
     tv.tv_sec = deadtime;
 
-    printf("enter start by client\n");
+    P2FILE("enter start by client\n");
 
 #pragma region client_create_connect    //客户端创建连接
     reconnect:
@@ -96,9 +97,9 @@ int start_by_client_mode(void) {
             // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
             if (try_time_sum >= deadtime) {
                 // 测试 直接退出 多次尝试均不能连通，所以根据“nolink“策略进行操作资源
-                printf("---------------------------------------------------------------------------------------------------------\n");
-                printf("| Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy! |\n");
-                printf("---------------------------------------------------------------------------------------------------------\n");
+                P2FILE("---------------------------------------------------------------------------------------------------------\n");
+                P2FILE("| Can not connect through multiple attempts, so operate resources according to the \"nolink\" strategy! |\n");
+                P2FILE("---------------------------------------------------------------------------------------------------------\n");
 
                 SERVER_STATUS_DATAS datas = {0};
                 get_local_server_status_datas(&datas);
@@ -110,27 +111,27 @@ int start_by_client_mode(void) {
                     if (!client_resources_takeover_status) {
                         take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
-                        printf("*****************************\n");
-                        printf("* client take over resource *\n");
-                        printf("*****************************\n");
+                        P2FILE("*****************************\n");
+                        P2FILE("* client take over resource *\n");
+                        P2FILE("*****************************\n");
                     } else {
-                        printf("*************************************\n");
-                        printf("* client take over resource already *\n");
-                        printf("*************************************\n");
+                        P2FILE("*************************************\n");
+                        P2FILE("* client take over resource already *\n");
+                        P2FILE("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
-                        printf("***********************************\n");
-                        printf("* client release resource already *\n");
-                        printf("***********************************\n");
+                        P2FILE("***********************************\n");
+                        P2FILE("* client release resource already *\n");
+                        P2FILE("***********************************\n");
                     } else {
                         release_resources(virtual_ip_with_mask, ethernet_name);
                         client_resources_takeover_status = false;
-                        printf("***************************\n");
-                        printf("* client release resource *\n");
-                        printf("***************************\n");
+                        P2FILE("***************************\n");
+                        P2FILE("* client release resource *\n");
+                        P2FILE("***************************\n");
                     }
 
                 }
@@ -140,7 +141,7 @@ int start_by_client_mode(void) {
                 goto reconnect;
             }
         } else {
-            printf("Generated faults manually\n");
+            P2FILE("Generated faults manually\n");
         }
 
         sleep(keepalive);
@@ -184,17 +185,17 @@ int start_by_client_mode(void) {
             ret = select(cfd + 1, &set, NULL, NULL, &tv);
 
             if (ret == -1) {
-                printf("--------------------\n");
-                printf("| select cfd error |\n");
-                printf("--------------------\n");
+                P2FILE("--------------------\n");
+                P2FILE("| select cfd error |\n");
+                P2FILE("--------------------\n");
                 // 出错就直接重新和server建立一个连接
                 close(cfd);
                 goto reconnect;
             } else if (ret == 0) {
 #pragma region client_read_timeout  // 客户端等待server返回信息超时
-                printf("-----------------------\n");
-                printf("| select cfd time out |\n");
-                printf("-----------------------\n");
+                P2FILE("-----------------------\n");
+                P2FILE("| select cfd time out |\n");
+                P2FILE("-----------------------\n");
 
                 SERVER_STATUS_DATAS datas = {0};
                 get_local_server_status_datas(&datas);
@@ -206,27 +207,27 @@ int start_by_client_mode(void) {
                     if (!client_resources_takeover_status) {
                         take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                         client_resources_takeover_status = true;
-                        printf("*****************************\n");
-                        printf("* client take over resource *\n");
-                        printf("*****************************\n");
+                        P2FILE("*****************************\n");
+                        P2FILE("* client take over resource *\n");
+                        P2FILE("*****************************\n");
                     } else {
-                        printf("*************************************\n");
-                        printf("* client take over resource already *\n");
-                        printf("*************************************\n");
+                        P2FILE("*************************************\n");
+                        P2FILE("* client take over resource already *\n");
+                        P2FILE("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
-                        printf("***********************************\n");
-                        printf("* client release resource already *\n");
-                        printf("***********************************\n");
+                        P2FILE("***********************************\n");
+                        P2FILE("* client release resource already *\n");
+                        P2FILE("***********************************\n");
                     } else {
                         release_resources(virtual_ip_with_mask, ethernet_name);
                         client_resources_takeover_status = false;
-                        printf("***************************\n");
-                        printf("* client release resource *\n");
-                        printf("***************************\n");
+                        P2FILE("***************************\n");
+                        P2FILE("* client release resource *\n");
+                        P2FILE("***************************\n");
                     }
 
                 }
@@ -242,9 +243,9 @@ int start_by_client_mode(void) {
                 if (n == 0) {
 #pragma region server_closed_connect    // 客户端发现server关闭了连接
                     // 服务端关闭了连接，重新创建socket尝试连接服务端,并接管资源
-                    printf("------------------------\n");
-                    printf("| server colse connect |\n");
-                    printf("------------------------\n");
+                    P2FILE("------------------------\n");
+                    P2FILE("| server colse connect |\n");
+                    P2FILE("------------------------\n");
                     close(cfd);
                     SERVER_STATUS_DATAS datas = {0};
                     get_local_server_status_datas(&datas);
@@ -256,27 +257,27 @@ int start_by_client_mode(void) {
                         if (!client_resources_takeover_status) {
                             take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                             client_resources_takeover_status = true;
-                            printf("*****************************\n");
-                            printf("* client take over resource *\n");
-                            printf("*****************************\n");
+                            P2FILE("*****************************\n");
+                            P2FILE("* client take over resource *\n");
+                            P2FILE("*****************************\n");
                         } else {
-                            printf("*************************************\n");
-                            printf("* client take over resource already *\n");
-                            printf("*************************************\n");
+                            P2FILE("*************************************\n");
+                            P2FILE("* client take over resource already *\n");
+                            P2FILE("*************************************\n");
                         }
 
                     } else {
                         // release
                         if (!client_resources_takeover_status) {
-                            printf("***********************************\n");
-                            printf("* client release resource already *\n");
-                            printf("***********************************\n");
+                            P2FILE("***********************************\n");
+                            P2FILE("* client release resource already *\n");
+                            P2FILE("***********************************\n");
                         } else {
                             release_resources(virtual_ip_with_mask, ethernet_name);
                             client_resources_takeover_status = false;
-                            printf("***************************\n");
-                            printf("* client release resource *\n");
-                            printf("***************************\n");
+                            P2FILE("***************************\n");
+                            P2FILE("* client release resource *\n");
+                            P2FILE("***************************\n");
                         }
 
                     }
@@ -320,7 +321,7 @@ int start_by_client_mode(void) {
 
             }
         } else {
-            printf("Generated faults manually\n");
+            P2FILE("Generated faults manually\n");
             sleep(keepalive);
         }
     }
@@ -338,7 +339,7 @@ int start_by_server_mode(void) {
     struct sockaddr_in client_addr;
     struct timeval tv;
 
-    printf("enter start by server\n");
+    P2FILE("enter start by server\n");
 #pragma region server_pre_create_connect    // 设置端口复用等
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
@@ -375,16 +376,16 @@ int start_by_server_mode(void) {
             FD_SET(lfd, &set);
             bzero(&tv, sizeof(struct timeval));
             tv.tv_sec = deadtime;
-            printf("select lfd wait %d seconds, lfd = %d\n", tv.tv_sec, lfd);
+            P2FILE("select lfd wait %d seconds, lfd = %d\n", tv.tv_sec, lfd);
             ret = select(lfd + 1, &set, NULL, NULL, &tv);
 
             if (ret == -1) {
-                printf("select lfd error\n");
+                P2FILE("select lfd error\n");
                 break;
             } else if (ret == 0) {
 #pragma region server_create_connect_timeout
                 // 如果在deadtime时间内，客户端未和服务端建立连接，服务端会认为客户端死亡，开始接管资源
-                printf("select lfd time out\n");
+                P2FILE("select lfd time out\n");
 
                 SERVER_STATUS_DATAS datas = {0};
                 get_local_server_status_datas(&datas);
@@ -396,41 +397,41 @@ int start_by_server_mode(void) {
                     if (!server_resources_takeover_status) {
                         take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                         server_resources_takeover_status = true;
-                        printf("*****************************\n");
-                        printf("* server take over resource *\n");
-                        printf("*****************************\n");
+                        P2FILE("*****************************\n");
+                        P2FILE("* server take over resource *\n");
+                        P2FILE("*****************************\n");
                     } else {
-                        printf("*************************************\n");
-                        printf("* server take over resource already *\n");
-                        printf("*************************************\n");
+                        P2FILE("*************************************\n");
+                        P2FILE("* server take over resource already *\n");
+                        P2FILE("*************************************\n");
                     }
 
                 } else {
                     // release
                     if (!server_resources_takeover_status) {
-                        printf("***********************************\n");
-                        printf("* server release resource already *\n");
-                        printf("***********************************\n");
+                        P2FILE("***********************************\n");
+                        P2FILE("* server release resource already *\n");
+                        P2FILE("***********************************\n");
                     } else {
                         release_resources(virtual_ip_with_mask, ethernet_name);
                         server_resources_takeover_status = false;
-                        printf("***************************\n");
-                        printf("* server release resource *\n");
-                        printf("***************************\n");
+                        P2FILE("***************************\n");
+                        P2FILE("* server release resource *\n");
+                        P2FILE("***************************\n");
                     }
                 }
                 continue;
 #pragma endregion server_create_connect_timeout
             } else {
 #pragma region server_create_connect_success
-                printf("a read comming!\n");
+                P2FILE("a read comming!\n");
                 // 在deadtime时间内建立连接
                 cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
                 inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
 
                 // 打印连入的客户端信息
-                printf("client addr: %s\n", buf);
-                printf("client port: %d\n", ntohs(client_addr.sin_port));
+                P2FILE("client addr: %s\n", buf);
+                P2FILE("client port: %d\n", ntohs(client_addr.sin_port));
 
                 // 连入的客户端不是ha.cf中的对端ip，直接丢弃
                 if (strcmp(buf, peer_addr) != 0) {
@@ -452,7 +453,7 @@ int start_by_server_mode(void) {
                         break;
                     } else if (ret == 0) {
 #pragma region server_recv_timeout      // server等待从client来的信息超时
-                        printf("time out\n");
+                        P2FILE("time out\n");
                         SERVER_STATUS_DATAS datas = {0};
                         get_local_server_status_datas(&datas);
 
@@ -463,27 +464,27 @@ int start_by_server_mode(void) {
                             if (!server_resources_takeover_status) {
                                 take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                                 server_resources_takeover_status = true;
-                                printf("*****************************\n");
-                                printf("* server take over resource *\n");
-                                printf("*****************************\n");
+                                P2FILE("*****************************\n");
+                                P2FILE("* server take over resource *\n");
+                                P2FILE("*****************************\n");
                             } else {
-                                printf("*************************************\n");
-                                printf("* server take over resource already *\n");
-                                printf("*************************************\n");
+                                P2FILE("*************************************\n");
+                                P2FILE("* server take over resource already *\n");
+                                P2FILE("*************************************\n");
                             }
 
                         } else {
                             // release
                             if (!server_resources_takeover_status) {
-                                printf("***********************************\n");
-                                printf("* server release resource already *\n");
-                                printf("***********************************\n");
+                                P2FILE("***********************************\n");
+                                P2FILE("* server release resource already *\n");
+                                P2FILE("***********************************\n");
                             } else {
                                 release_resources(virtual_ip_with_mask, ethernet_name);
                                 server_resources_takeover_status = false;
-                                printf("***************************\n");
-                                printf("* server release resource *\n");
-                                printf("***************************\n");
+                                P2FILE("***************************\n");
+                                P2FILE("* server release resource *\n");
+                                P2FILE("***************************\n");
                             }
                         }
 
@@ -494,16 +495,16 @@ int start_by_server_mode(void) {
 #pragma region server_recv      // server 正常收到从client来的数据
                         bzero(buf, BUFSIZ);
                         n = Read(cfd, buf, BUFSIZ);
-                        printf("------------------------------\n");
-                        printf("read num %d\n", n);
-                        printf("------------------------------\n");
+                        P2FILE("------------------------------\n");
+                        P2FILE("read num %d\n", n);
+                        P2FILE("------------------------------\n");
 
                         if (n == 0) {
 #pragma region client_closed_connect        // server发现client关闭了连接
                             // 如果客户端关闭的连接，也接管资源
-                            printf("-------------------------\n");
-                            printf("| client close connect! |\n");
-                            printf("-------------------------\n");
+                            P2FILE("-------------------------\n");
+                            P2FILE("| client close connect! |\n");
+                            P2FILE("-------------------------\n");
                             SERVER_STATUS_DATAS datas = {0};
                             get_local_server_status_datas(&datas);
 
@@ -514,27 +515,27 @@ int start_by_server_mode(void) {
                                 if (!server_resources_takeover_status) {
                                     take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
                                     server_resources_takeover_status = true;
-                                    printf("*****************************\n");
-                                    printf("* server take over resource *\n");
-                                    printf("*****************************\n");
+                                    P2FILE("*****************************\n");
+                                    P2FILE("* server take over resource *\n");
+                                    P2FILE("*****************************\n");
                                 } else {
-                                    printf("*************************************\n");
-                                    printf("* server take over resource already *\n");
-                                    printf("*************************************\n");
+                                    P2FILE("*************************************\n");
+                                    P2FILE("* server take over resource already *\n");
+                                    P2FILE("*************************************\n");
                                 }
 
                             } else {
                                 // release
                                 if (!server_resources_takeover_status) {
-                                    printf("***********************************\n");
-                                    printf("* server release resource already *\n");
-                                    printf("***********************************\n");
+                                    P2FILE("***********************************\n");
+                                    P2FILE("* server release resource already *\n");
+                                    P2FILE("***********************************\n");
                                 } else {
                                     release_resources(virtual_ip_with_mask, ethernet_name);
                                     server_resources_takeover_status = false;
-                                    printf("***************************\n");
-                                    printf("* server release resource *\n");
-                                    printf("***************************\n");
+                                    P2FILE("***************************\n");
+                                    P2FILE("* server release resource *\n");
+                                    P2FILE("***************************\n");
                                 }
                             }
                             close(cfd);
@@ -567,9 +568,9 @@ int start_by_server_mode(void) {
                         n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
                         // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
 
-                        printf("----------------------------------------\n");
-                        printf("| server send %d bytes datas to client |\n", n);
-                        printf("----------------------------------------\n");
+                        P2FILE("----------------------------------------\n");
+                        P2FILE("| server send %d bytes datas to client |\n", n);
+                        P2FILE("----------------------------------------\n");
 #pragma endregion server_recv
                     }
 
@@ -578,8 +579,8 @@ int start_by_server_mode(void) {
             }
 
         } else {
-            printf("Generated faults manually\n");
-            printf("sleep %d seconds\n", keepalive);
+            P2FILE("Generated faults manually\n");
+            P2FILE("sleep %d seconds\n", keepalive);
             sleep(keepalive);
         }
     }
@@ -615,7 +616,7 @@ void *manual_switch(void *) {
         if (n == -1) {
             perror("recvfrom error");
         }
-        printf("manual_switch thread : recvfrom buf = %s\n", buf);
+        P2FILE("manual_switch thread : recvfrom buf = %s\n", buf);
         if (strcmp(buf, "standby") == 0) {
             trouble = true;
             release_resources(virtual_ip_with_mask, ethernet_name);
@@ -638,6 +639,10 @@ int main(int argc, char *argv[]) {
     bool b_mode_set = false;
 
     bzero(mode, 20);
+
+#pragma region set_log_path
+    set_log_path_and_prefix("/var/log", "ha-log");
+#pragma endregion set_log_path
 
 #pragma region write_pidfile
     // 写pid到/var/run/infosec-heartbeat.pid
@@ -692,13 +697,13 @@ int main(int argc, char *argv[]) {
     }
     hb_config.CloseFile();
 
-    printf("-------------------------------------------------------------------\n");
-    printf("deadtime = %d, keepalive = %d\n", deadtime, keepalive);
-    printf("primary hostname = %s, backup hostname = %s\n", p_hostname, b_hostname);
-    printf("ping_target = %s, tcpport = %d\n", ping_target, tcpport);
-    printf("ucast = %s\n", ucast);
-    printf("udpport = %d\n", udpport);
-    printf("-------------------------------------------------------------------\n");
+    P2FILE("-------------------------------------------------------------------\n");
+    P2FILE("deadtime = %d, keepalive = %d\n", deadtime, keepalive);
+    P2FILE("primary hostname = %s, backup hostname = %s\n", p_hostname, b_hostname);
+    P2FILE("ping_target = %s, tcpport = %d\n", ping_target, tcpport);
+    P2FILE("ucast = %s\n", ucast);
+    P2FILE("udpport = %d\n", udpport);
+    P2FILE("-------------------------------------------------------------------\n");
 
 
     std::string saddr;
@@ -708,8 +713,8 @@ int main(int argc, char *argv[]) {
         strcpy(peer_addr, saddr.substr(offset + 1).c_str());
     }
 
-    printf("peer_addr = %s\n", peer_addr);
-    printf("-------------------------------------------------------------------\n");
+    P2FILE("peer_addr = %s\n", peer_addr);
+    P2FILE("-------------------------------------------------------------------\n");
 
 
     HBRes hb_res;
@@ -719,11 +724,11 @@ int main(int argc, char *argv[]) {
     hb_res.get_primary_node(primary_node);
     hb_res.close_file();
 
-    printf("virtual_ip_with_mask = %s\n", virtual_ip_with_mask);
-    printf("ethernet_name = %s\n", ethernet_name);
-    printf("eth_num = %d\n", eth_num);
-    printf("primary_node = %s\n", primary_node);
-    printf("---------------------------------------\n");
+    P2FILE("virtual_ip_with_mask = %s\n", virtual_ip_with_mask);
+    P2FILE("ethernet_name = %s\n", ethernet_name);
+    P2FILE("eth_num = %d\n", eth_num);
+    P2FILE("primary_node = %s\n", primary_node);
+    P2FILE("---------------------------------------\n");
 
 #pragma endregion main_read_config
 
@@ -744,8 +749,8 @@ int main(int argc, char *argv[]) {
     char hostname[BUFSIZ];
     gethostname(hostname, BUFSIZ);
 
-    printf("hostname = %s\n", hostname);
-    printf("---------------------------------------\n");
+    P2FILE("hostname = %s\n", hostname);
+    P2FILE("---------------------------------------\n");
 
     bzero(mode, 0);
 //    if (strcmp(hostname, p_hostname) == 0) {
@@ -760,14 +765,14 @@ int main(int argc, char *argv[]) {
     // 如果所有node和primary_node都不匹配，则不能成功启动
     if (strcmp(p_hostname, primary_node) != 0 &&
         strcmp(b_hostname, primary_node) != 0) {
-        printf("ha.cf node and haresources node not match!\n");
+        P2FILE("ha.cf node and haresources node not match!\n");
         return -1;
     }
 
     // 如果本机hostname和ha.cf中所有的节点都不匹配的话，也不能启动
     if (strcmp(p_hostname, hostname) != 0 &&
         strcmp(b_hostname, hostname) != 0) {
-        printf("localhost name and ha.cf node not match!\n");
+        P2FILE("localhost name and ha.cf node not match!\n");
         return -1;
     }
 
@@ -776,8 +781,8 @@ int main(int argc, char *argv[]) {
     } else
         strcpy(mode, "server");
 
-    printf("start mode = %s\n", mode);
-    printf("---------------------------------------\n");
+    P2FILE("start mode = %s\n", mode);
+    P2FILE("---------------------------------------\n");
 
 #pragma region start // 启动
     // 初始化所有的策略文件
