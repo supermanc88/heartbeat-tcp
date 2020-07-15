@@ -41,3 +41,11 @@ int plug_run(void *data)
     int ret = GetSrvStatus("127.0.0.1", NULL);
     return (ret == 0 ? 1 : 0);
 }
+
+int main()
+{
+    monitor_srv_init();
+
+    int ret = GetSrvStatus("127.0.0.1", NULL);
+    return (ret == 0 ? 1 : 0);
+}

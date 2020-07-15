@@ -13,3 +13,6 @@ set(LOG_SRC hb-log.h hb-log.cpp
 
 #add_executable(hb-log hb-log.cpp hb-log.h)
 add_library(hb-log STATIC ${LOG_SRC})
+
+
+add_executable(logtest logtest.cpp hb-log.cpp ../common/custom-functions.h ../common/custom-functions.cpp)
