@@ -56,10 +56,16 @@ warntime 10
 initdead 120
 #
 #
+#
+#   服务检测间隔，如下每60秒检测一次
+#
+detect_interval 60
+#
+#
 #	What UDP port to use for bcast/ucast communication?
 #
 udpport	694
-server_port 8888
+tcpport 8888
 #
 #
 #	What interfaces to broadcast heartbeats over?

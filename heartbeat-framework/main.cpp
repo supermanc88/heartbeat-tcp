@@ -25,12 +25,14 @@
 #define GET_STATUS_TIME_INTERVAL    10
 
 
-int keepalive = KEEYALIVE;
-int deadtime = DEADTIME;
-int warntime = WARNTIME;
-int initdead = INITDEAD;
-int server_port = SERVERPORT;
-bool auto_failback = true;
+int keepalive = KEEYALIVE;                                  // 发包间隔
+int deadtime = DEADTIME;                                    // 死亡判定时间
+int warntime = WARNTIME;                                    // 警告时间：上次发包到现在的时间间隔，超出此时间后，会发出延时警告
+int initdead = INITDEAD;                                    // 再上次死亡后，有些系统的网络不会马上恢复，启动heartbaet后，内部自己停顿时长，以确保网络恢复
+int detect_interval = 60;                                   // 服务检测间隔时长
+int detect_times = detect_interval / keepalive;             // 转换成每发多少次心跳，发一次服务检测请求
+int tcpport = SERVERPORT;                                   // tcp端口，以server模式启动时使用
+bool auto_failback = true;                                  // 回切
 char ping_target[BUFSIZ] = "192.168.231.1";
 char peer_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_with_mask[BUFSIZ] = VIRTUAL_IP;
@@ -38,7 +40,7 @@ char ethernet_name[BUFSIZ] = "eth0";
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
-char primary_node[BUFSIZ] = "netsign";         // haresources中主机名
+char primary_node[BUFSIZ] = "netsign";                      // haresources中主机名
 
 
 //资源接管状态,资源接管后置为true，释放后置为false
@@ -79,7 +81,7 @@ int start_by_client_mode(void) {
     inet_pton(AF_INET, peer_addr, &i_addr);
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(server_port);
+    serv_addr.sin_port = htons(tcpport);
     serv_addr.sin_addr.s_addr = i_addr;
 
 
@@ -302,7 +304,7 @@ int start_by_client_mode(void) {
                         none_package_send_times++;
                     }
 
-                    if (none_package_send_times >= GET_STATUS_TIME_INTERVAL) {
+                    if (none_package_send_times >= detect_times) {
                         trans_data_set_get_server_status(next_send_data);
                         none_package_send_times = 0;
                     }
@@ -340,7 +342,7 @@ int start_by_server_mode(void) {
 #pragma region server_pre_create_connect    // 设置端口复用等
     lfd = Socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(server_port);
+    serv_addr.sin_port = htons(tcpport);
 //    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -637,6 +639,7 @@ int main(int argc, char *argv[]) {
 
     bzero(mode, 20);
 
+#pragma region write_pidfile
     // 写pid到/var/run/infosec-heartbeat.pid
 
     FILE *pid_fp = fopen("/var/run/infosec-heartbeat.pid", "a");
@@ -646,6 +649,7 @@ int main(int argc, char *argv[]) {
     }
     fprintf(pid_fp, "%d", getpid());
     fclose(pid_fp);
+#pragma endregion write_pidfile
 
 #pragma region main_read_config
     // 读取配置,不成功就使用默认配置
@@ -663,6 +667,10 @@ int main(int argc, char *argv[]) {
             warntime = atoi(value);
         if (hb_config.GetValue("initdeat", value) == RET_SUCCESS)
             initdead = atoi(value);
+        if (hb_config.GetValue("detect_interval", value) == RET_SUCCESS) {
+            detect_interval = atoi(value);
+            detect_times = detect_interval / keepalive;
+        }
         if (hb_config.GetValue("auto_failback", value) == RET_SUCCESS) {
             if (strcmp(value, "on") == 0)
                 auto_failback = true;
@@ -675,12 +683,10 @@ int main(int argc, char *argv[]) {
             strcpy(b_hostname, value);
         if (hb_config.GetValue("ping", value) == RET_SUCCESS)
             strcpy(ping_target, value);
-        if (hb_config.GetValue("server_port", value) == RET_SUCCESS)
-            server_port = atoi(value);
+        if (hb_config.GetValue("tcpport", value) == RET_SUCCESS)
+            tcpport = atoi(value);
         if (hb_config.GetValue("ucast", value) == RET_SUCCESS)
             strcpy(ucast, value);
-//        if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS)
-//            strcpy(plugins_dir, value);
         if (hb_config.GetValue("udpport", value) == RET_SUCCESS)
             udpport = atoi(value);
     }
@@ -689,7 +695,7 @@ int main(int argc, char *argv[]) {
     printf("-------------------------------------------------------------------\n");
     printf("deadtime = %d, keepalive = %d\n", deadtime, keepalive);
     printf("primary hostname = %s, backup hostname = %s\n", p_hostname, b_hostname);
-    printf("ping_target = %s, server_port = %d\n", ping_target, server_port);
+    printf("ping_target = %s, tcpport = %d\n", ping_target, tcpport);
     printf("ucast = %s\n", ucast);
     printf("udpport = %d\n", udpport);
     printf("-------------------------------------------------------------------\n");
