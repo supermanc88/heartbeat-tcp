@@ -91,7 +91,7 @@ int start_by_client_mode(void) {
 
 #pragma region client_connect_fail  // 客户端创建连接失败
     if (ret == -1) {
-        perror("connect server error");
+        P2FILE("connect server error:%s\n", strerror(errno));
 
         if (!trouble) {
             // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
@@ -173,6 +173,7 @@ int start_by_client_mode(void) {
             make_telegram(send_data, serialized_data, &serialized_data_size);
 
             // 2. 发送数据
+            P2FILE("Send data to Server\n");
             n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
             // 释放内存
             if (send_data) {
@@ -289,7 +290,7 @@ int start_by_client_mode(void) {
                     goto reconnect;
 #pragma endregion server_closed_connect
                 } else if (n == -1) {
-                    perror("read error");
+                    P2FILE("read error:%s\n", strerror(errno));
                     close(cfd);
                     goto reconnect;
                 } else {

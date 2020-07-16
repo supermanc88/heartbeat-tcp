@@ -124,9 +124,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else {
 
             }
-            P2FILE("-------------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_REPLY_ACTION |\n");
-            P2FILE("-------------------------------------------\n");
+            P2FILE("-----------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_REPLY_ACTION |\n");
+            P2FILE("-----------------------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
@@ -145,9 +145,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
             get_local_server_status_datas(&p_next_data->server_status_datas);
 
-            P2FILE("--------------------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
-            P2FILE("--------------------------------------------------\n");
+            P2FILE("------------------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_REPLY_SERVER_STATUS |\n");
+            P2FILE("------------------------------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
@@ -165,9 +165,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_DATA;
-            P2FILE("-----------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_REPLY_DATA |\n");
-            P2FILE("-----------------------------------------\n");
+            P2FILE("---------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_REPLY_DATA |\n");
+            P2FILE("---------------------------------------------------\n");
 
             *next_send_data = (void *) p_next_data;
         }
@@ -195,9 +195,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             } else {
                 // nothing!
             }
-            P2FILE("----------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            P2FILE("----------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("--------------------------------------------------\n");
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
@@ -214,20 +214,20 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             policy = resource_manager(recved_data, p_next_data);
 
             if (policy == LINK_ACT_DO_NOTHING) {
-                P2FILE("----------------------------------------\n");
-                P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-                P2FILE("----------------------------------------\n");
+                P2FILE("--------------------------------------------------\n");
+                P2FILE("| construct send data type: TRANS_TYPE_HEARTBEAT |\n");
+                P2FILE("--------------------------------------------------\n");
             } else if (policy == LINK_ACT_BACKUP_NODE_TAKEOVER) {
                 release_resources(virtual_ip_with_mask, ethernet_name);
                 client_resources_takeover_status = false;
-                P2FILE("-------------------------------------\n");
-                P2FILE("| send data type: TRANS_TYPE_ACTION |\n");
-                P2FILE("-------------------------------------\n");
+                P2FILE("-----------------------------------------------\n");
+                P2FILE("| construct send data type: TRANS_TYPE_ACTION |\n");
+                P2FILE("-----------------------------------------------\n");
             } else if (policy == LINK_ACT_PRIMARY_NODE_TAKEOVER) {
                 // 需要向备机发包，让备机先释放，我再拿
-                P2FILE("-------------------------------------\n");
-                P2FILE("| send data type: TRANS_TYPE_ACTION |\n");
-                P2FILE("-------------------------------------\n");
+                P2FILE("-----------------------------------------------\n");
+                P2FILE("| construct send data type: TRANS_TYPE_ACTION |\n");
+                P2FILE("-----------------------------------------------\n");
             }
 
             *next_send_data = (void *) p_next_data;
@@ -240,9 +240,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            P2FILE("----------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            P2FILE("----------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("--------------------------------------------------\n");
         }
             break;
         case TRANS_TYPE_HEARTBEAT: {
@@ -252,9 +252,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            P2FILE("----------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            P2FILE("----------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("--------------------------------------------------\n");
         }
             break;
         default: {
@@ -265,9 +265,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             p_next_data = (TRANS_DATA *) malloc(sizeof(TRANS_DATA));
             trans_data_set_none(p_next_data);
             *next_send_data = (void *) p_next_data;
-            P2FILE("----------------------------------------\n");
-            P2FILE("| send data type: TRANS_TYPE_HEARTBEAT |\n");
-            P2FILE("----------------------------------------\n");
+            P2FILE("--------------------------------------------------\n");
+            P2FILE("| construct send data type: TRANS_TYPE_HEARTBEAT |\n");
+            P2FILE("--------------------------------------------------\n");
         }
             break;
     }
@@ -524,11 +524,11 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     bzero(cmd_str, 256);
     // 2. 发送免费arp
     // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
-    std::string svirtual_ip, svirtual_ip_with_mask;
-    svirtual_ip_with_mask.assign(virtual_ip_with_mask);
-    svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
-    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", svirtual_ip.c_str(), ethernet_name,
-            svirtual_ip.c_str());
+    std::string str_virtual_ip, str_virtual_ip_with_mask;
+    str_virtual_ip_with_mask.assign(virtual_ip_with_mask);
+    str_virtual_ip = str_virtual_ip_with_mask.substr(0, str_virtual_ip_with_mask.find_last_of("/"));
+    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", str_virtual_ip.c_str(), ethernet_name,
+            str_virtual_ip.c_str());
 
     system_to_file((const char *) cmd_str, "/tmp/send_arp.tmp");
     return 0;
@@ -602,16 +602,16 @@ int policy_stand_alone_init()
             str_line.erase(tail_pos, 1);
 
         if (space_pos = str_line.find("="), std::string::npos != space_pos) {
-            std::string skey = str_line.substr(0, space_pos);
-            std::string svalue = str_line.substr(space_pos + 1, str_line.length() - space_pos - 1);
+            std::string str_key = str_line.substr(0, space_pos);
+            std::string str_value = str_line.substr(space_pos + 1, str_line.length() - space_pos - 1);
 
-            skey.erase(0, skey.find_first_not_of(" "));
-            skey.erase(skey.find_last_not_of(" ") + 1);
+            str_key.erase(0, str_key.find_first_not_of(" "));
+            str_key.erase(str_key.find_last_not_of(" ") + 1);
 
-            svalue.erase(0, svalue.find_first_not_of(" "));
-            svalue.erase(svalue.find_last_not_of(" ") + 1);
+            str_value.erase(0, str_value.find_first_not_of(" "));
+            str_value.erase(str_value.find_last_not_of(" ") + 1);
 
-            policy_nolink_primary_map[skey] = atoi(svalue.c_str());
+            policy_nolink_primary_map[str_key] = atoi(str_value.c_str());
         }
     }
 
