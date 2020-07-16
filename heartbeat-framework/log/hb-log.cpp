@@ -10,12 +10,9 @@
 
 #define DAYS_AGO_TIME_FILE  "/tmp/getndaysagotime.tmp"
 
-
-char log_path[512] = LOG_FILE_PATH;                     // 日志文件存放路径
-char log_prefix[128] = "hblog";                         // 日志文件前缀
 int max_keep_day = 30;
 
-int hb_log(char *info_source, char *info_level, char *fmt, ...) {
+int hb_log(char *log_path, char *log_prefix, char *info_source, char *info_level, char *fmt, ...) {
 
     int ret = 0;
     va_list vaList;
@@ -37,11 +34,11 @@ int hb_log(char *info_source, char *info_level, char *fmt, ...) {
     }
 
     // 找到 max_keep_day 时的日志文件，并删除
-    char daysago_time[BUFSIZ] = {0};
-    if (get_n_days_ago_time(max_keep_day, daysago_time) == 0) {
+    char days_ago_time[BUFSIZ] = {0};
+    if (get_n_days_ago_time(max_keep_day, days_ago_time) == 0) {
         remove("/tmp/getndaysagotime.tmp");
 
-        sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, daysago_time);
+        sprintf(tmpBuf, "%s/%s%8.8s.runlog", log_path, log_prefix, days_ago_time);
 
         fp = fopen(tmpBuf, "r");
 

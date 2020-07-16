@@ -426,6 +426,16 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
     if (WIFEXITED(ret)) {
         check_vip_ret = WEXITSTATUS(ret);
     }
+    if(check_vip_ret == 1) {
+        P2FILE("has virtual ip\n");
+        client_resources_takeover_status = true;
+        server_resources_takeover_status = true;
+    }
+    else {
+        P2FILE("no virtual ip\n");
+        client_resources_takeover_status = false;
+        server_resources_takeover_status = false;
+    }
 
     data->have_virtual_ip = (check_vip_ret == 1) ? true : false;
     data->server_status = (bool) run_all_plugin();
@@ -436,8 +446,8 @@ int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 int policy_online_init()
 {
     FILE *fp;
-    char str_line[256] = {0};
-    std::string sline;
+    char read_line_buf[256] = {0};
+    std::string str_line;
     int tail_pos = -1;
     int space_pos = -1;
 
@@ -446,24 +456,24 @@ int policy_online_init()
     if (fp == NULL)
         return 0;
 
-    while (fgets(str_line, 256, fp)) {
+    while (fgets(read_line_buf, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+        if (read_line_buf[0] == '#' || read_line_buf[0] == '\n' || read_line_buf[0] == '\r')
             continue;
 
-        sline.assign(str_line);
+        str_line.assign(read_line_buf);
 
-        tail_pos = sline.find("\n");
+        tail_pos = str_line.find("\n");
         if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
+            str_line.erase(tail_pos, 1);
 
-        tail_pos = sline.find("\r");
+        tail_pos = str_line.find("\r");
         if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
+            str_line.erase(tail_pos, 1);
 
-        if (space_pos = sline.find("="), std::string::npos != space_pos) {
-            std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
+        if (space_pos = str_line.find("="), std::string::npos != space_pos) {
+            std::string skey = str_line.substr(0, space_pos);
+            std::string svalue = str_line.substr(space_pos + 1, str_line.length() - space_pos - 1);
 
             skey.erase(0, skey.find_first_not_of(" "));
             skey.erase(skey.find_last_not_of(" ") + 1);
@@ -567,8 +577,8 @@ int policy_stand_alone_manager(bool server_status, bool have_virtual_ip, int nod
 int policy_stand_alone_init()
 {
     FILE *fp;
-    char str_line[256] = {0};
-    std::string sline;
+    char read_line_str[256] = {0};
+    std::string str_line;
     int tail_pos = -1;
     int space_pos = -1;
 
@@ -576,24 +586,24 @@ int policy_stand_alone_init()
     if (fp == NULL)
         return 0;
 
-    while (fgets(str_line, 256, fp)) {
+    while (fgets(read_line_str, 256, fp)) {
         // 如果是#开头的，说明是注释的，不需要解析 或者是换行
-        if (str_line[0] == '#' || str_line[0] == '\n' || str_line[0] == '\r')
+        if (read_line_str[0] == '#' || read_line_str[0] == '\n' || read_line_str[0] == '\r')
             continue;
 
-        sline.assign(str_line);
+        str_line.assign(read_line_str);
 
-        tail_pos = sline.find("\n");
+        tail_pos = str_line.find("\n");
         if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
+            str_line.erase(tail_pos, 1);
 
-        tail_pos = sline.find("\r");
+        tail_pos = str_line.find("\r");
         if (std::string::npos != tail_pos)
-            sline.erase(tail_pos, 1);
+            str_line.erase(tail_pos, 1);
 
-        if (space_pos = sline.find("="), std::string::npos != space_pos) {
-            std::string skey = sline.substr(0, space_pos);
-            std::string svalue = sline.substr(space_pos + 1, sline.length() - space_pos - 1);
+        if (space_pos = str_line.find("="), std::string::npos != space_pos) {
+            std::string skey = str_line.substr(0, space_pos);
+            std::string svalue = str_line.substr(space_pos + 1, str_line.length() - space_pos - 1);
 
             skey.erase(0, skey.find_first_not_of(" "));
             skey.erase(skey.find_last_not_of(" ") + 1);

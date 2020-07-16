@@ -16,8 +16,8 @@
  */
 int main(int argc, char * argv[])
 {
-    char str_line[256] = {0};
-    std::string sline;
+    char read_line_buf[256] = {0};
+    std::string str_line;
 
     // 命令行运行 ip addr，在内容中查找virtual_ip
     system_to_file("ip addr", MY_TMP_FILENAME);
@@ -28,16 +28,16 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-    while(fgets(str_line, 256, fp)) {
-        sline.assign(str_line);
+    while(fgets(read_line_buf, 256, fp)) {
+        str_line.assign(read_line_buf);
 
-        if(sline.find(argv[1]) != std::string::npos) {
-            printf("has vip\n");
+        if(str_line.find(argv[1]) != std::string::npos) {
+//            printf("has vip\n");
             fclose(fp);
             return 1;
         }
     }
     fclose(fp);
-    printf("do not has vip\n");
+//    printf("do not has vip\n");
     return 0;
 }

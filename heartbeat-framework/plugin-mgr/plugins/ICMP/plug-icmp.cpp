@@ -28,7 +28,7 @@ int plug_init(void *data) {
     memcpy(pdata->initStruct.pluginName, "icmp", strlen("icmp"));
 
 
-    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug init\n");
+    hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_HEARTBEAT, INFO_LEVEL_INFO, "icmp plug init\n");
 
 
     HBConfig hb;
@@ -42,7 +42,7 @@ int plug_init(void *data) {
 
     loadconfig();
 
-    hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout,
+    hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_HEARTBEAT, INFO_LEVEL_INFO, "icmp plug ping_timeout = %d, ping_retry = %d\n", ping_timeout,
            ping_retry);
 
     ping_timeout = ping_timeout / 1000;
@@ -73,14 +73,14 @@ int plug_run(void *data) {
     else {
         if (WIFEXITED(ret)) {
             if (WEXITSTATUS(ret) == 0) {
-                hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping success\n");
+                LOGINFO("system ping success\n");
                 return 1;
             } else {
-                hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system ping error\n");
+                LOGINFO("system ping error\n");
                 return 0;
             }
         } else
-            hb_log(INFO_SOURCE_ICMP, INFO_LEVEL_INFO, "system error code = %d\n", WEXITSTATUS(ret));
+            LOGINFO("system error code = %d\n", WEXITSTATUS(ret));
     }
 
     return 0;

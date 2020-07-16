@@ -115,6 +115,7 @@ int start_by_client_mode(void) {
                         P2FILE("* client take over resource *\n");
                         P2FILE("*****************************\n");
                     } else {
+                        client_resources_takeover_status = true;
                         P2FILE("*************************************\n");
                         P2FILE("* client take over resource already *\n");
                         P2FILE("*************************************\n");
@@ -123,6 +124,7 @@ int start_by_client_mode(void) {
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
+                        client_resources_takeover_status = false;
                         P2FILE("***********************************\n");
                         P2FILE("* client release resource already *\n");
                         P2FILE("***********************************\n");
@@ -219,6 +221,7 @@ int start_by_client_mode(void) {
                 } else {
                     // release
                     if (!client_resources_takeover_status) {
+                        client_resources_takeover_status = false;
                         P2FILE("***********************************\n");
                         P2FILE("* client release resource already *\n");
                         P2FILE("***********************************\n");
@@ -261,6 +264,7 @@ int start_by_client_mode(void) {
                             P2FILE("* client take over resource *\n");
                             P2FILE("*****************************\n");
                         } else {
+                            client_resources_takeover_status = true;
                             P2FILE("*************************************\n");
                             P2FILE("* client take over resource already *\n");
                             P2FILE("*************************************\n");
@@ -269,6 +273,7 @@ int start_by_client_mode(void) {
                     } else {
                         // release
                         if (!client_resources_takeover_status) {
+                            client_resources_takeover_status = false;
                             P2FILE("***********************************\n");
                             P2FILE("* client release resource already *\n");
                             P2FILE("***********************************\n");
@@ -401,6 +406,7 @@ int start_by_server_mode(void) {
                         P2FILE("* server take over resource *\n");
                         P2FILE("*****************************\n");
                     } else {
+                        server_resources_takeover_status = true;
                         P2FILE("*************************************\n");
                         P2FILE("* server take over resource already *\n");
                         P2FILE("*************************************\n");
@@ -409,6 +415,7 @@ int start_by_server_mode(void) {
                 } else {
                     // release
                     if (!server_resources_takeover_status) {
+                        server_resources_takeover_status = false;
                         P2FILE("***********************************\n");
                         P2FILE("* server release resource already *\n");
                         P2FILE("***********************************\n");
@@ -468,6 +475,7 @@ int start_by_server_mode(void) {
                                 P2FILE("* server take over resource *\n");
                                 P2FILE("*****************************\n");
                             } else {
+                                server_resources_takeover_status = true;
                                 P2FILE("*************************************\n");
                                 P2FILE("* server take over resource already *\n");
                                 P2FILE("*************************************\n");
@@ -476,6 +484,7 @@ int start_by_server_mode(void) {
                         } else {
                             // release
                             if (!server_resources_takeover_status) {
+                                server_resources_takeover_status = false;
                                 P2FILE("***********************************\n");
                                 P2FILE("* server release resource already *\n");
                                 P2FILE("***********************************\n");
@@ -519,6 +528,7 @@ int start_by_server_mode(void) {
                                     P2FILE("* server take over resource *\n");
                                     P2FILE("*****************************\n");
                                 } else {
+                                    server_resources_takeover_status = true;
                                     P2FILE("*************************************\n");
                                     P2FILE("* server take over resource already *\n");
                                     P2FILE("*************************************\n");
@@ -527,6 +537,7 @@ int start_by_server_mode(void) {
                             } else {
                                 // release
                                 if (!server_resources_takeover_status) {
+                                    server_resources_takeover_status = false;
                                     P2FILE("***********************************\n");
                                     P2FILE("* server release resource already *\n");
                                     P2FILE("***********************************\n");
@@ -641,7 +652,7 @@ int main(int argc, char *argv[]) {
     bzero(mode, 20);
 
 #pragma region set_log_path
-    set_log_path_and_prefix("/var/log", "ha-log");
+//    set_plug_log_path_and_prefix("/var/log", "ha-log");
 #pragma endregion set_log_path
 
 #pragma region write_pidfile

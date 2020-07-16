@@ -23,10 +23,10 @@ void log_notice(char * format, ...);
 //#define LOGERROR(A, args...)  log_error((char *)A, ##args)
 //#define LOGNOTICE(A, args...)  log_notice((char *)A, ##args)
 
-#define LOGINFO(A, args...) hb_log(INFO_SOURCE_NETSIGN, INFO_LEVEL_INFO, (char *)A, ##args)
-#define LOGWARN(A, args...) hb_log(INFO_SOURCE_NETSIGN, INFO_LEVEL_WARN, (char *)A, ##args)
-#define LOGERROR(A, args...)  hb_log(INFO_SOURCE_NETSIGN, INFO_LEVEL_ERROR, (char *)A, ##args)
-#define LOGNOTICE(A, args...)  hb_log(INFO_SOURCE_NETSIGN, INFO_LEVEL_NOTICE, (char *)A, ##args)
+#define LOGINFO(A, args...) hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_NETSIGN, INFO_LEVEL_INFO, (char *)A, ##args)
+#define LOGWARN(A, args...) hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_NETSIGN, INFO_LEVEL_WARN, (char *)A, ##args)
+#define LOGERROR(A, args...)  hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_NETSIGN, INFO_LEVEL_ERROR, (char *)A, ##args)
+#define LOGNOTICE(A, args...)  hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_NETSIGN, INFO_LEVEL_NOTICE, (char *)A, ##args)
 
 #endif
 

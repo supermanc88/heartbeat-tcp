@@ -23,7 +23,7 @@ int plug_init(void *data)
     memcpy(pdata->initStruct.pluginName, "netsignstatus", strlen("netsignstatus"));
 
 
-    hb_log(INFO_SOURCE_NETSIGN, INFO_LEVEL_INFO, "netsignstatus plug init\n");
+    hb_log(PLUG_LOG_FILE_PATH, PLUG_LOG_FILE_PREFIX, INFO_SOURCE_HEARTBEAT, INFO_LEVEL_INFO, "netsignstatus plug init\n");
 
     return 0;
 }

@@ -257,9 +257,6 @@ int monitor_srv_init()
 
     LOGINFO("%s\n", "MonSrv init");
 
-    printf("%s", "-------------------------------------------------------------------\n");
-
-
     return 0;
 }
 

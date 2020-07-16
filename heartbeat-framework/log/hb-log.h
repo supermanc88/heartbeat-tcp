@@ -9,7 +9,11 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#define LOG_FILE_PATH "/opt/infosec/NetSignServer52/NetSignServer/haplugin/log"
+#define PLUG_LOG_FILE_PATH "/opt/infosec/NetSignServer52/NetSignServer/haplugin/log"
+#define PLUG_LOG_FILE_PREFIX "pluglog"
+
+#define MAIN_LOG_FILE_PATH "/var/log"
+#define MAIN_LOG_FILE_PREFIX "halog"
 
 
 #define MAX_RECORD_LEN    2048    /* 记录最大长度 */
@@ -32,14 +36,16 @@
 
 
 /**
- * 写日志信息
- * @param info_source 信息来源
- * @param info_level 信息级别
- * @param fmt 信息格式
+ *
+ * @param log_path      日志目录
+ * @param log_prefix    日志前缀
+ * @param info_source   信息来源
+ * @param info_level    信息级别
+ * @param fmt           信息格式
  * @param ...
- * @return D_SUCCEED: 成功, 失败退出
+ * @return              D_SUCCEED: 成功, 失败退出
  */
-int hb_log(char *info_source, char *info_level, char *fmt, ...);
+int hb_log(char *log_path, char *log_prefix, char *info_source, char *info_level, char *fmt, ...);
 
 /**
  * 获取当前系统时间
