@@ -133,7 +133,7 @@ int list_plug_directory(char *dir_path) {
         if (strcmp(filename->d_name, ".") == 0 ||
             strcmp(filename->d_name, "..") == 0)
             continue;
-        P2FILE("file name : %s\n", filename->d_name);
+        P2FILE("list file name : %s\n", filename->d_name);
 
         bzero(plug_path_obs, 256);
         strcpy(plug_path_obs, dir_path);
@@ -179,7 +179,7 @@ int run_all_plugin() {
         result &= tmp;
     }
 
-    P2FILE("result = %d\n", result);
+    P2FILE("server status result = %d\n", result);
 
     return result;
 }

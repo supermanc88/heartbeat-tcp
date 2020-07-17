@@ -7,6 +7,7 @@
 #include <string>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <signal.h>
 
 
 #include "wrap.h"
@@ -67,6 +68,9 @@ int start_by_client_mode(void) {
     TRANS_DATA *next_send_data;
 
     int n, i, ret;
+
+    // 忽略此信号，进程不终止
+    signal(SIGPIPE, SIG_IGN);
 
     int try_time_sum = 0;
     struct timeval tv;
@@ -170,22 +174,35 @@ int start_by_client_mode(void) {
             std::string serialized_data;
             size_t serialized_data_size;
 
+            P2FILE("serilization data start\n");
             make_telegram(send_data, serialized_data, &serialized_data_size);
+            P2FILE("serilization data complete\n");
 
-            // 2. 发送数据
-            P2FILE("Send data to Server\n");
+
+            // 2. 发送数据 如果对端已经关闭，此时write会触发SIGPIPE 进程会自动退出
+            // 所以应在程序开始时处理此信号
+            // man 2 write
+            // EPIPE  fd is connected to a pipe or socket whose reading end is closed.  When this happens the writing process will
+            // also receive a SIGPIPE signal.  (Thus, the write return value is seen only if the program catches, blocks or
+            //                                                                                                   ignores this signal.)
+
             n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
+            P2FILE("Send %d bytes data to Server\n", n);
+
             // 释放内存
             if (send_data) {
+                P2FILE("free data\n");
                 free(send_data);
                 send_data = NULL;
             }
+            P2FILE("free data done\n");
 #pragma endregion client_send_data
             fd_set set;
             FD_ZERO(&set);
             FD_SET(cfd, &set);
 
             ret = select(cfd + 1, &set, NULL, NULL, &tv);
+            P2FILE("select wait time = %d, deadtime = %d, ret = %d\n", tv.tv_sec, deadtime, ret);
 
             if (ret == -1) {
                 P2FILE("--------------------\n");
@@ -306,6 +323,7 @@ int start_by_client_mode(void) {
                     // 2. 根据收到的数据生成下次要发送的数据
                     trans_data_generator(parsed_buf, (void **) (&next_send_data));
                     free(parsed_buf);
+                    P2FILE("free parsed buf\n");
 
                     if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
                         none_package_send_times++;
@@ -505,9 +523,9 @@ int start_by_server_mode(void) {
 #pragma region server_recv      // server 正常收到从client来的数据
                         bzero(buf, BUFSIZ);
                         n = Read(cfd, buf, BUFSIZ);
-                        P2FILE("------------------------------\n");
+                        P2FILE("-------------\n");
                         P2FILE("read num %d\n", n);
-                        P2FILE("------------------------------\n");
+                        P2FILE("-------------\n");
 
                         if (n == 0) {
 #pragma region client_closed_connect        // server发现client关闭了连接
@@ -554,7 +572,7 @@ int start_by_server_mode(void) {
                             break;
 #pragma endregion client_closed_connect
                         } else if (n == -1) {
-                            perror("read error");
+                            P2FILE("read error : %s\n", strerror(errno));
                             close(cfd);
                             break;
                         }
