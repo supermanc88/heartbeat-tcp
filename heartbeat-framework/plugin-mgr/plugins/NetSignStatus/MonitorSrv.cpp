@@ -93,12 +93,7 @@ int GetSrvStatus(char *RIP, char *VIP)
 
         //直接获取check-service
         XmlNode *ifchksrvNode = serviceNode->findChild("checkService");
-/*		if ( NULL == ifchksrvNode) 
-		{
-			LOGERROR("%s","GET_CHKSRVNODE_ERROR");	
-			return GET_CHKSRVNODE;
-		}
-		*/
+
         if (NULL == ifchksrvNode || 0 == strcmp(ifchksrvNode->getString(), "true")) {
 
             //获取service名称
@@ -115,48 +110,13 @@ int GetSrvStatus(char *RIP, char *VIP)
                 return GET_PORTNODE;
             }
 
-
-            //直接获取service ip
-            //XmlNode* ipNode = serviceNode->findChild("ip");
-
-            //如果当前节点没有占用虚IP，优先从配置文件中解析实IP，如果没有IP配置
-            //或者IP配置中含有*，则使用127.0.0.1
-            //if ( 0 == strcmp("127.0.0.1", VIP))
-            //{
-            //	if(NULL != ipNode && NULL != strstr(ipNode->getString(), "*") )
-            //	{
-            //		memset(RemoteIP, 0x00, BUFFSIZE);
-            //		strcpy(RemoteIP, ipNode->getString());
-            //	}
-            //}
-            //else	//若已经占用虚IP，则使用虚IP
-            //{
-            //	memset(RemoteIP, 0x00, BUFFSIZE);
-            //	strcpy(RemoteIP, VIP);
-            //
-            //}
-
             for (ConnectCount = 0; ConnectCount <= connect_retry; ConnectCount++) {
                 LOGINFO("Detect Service [%s]...\n", attr->getString());
 
-                //探测服务状态
-                //Ret = Detect((char *)ipNode->getString(), atoi(portNode->getString()), connect_timeout);
-
-                //探测服务状态
-                //Ret = DetectService(VIP, atoi(portNode->getString()), connect_timeout);
-                //
-                //if(0 == Ret)
-                //{
-                //	break;
-                //}
-                //else if(0 != Ret)
-                //{
                 Ret = DetectService(RIP, atoi(portNode->getString()), connect_timeout);
                 if (0 == Ret) {
                     break;
                 }
-                //}
-
             }
 
             if (0 != Ret) {

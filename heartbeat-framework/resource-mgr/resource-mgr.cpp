@@ -27,40 +27,6 @@ extern char virtual_ip_with_mask[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
 extern int eth_num;
 
-//int main(void)
-//{
-//    policy_online_init();
-//    printf("resource manager\n");
-//    printf("---------------------------\n");
-//
-//    std::map<std::string, int>::iterator iter;
-//    int i = 0;
-//    for(iter = policy_map.begin(); iter != policy_map.end(); iter++){
-//        printf("%s = %d\n", iter->first.c_str(), iter->second);
-//        i++;
-//    }
-//
-//    printf("total count: %d\n", i);
-//
-//    printf("----------------------------\n");
-//
-//    policy_no_link_init();
-//
-//    std::map< std::string, std::map<std::string, int> >::iterator iter2;
-//
-//    i = 0;
-//    for(iter2 = policy_nolink_map.begin(); iter2 != policy_nolink_map.end(); iter2++) {
-//        std::map<std::string, int>::iterator iter3;
-//        for(iter3 = iter2->second.begin(); iter3 != iter2->second.end(); iter3++){
-//            printf("%s, %s = %d\n", iter2->first.c_str(), iter3->first.c_str(), iter3->second);
-//            i++;
-//        }
-//    }
-//
-//    printf("total count: %d\n", i);
-//
-//    return 0;
-//}
 
 int trans_data_generator(void *recved_data, void **next_send_data)
 {

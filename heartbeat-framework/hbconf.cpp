@@ -124,19 +124,3 @@ HB_RET HBConfig::GetValue(const char *key, char *value) {
     }
     return RET_GETVALUE_ERROR;
 }
-
-
-//int main(void)
-//{
-//    HBConfig hb;
-//    char value[256] = {0};
-//    hb.OpenFile("/home/superman/ha.cf", "r");
-//
-//    if(hb.GetValue("udpport", value) == RET_SUCCESS)
-//        printf("%s\n", value);
-//
-//    if(hb.GetValue("auto_failback", value) == RET_SUCCESS)
-//        printf("%s\n", value);
-//
-//    return 0;
-//}

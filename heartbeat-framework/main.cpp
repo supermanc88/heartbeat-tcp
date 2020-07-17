@@ -69,9 +69,6 @@ int start_by_client_mode(void) {
 
     int n, i, ret;
 
-    // 忽略此信号，进程不终止
-    signal(SIGPIPE, SIG_IGN);
-
     int try_time_sum = 0;
     struct timeval tv;
     bzero(&tv, sizeof(struct timeval));
@@ -187,7 +184,6 @@ int start_by_client_mode(void) {
             //                                                                                                   ignores this signal.)
 
             n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
-            P2FILE("Send %d bytes data to Server\n", n);
 
             // 释放内存
             if (send_data) {
@@ -196,6 +192,14 @@ int start_by_client_mode(void) {
                 send_data = NULL;
             }
             P2FILE("free data done\n");
+
+            if (n == -1) {
+                P2FILE("server close connect, write error %s\n", strerror(errno));
+                close(cfd);
+                goto reconnect;
+            }
+            P2FILE("Send %d bytes data to Server\n", n);
+
 #pragma endregion client_send_data
             fd_set set;
             FD_ZERO(&set);
@@ -597,6 +601,11 @@ int start_by_server_mode(void) {
                         // 4. 发送数据
                         n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
                         // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
+                        if (n == -1) {
+                            P2FILE("client close connect, write error: %s\n", strerror(errno));
+                            close(cfd);
+                            break;
+                        }
 
                         P2FILE("----------------------------------------\n");
                         P2FILE("| server send %d bytes datas to client |\n", n);
@@ -669,6 +678,10 @@ int main(int argc, char *argv[]) {
     bool b_mode_set = false;
 
     bzero(mode, 20);
+
+
+    // 忽略此信号，进程不终止
+    signal(SIGPIPE, SIG_IGN);
 
 #pragma region set_log_path
 //    set_plug_log_path_and_prefix("/var/log", "ha-log");
