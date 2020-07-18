@@ -26,6 +26,11 @@ extern char peer_addr[BUFSIZ];
 extern char virtual_ip_with_mask[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
 extern int eth_num;
+extern int detect_interval;
+
+
+bool host_vip_status = false;
+bool host_server_status = false;
 
 
 int trans_data_generator(void *recved_data, void **next_send_data)
@@ -260,6 +265,10 @@ int trans_data_set_action(void *data, ACTION_TYPE type)
 int trans_data_set_get_server_status(void *data)
 {
 
+    P2FILE("----------------------------------------------------------\n");
+    P2FILE("| construct send data type: TRANS_TYPE_GET_SERVER_STATUS |\n");
+    P2FILE("----------------------------------------------------------\n");
+
     TRANS_DATA *pdata = (TRANS_DATA *) data;
 
     bzero(pdata, sizeof(TRANS_DATA));
@@ -372,39 +381,8 @@ int policy_online_manager(bool primary_server_status, bool primary_have_virtual_
 
 int get_local_server_status_datas(SERVER_STATUS_DATAS *data)
 {
-    char cmd_str[256] = {0};
-    int ret;
-    int check_vip_ret;
-    char vip[BUFSIZ];
-    // 这里运行一次本地的插件获取状态
-    P2FILE("get_local_server_status_datas...\n");
-
-    std::string svirtual_ip, svirtual_ip_with_mask;
-    svirtual_ip_with_mask.assign(virtual_ip_with_mask);
-    svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
-
-    strcpy(vip, svirtual_ip.c_str());
-    // 这里通过check-vip程序来获取本机是否有虚ip
-    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/check-virtual-ip %s", vip);
-
-    ret = system(cmd_str);
-
-    if (WIFEXITED(ret)) {
-        check_vip_ret = WEXITSTATUS(ret);
-    }
-    if(check_vip_ret == 1) {
-        P2FILE("has virtual ip\n");
-        client_resources_takeover_status = true;
-        server_resources_takeover_status = true;
-    }
-    else {
-        P2FILE("no virtual ip\n");
-        client_resources_takeover_status = false;
-        server_resources_takeover_status = false;
-    }
-
-    data->have_virtual_ip = (check_vip_ret == 1) ? true : false;
-    data->server_status = (bool) run_all_plugin();
+    data->have_virtual_ip = host_vip_status;
+    data->server_status = host_server_status;
     return 0;
 }
 
@@ -600,5 +578,51 @@ int policy_init()
     policy_online_init();
     policy_stand_alone_init();
     return 0;
+}
+
+void *get_local_server_status_datas_thread(void *)
+{
+    while (true) {
+
+        P2FILE("get_local_server_status_datas_thread start!\n");
+
+        char cmd_str[256] = {0};
+        int ret;
+        int check_vip_ret;
+        char vip[BUFSIZ];
+        // 这里运行一次本地的插件获取状态
+        P2FILE("get_local_server_status_datas...\n");
+
+        std::string svirtual_ip, svirtual_ip_with_mask;
+        svirtual_ip_with_mask.assign(virtual_ip_with_mask);
+        svirtual_ip = svirtual_ip_with_mask.substr(0, svirtual_ip_with_mask.find_last_of("/"));
+
+        strcpy(vip, svirtual_ip.c_str());
+        // 这里通过check-vip程序来获取本机是否有虚ip
+        sprintf(cmd_str, "/opt/infosec-heartbeat/bin/check-virtual-ip %s", vip);
+
+        ret = system(cmd_str);
+
+        if (WIFEXITED(ret)) {
+            check_vip_ret = WEXITSTATUS(ret);
+        }
+        if(check_vip_ret == 1) {
+            P2FILE("has virtual ip\n");
+            client_resources_takeover_status = true;
+            server_resources_takeover_status = true;
+        }
+        else {
+            P2FILE("no virtual ip\n");
+            client_resources_takeover_status = false;
+            server_resources_takeover_status = false;
+        }
+
+        host_vip_status = (check_vip_ret == 1) ? true : false;
+        host_server_status = (bool) run_all_plugin();
+
+        P2FILE("get_local_server_status_datas_thread complete!\n");
+        sleep(detect_interval);
+    }
+    return NULL;
 }
 

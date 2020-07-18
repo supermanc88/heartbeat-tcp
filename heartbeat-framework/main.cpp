@@ -777,10 +777,16 @@ int main(int argc, char *argv[]) {
 
 #pragma region start_thread
 
-    pthread_t tid;
-    int ret = pthread_create(&tid, NULL, manual_switch, NULL);
+    pthread_t manual_switch_tid, get_local_status_tid;
+    int ret = pthread_create(&manual_switch_tid, NULL, manual_switch, NULL);
     if (ret != 0) {
-        perror("pthread_create error");
+        perror("manual_switch pthread_create error");
+        return -1;
+    }
+
+    ret = pthread_create(&manual_switch_tid, NULL, get_local_server_status_datas_thread, NULL);
+    if (ret != 0) {
+        perror("get_local_server_status_datas_thread pthread_create error");
         return -1;
     }
 

@@ -128,4 +128,10 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
  */
 int release_resources(const char *virtual_ip_with_mask, const char *ethernet_name);
 
+/**
+ * 获取本机服务状态的线程
+ * @return
+ */
+void * get_local_server_status_datas_thread(void*);
+
 #endif //HEARTBEAT_TCP_RESOURCE_MGR_H
