@@ -28,7 +28,7 @@
  * TRANS_TYPE_ACTION TRANS_TYPE_REPLY时，TRANS_DATA选用trans_action_data
  * TRANS_TYPE_GET_SERVER_STATUS TRANS_TYPE_REPLY_SERVER_STATUS时，TRANS_DATA选用server_status
  * TRANS_TYPE_GET_DATA TRANS_TYPE_REPLY_DATA时，TRANS_DATA选用data
- * TRANS_TYPE_NONE时，TRANS_DATA中union数据均不使用
+ * TRANS_TYPE_HEARTBEAT时，TRANS_DATA中union数据均不使用
  */
 enum TRANS_TYPE {
     TRANS_TYPE_HEARTBEAT,
@@ -61,11 +61,21 @@ struct TRANS_ACTION_DATA {
 };
 
 
+/**
+ * 本机状态
+ * server_status 用来存储插件运行结果的交集
+ * have_virtual_ip 本机是否存在虚ip
+ */
 struct SERVER_STATUS_DATAS {
     bool server_status;
     bool have_virtual_ip;
 };
 
+/**
+ * 变长的数据包
+ * size 数据的长度
+ * data 根据需要动态申请内存
+ */
 struct DATA_COLLECTION {
     size_t size;
     unsigned char data[1];
@@ -79,8 +89,7 @@ struct DATA_COLLECTION {
  * server_status 本机服务状态（所有插件运行and结果）
  * data_collection 传输数据正文
  *
- * 如果type为TRANS_TYPE_NONE时，直接使用data可拿到后面的数据，其它情况使用data时需要
- * 加上TRANS_ACTION_DATA结构体大小，或直接使用extra_data
+ * 如果type为TRANS_TYPE_HEARTBEAT时，直接使用data可拿到后面的数据，其它情况使用data时需要
  */
 struct TRANS_DATA {
     TRANS_TYPE type;
@@ -88,11 +97,8 @@ struct TRANS_DATA {
     union {
         struct TRANS_ACTION_DATA trans_action_data;
         struct SERVER_STATUS_DATAS server_status_datas;
-//        bool server_status;
         struct DATA_COLLECTION data_collection;
-//        char data[1];
     };
-//    char extra_data[1];
 };
 
 
