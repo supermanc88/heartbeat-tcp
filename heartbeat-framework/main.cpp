@@ -205,6 +205,8 @@ int start_by_client_mode(void) {
             FD_ZERO(&set);
             FD_SET(cfd, &set);
 
+            bzero(&tv, sizeof(struct timeval));
+            tv.tv_sec = deadtime;
             ret = select(cfd + 1, &set, NULL, NULL, &tv);
             P2FILE("select wait time = %d, deadtime = %d, ret = %d\n", tv.tv_sec, deadtime, ret);
 
