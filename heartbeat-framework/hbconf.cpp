@@ -1,6 +1,6 @@
-#include <iostream>
-#include <string.h>
 #include "hbconf.h"
+
+#include <string.h>
 
 HBConfig::HBConfig() {
     keymap.clear();

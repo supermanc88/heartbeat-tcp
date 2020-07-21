@@ -1,8 +1,9 @@
+#include "hares.h"
+
 #include <strings.h>
 #include <string.h>
 #include <string>
 
-#include "hares.h"
 
 HBRes::HBRes() {
     fp = NULL;

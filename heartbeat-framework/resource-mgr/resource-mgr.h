@@ -1,7 +1,7 @@
 #ifndef HEARTBEAT_TCP_RESOURCE_MGR_H
 #define HEARTBEAT_TCP_RESOURCE_MGR_H
 
-#include "../heartbeat-config.h"
+#include "heartbeat-config.h"
 
 #define POLICY_LINK_PATH "/etc/ha.d/policy/policy-online.dat"
 #define POLICY_NOLINK_PRIMARY_PATH "/etc/ha.d/policy/policy-stand-alone.dat"

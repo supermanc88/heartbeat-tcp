@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 message("lib dir: ${LIBRARY_DIRECTORY}")
 
-include_directories(../../../log)
+include_directories(../../../)
 
 set(ICMP_SRC loadconfig.h loadconfig.cpp
         plug-icmp.cpp plug-icmp.h

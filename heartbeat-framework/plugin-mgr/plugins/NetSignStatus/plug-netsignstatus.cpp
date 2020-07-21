@@ -6,8 +6,8 @@
 #include <errno.h>
 
 #include "plug-netsignstatus.h"
-#include "../../hb-plugin.h"
-#include "hb-log.h"
+#include "plugin-mgr/hb-plugin.h"
+#include "log/hb-log.h"
 #include "MonitorSrv.h"
 
 

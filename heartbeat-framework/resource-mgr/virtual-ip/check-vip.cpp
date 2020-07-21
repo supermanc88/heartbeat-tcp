@@ -3,7 +3,7 @@
 #include <string>
 
 #include "check-vip.h"
-#include "../../common/custom-functions.h"
+#include "common/custom-functions.h"
 
 
 /**

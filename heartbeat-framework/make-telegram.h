@@ -1,7 +1,3 @@
-//
-// Created by CHM on 2020/6/22.
-//
-
 #ifndef HEARTBEAT_TCP_MAKE_TELEGRAM_H
 #define HEARTBEAT_TCP_MAKE_TELEGRAM_H
 

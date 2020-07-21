@@ -1,17 +1,19 @@
+#include "plug-icmp.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <netinet/in.h>
 #include <string>
 
-#include "plug-icmp.h"
-#include "../../hb-plugin.h"
 
-#include "../../../heartbeat-config.h"
-#include "../../../hbconf.h"
-#include "../../../common/custom-functions.h"
+#include "plugin-mgr/hb-plugin.h"
+
+#include "heartbeat-config.h"
+#include "hbconf.h"
+#include "common/custom-functions.h"
 #include "loadconfig.h"
-#include "hb-log.h"
+#include "log/hb-log.h"
 
 char ping_target[BUFSIZ] = "192.168.1.1";
 extern int ping_timeout;

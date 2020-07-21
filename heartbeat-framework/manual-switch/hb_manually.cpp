@@ -1,16 +1,12 @@
+#include "hb_manually.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <strings.h>
 #include <string.h>
 
-
-#include "hb_manually.h"
-#include "../hbconf.h"
+#include "hbconf.h"
 
 #define HACONFIG_FILE_PATH  "/etc/ha.d/ha.cf"
 

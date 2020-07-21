@@ -1,3 +1,5 @@
+#include "resource-mgr.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -7,10 +9,9 @@
 #include <vector>
 #include <string.h>
 
-#include "resource-mgr.h"
-#include "../plugin-mgr/plugin-manager.h"
-#include "../common/custom-functions.h"
-#include "../common/log2file.h"
+#include "plugin-mgr/plugin-manager.h"
+#include "common/custom-functions.h"
+#include "common/log2file.h"
 
 std::map<std::string, int> policy_link_map;
 std::map<std::string, std::map<std::string, int>> policy_nolink_map;

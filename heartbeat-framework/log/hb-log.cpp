@@ -1,12 +1,11 @@
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <errno.h>
 
 #include <string>
 
 #include "hb-log.h"
 
-#include "../common/custom-functions.h"
+#include "common/custom-functions.h"
 
 #define DAYS_AGO_TIME_FILE  "/tmp/getndaysagotime.tmp"
 

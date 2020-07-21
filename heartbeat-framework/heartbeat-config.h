@@ -1,9 +1,7 @@
-//
-// Created by CHM on 5/21/2020.
-//
-
 #ifndef INFOSEC_HEARTBEAT_HEARTBEAT_CONFIG_H
 #define INFOSEC_HEARTBEAT_HEARTBEAT_CONFIG_H
+
+#include <unistd.h>
 
 #define HEARTBEAT_VERSION 0.1
 

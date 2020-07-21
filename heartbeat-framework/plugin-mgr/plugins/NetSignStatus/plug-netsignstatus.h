@@ -1,7 +1,3 @@
-//
-// Created by CHM on 2020/6/8.
-//
-
 #ifndef HEARTBEAT_TCP_PLUG_NETSIGNSTATUS_H
 #define HEARTBEAT_TCP_PLUG_NETSIGNSTATUS_H
 

@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <strings.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string>
 #include <arpa/inet.h>
 #include <pthread.h>

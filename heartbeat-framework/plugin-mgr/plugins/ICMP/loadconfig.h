@@ -1,7 +1,7 @@
 #ifndef _MONITORSRV_H_
 #define _MONITORSRV_H_
 
-#include "hb-log.h"
+#include "log/hb-log.h"
 
 #define MONSRVCONF        "/opt/infosec/NetSignServer52/NetSignServer/haplugin/conf.ini"
 

@@ -6,7 +6,7 @@
 #include <cstdlib>  
 #include <cstring>   
 #include <cstdarg>
-#include "../../../log/hb-log.h"
+#include "log/hb-log.h"
 
 #define FMT_TMP_LEN 256
 

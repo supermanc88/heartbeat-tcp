@@ -1,7 +1,3 @@
-//
-// Created by CHM on 2020/6/28.
-//
-
 #ifndef HEARTBEAT_TCP_HB_MANUALLY_H
 #define HEARTBEAT_TCP_HB_MANUALLY_H
 

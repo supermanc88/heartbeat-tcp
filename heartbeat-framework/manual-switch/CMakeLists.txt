@@ -4,6 +4,8 @@ project(hb_manual)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+include_directories(../)
+
 set(HB_MANUAL hb_manually.cpp hb_manually.h
         ../hbconf.h ../hbconf.cpp)
 

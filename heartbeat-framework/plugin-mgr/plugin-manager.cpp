@@ -1,19 +1,16 @@
-#include <unistd.h>
-#include <stdlib.h>
+#include "plugin-manager.h"
+
 #include <stdio.h>
 #include <string.h>
-#include <strings.h>
 #include <string>
 #include <dlfcn.h>
-#include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
 #include <map>
 
-#include "plugin-manager.h"
 #include "hb-plugin.h"
-#include "../common/log2file.h"
+#include "common/log2file.h"
 
 
 std::vector<std::string> plugins_path;       // 用来存储插件的所有路径

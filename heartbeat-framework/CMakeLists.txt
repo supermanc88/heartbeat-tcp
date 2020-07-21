@@ -16,6 +16,8 @@ message("hb framework ${LIBRARY_DIRECTORY}")
 
 link_directories(${LIBRARY_DIRECTORY})
 
+include_directories(./)
+
 set(SRC_PATH
         main.cpp
         wrap.cpp

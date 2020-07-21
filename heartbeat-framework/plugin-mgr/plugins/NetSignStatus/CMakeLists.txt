@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 message(${LIBRARY_DIRECTORY})
 
-include_directories(../../../log)
+include_directories(../../../)
 
 set(NETSIGN_SRC plug-netsignstatus.cpp plug-netsignstatus.h
         Detect.h Detect.cpp
