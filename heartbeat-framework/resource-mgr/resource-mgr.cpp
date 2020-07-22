@@ -29,6 +29,9 @@ extern char ethernet_name[BUFSIZ];
 extern int eth_num;
 extern int detect_interval;
 
+extern bool manual_switch_toggle;
+extern bool manual_switch_action;
+
 
 bool host_vip_status = false;
 bool host_server_status = false;
@@ -81,6 +84,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
                 p_next_data->trans_action_data.type = ACTION_TYPE_GOT_RES;
                 p_next_data->trans_action_data.result = 1;
 
+                p_next_data->manual_switch.toggle = manual_switch_toggle;
+                p_next_data->manual_switch.take_or_release = manual_switch_action;
+
             } else if (action_type == ACTION_TYPE_FREE_RES) {
                 P2FILE("--------------------------------------------------------------\n");
                 P2FILE("| server recv free res,so server start release the resources |\n");
@@ -93,6 +99,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
 
                 p_next_data->trans_action_data.type = ACTION_TYPE_FREED_RES;
                 p_next_data->trans_action_data.result = 1;
+
+                p_next_data->manual_switch.toggle = manual_switch_toggle;
+                p_next_data->manual_switch.take_or_release = manual_switch_action;
+
             } else {
 
             }
@@ -114,6 +124,9 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_SERVER_STATUS;
+
+            p_next_data->manual_switch.toggle = manual_switch_toggle;
+            p_next_data->manual_switch.take_or_release = manual_switch_action;
 
             get_local_server_status_datas(&p_next_data->server_status_datas);
 
@@ -137,6 +150,10 @@ int trans_data_generator(void *recved_data, void **next_send_data)
             bzero(p_next_data, sizeof(TRANS_DATA));
             p_next_data->size = sizeof(TRANS_DATA);
             p_next_data->type = TRANS_TYPE_REPLY_DATA;
+
+            p_next_data->manual_switch.toggle = manual_switch_toggle;
+            p_next_data->manual_switch.take_or_release = manual_switch_action;
+
             P2FILE("---------------------------------------------------\n");
             P2FILE("| construct send data type: TRANS_TYPE_REPLY_DATA |\n");
             P2FILE("---------------------------------------------------\n");
@@ -260,6 +277,9 @@ int trans_data_set_action(void *data, ACTION_TYPE type)
     pdata->trans_action_data.type = type;
     pdata->trans_action_data.result = 1;
 
+    pdata->manual_switch.toggle = manual_switch_toggle;
+    pdata->manual_switch.take_or_release = manual_switch_action;
+
     return 0;
 }
 
@@ -277,6 +297,9 @@ int trans_data_set_get_server_status(void *data)
     pdata->type = TRANS_TYPE_GET_SERVER_STATUS;
     pdata->size = sizeof(TRANS_DATA);
 
+    pdata->manual_switch.toggle = manual_switch_toggle;
+    pdata->manual_switch.take_or_release = manual_switch_action;
+
     return 0;
 }
 
@@ -290,6 +313,9 @@ int trans_data_set_get_data(void *data)
     pdata->type = TRANS_TYPE_GET_DATA;
     pdata->size = sizeof(TRANS_DATA);
 
+    pdata->manual_switch.toggle = manual_switch_toggle;
+    pdata->manual_switch.take_or_release = manual_switch_action;
+
     return 0;
 }
 
@@ -301,6 +327,10 @@ int trans_data_set_none(void *data)
 
     pdata->type = TRANS_TYPE_HEARTBEAT;
     pdata->size = sizeof(TRANS_DATA);
+
+    pdata->manual_switch.toggle = manual_switch_toggle;
+    pdata->manual_switch.take_or_release = manual_switch_action;
+
     return 0;
 }
 

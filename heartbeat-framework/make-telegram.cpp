@@ -19,6 +19,8 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
             telegram_transdata.mutable_trans_action_data()->set_type(
                     static_cast<ActionType>(pdata->trans_action_data.type));
             telegram_transdata.mutable_trans_action_data()->set_result(pdata->trans_action_data.result);
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         case TRANS_TYPE_REPLY_ACTION: {
@@ -27,6 +29,8 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
             telegram_transdata.mutable_trans_action_data()->set_type(
                     static_cast<ActionType>(pdata->trans_action_data.type));
             telegram_transdata.mutable_trans_action_data()->set_result(pdata->trans_action_data.result);
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         case TRANS_TYPE_GET_SERVER_STATUS: {
@@ -38,6 +42,8 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
             telegram_transdata.mutable_server_status_datas()->set_have_virtual_ip(
                     pdata->server_status_datas.have_virtual_ip
             );
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         case TRANS_TYPE_REPLY_SERVER_STATUS: {
@@ -49,6 +55,8 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
             telegram_transdata.mutable_server_status_datas()->set_have_virtual_ip(
                     pdata->server_status_datas.have_virtual_ip
             );
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         case TRANS_TYPE_GET_DATA: {
@@ -56,6 +64,8 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
             telegram_transdata.set_size(pdata->size);
             telegram_transdata.mutable_data_collection()->set_size(3);
             telegram_transdata.mutable_data_collection()->set_data("get");
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         case TRANS_TYPE_REPLY_DATA: {
@@ -65,11 +75,15 @@ int make_telegram(void *data, std::string &telegram_data, size_t *t_data_size) {
 //                                                                 pdata->size - (size_t) (&((TRANS_DATA *) 0)->data));
             telegram_transdata.mutable_data_collection()->set_size(5);
             telegram_transdata.mutable_data_collection()->set_data("reply");
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
         default: {
             telegram_transdata.set_type(HEARTBEAT);
             telegram_transdata.set_size(pdata->size);
+            telegram_transdata.mutable_manual_switch()->set_toggle(pdata->manual_switch.toggle);
+            telegram_transdata.mutable_manual_switch()->set_take_or_release(pdata->manual_switch.take_or_release);
         }
             break;
     }
@@ -91,6 +105,8 @@ int parse_telegram(std::string telegram_data, size_t t_data_size, void **data) {
             pdata->size = transdata.size();
             pdata->trans_action_data.type = static_cast<ACTION_TYPE>(transdata.mutable_trans_action_data()->type());
             pdata->trans_action_data.result = transdata.mutable_trans_action_data()->result();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         case REPLY_ACTION: {
@@ -98,6 +114,8 @@ int parse_telegram(std::string telegram_data, size_t t_data_size, void **data) {
             pdata->size = transdata.size();
             pdata->trans_action_data.type = static_cast<ACTION_TYPE>(transdata.mutable_trans_action_data()->type());
             pdata->trans_action_data.result = transdata.mutable_trans_action_data()->result();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         case GET_SERVER_STATUS: {
@@ -105,6 +123,8 @@ int parse_telegram(std::string telegram_data, size_t t_data_size, void **data) {
             pdata->size = transdata.size();
             pdata->server_status_datas.server_status = transdata.mutable_server_status_datas()->server_status();
             pdata->server_status_datas.have_virtual_ip = transdata.mutable_server_status_datas()->have_virtual_ip();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         case REPLY_SERVER_STATUS: {
@@ -112,21 +132,29 @@ int parse_telegram(std::string telegram_data, size_t t_data_size, void **data) {
             pdata->size = transdata.size();
             pdata->server_status_datas.server_status = transdata.mutable_server_status_datas()->server_status();
             pdata->server_status_datas.have_virtual_ip = transdata.mutable_server_status_datas()->have_virtual_ip();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         case GET_DATA: {
             pdata->type = TRANS_TYPE_GET_DATA;
             pdata->size = transdata.size();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         case REPLY_DATA: {
             pdata->type = TRANS_TYPE_REPLY_DATA;
             pdata->size = transdata.size();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
         default: {
             pdata->type = TRANS_TYPE_HEARTBEAT;
             pdata->size = transdata.size();
+            pdata->manual_switch.toggle = transdata.mutable_manual_switch()->toggle();
+            pdata->manual_switch.take_or_release = transdata.mutable_manual_switch()->take_or_release();
         }
             break;
     }

@@ -14,6 +14,9 @@
 #define INITDEAD            120
 #define SERVERPORT          8888
 
+#define TAKE_OVER_VIP       1
+#define RELEASE_VIP         0
+
 
 #define HACONFIG_FILE_PATH  "/etc/ha.d/ha.cf"
 #define HARESOURCES_FILE_PATH "/etc/ha.d/haresources"
@@ -79,6 +82,11 @@ struct DATA_COLLECTION {
     unsigned char data[1];
 };
 
+struct MANUAL_SWITCH {
+    bool toggle;                    // 开关
+    int take_or_release;            // 是接管还是释放   1:接管 0:释放
+};
+
 /**
  * TRANS_DATA 数据结构体
  * type 传输数据类型
@@ -97,6 +105,7 @@ struct TRANS_DATA {
         struct SERVER_STATUS_DATAS server_status_datas;
         struct DATA_COLLECTION data_collection;
     };
+    struct MANUAL_SWITCH manual_switch;
 };
 
 

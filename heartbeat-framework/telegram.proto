@@ -32,6 +32,11 @@ message DataCollection {
     string data = 2;
 }
 
+message ManualSwitch {
+    bool toggle = 1;
+    int32 take_or_release = 2;
+}
+
 /**
 通信的数据
 */
@@ -44,6 +49,7 @@ message TransData {
         ServerStatusDatas server_status_datas = 4;
         DataCollection data_collection = 5;
     }
+    ManualSwitch manual_switch = 6;
 /***后续的直接添加即可***/
 }
 

@@ -6,6 +6,9 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 
 #include "wrap.h"
@@ -20,6 +23,8 @@
 
 #define SERVER_IP "192.168.231.133"
 #define VIRTUAL_IP "192.168.231.155/24"
+
+#define FIFO_NAME "/var/tmp/manual_switch_fifo"          // 有名管道
 
 // 每发送10次none包，便向服务端询问一次服务状态
 #define GET_STATUS_TIME_INTERVAL    10
@@ -42,6 +47,10 @@ char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
 char primary_node[BUFSIZ] = "netsign";                      // haresources中主机名
 
+
+// 手动切换状态
+bool manual_switch_toggle = false;
+bool manual_switch_action = 0;
 
 //资源接管状态,资源接管后置为true，释放后置为false
 extern bool client_resources_takeover_status;
@@ -93,6 +102,12 @@ int start_by_client_mode(void) {
         P2FILE("connect server error:%s\n", strerror(errno));
 
         if (!trouble) {
+
+            // 如果发现 manual_switch_toggle 被置true，说明要手动切换，故设置故障
+            if (manual_switch_toggle) {
+                trouble = true;
+            }
+
             // 每隔2秒尝试重连一次，当超过deadtime时，就应该接管资源
             if (try_time_sum >= deadtime) {
                 // 测试 直接退出 多次尝试均不能连通，所以根据“nolink“策略进行操作资源
@@ -163,6 +178,11 @@ int start_by_client_mode(void) {
 #pragma endregion client_construct_first_data
     while (1) {
         if (!trouble) {
+
+            // 如果发现 manual_switch_toggle 被置true，说明要手动切换，故设置故障
+            if (manual_switch_toggle) {
+                trouble = true;
+            }
 
 #pragma region client_send_data        // 客户端向server发送数据
             // 1. 将要发送的数据序列化
@@ -324,10 +344,37 @@ int start_by_client_mode(void) {
                     sbuf.assign(buf, n);
                     parse_telegram(sbuf, n, (void **) (&parsed_buf));
 
+                    if (((TRANS_DATA*)parsed_buf)->manual_switch.toggle) {
+                        trouble = true;
+
+                        if (((TRANS_DATA*)parsed_buf)->manual_switch.take_or_release == RELEASE_VIP) {
+                            release_resources(virtual_ip_with_mask, ethernet_name);
+                            client_resources_takeover_status = false;
+                        } else {
+                            take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
+                            client_resources_takeover_status = true;
+                        }
+
+                    }
+
                     // 2. 根据收到的数据生成下次要发送的数据
                     trans_data_generator(parsed_buf, (void **) (&next_send_data));
                     free(parsed_buf);
                     P2FILE("free parsed buf\n");
+
+                    if (((TRANS_DATA*)parsed_buf)->manual_switch.toggle) {
+                        trouble = true;
+
+                        if (((TRANS_DATA*)parsed_buf)->manual_switch.take_or_release == RELEASE_VIP) {
+                            release_resources(virtual_ip_with_mask, ethernet_name);
+                            server_resources_takeover_status = false;
+                        } else {
+                            take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
+                            server_resources_takeover_status = true;
+                        }
+
+                    }
+
 
                     if (next_send_data->type == TRANS_TYPE_HEARTBEAT) {
                         none_package_send_times++;
@@ -399,6 +446,12 @@ int start_by_server_mode(void) {
     while (1) {
 
         if (!trouble) {
+
+            // 如果发现 manual_switch_toggle 被置true，说明要手动切换，故设置故障
+            if (manual_switch_toggle) {
+                trouble = true;
+            }
+
             fd_set set;
             FD_ZERO(&set);
             FD_SET(lfd, &set);
@@ -471,72 +524,26 @@ int start_by_server_mode(void) {
 
                 while (1) {
 
-                    // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
-                    FD_ZERO(&set);
-                    FD_SET(cfd, &set);
-                    bzero(&tv, sizeof(struct timeval));
-                    tv.tv_sec = deadtime;
-                    ret = select(cfd + 1, &set, NULL, NULL, &tv);
+                    if (!trouble) {
 
-                    if (ret == -1) {
-                        close(cfd);
-                        break;
-                    } else if (ret == 0) {
-#pragma region server_recv_timeout      // server等待从client来的信息超时
-                        P2FILE("time out\n");
-                        SERVER_STATUS_DATAS datas = {0};
-                        get_local_server_status_datas(&datas);
-
-                        int act = policy_stand_alone_manager(datas.server_status, datas.have_virtual_ip, 1);
-                        if (act == NOLINK_ACT_DO_NOTING) {
-                            // do nothing
-                        } else if (act == NOLINK_ACT_TAKEOVER) {
-                            if (!server_resources_takeover_status) {
-                                take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
-                                server_resources_takeover_status = true;
-                                P2FILE("*****************************\n");
-                                P2FILE("* server take over resource *\n");
-                                P2FILE("*****************************\n");
-                            } else {
-                                server_resources_takeover_status = true;
-                                P2FILE("*************************************\n");
-                                P2FILE("* server take over resource already *\n");
-                                P2FILE("*************************************\n");
-                            }
-
-                        } else {
-                            // release
-                            if (!server_resources_takeover_status) {
-                                server_resources_takeover_status = false;
-                                P2FILE("***********************************\n");
-                                P2FILE("* server release resource already *\n");
-                                P2FILE("***********************************\n");
-                            } else {
-                                release_resources(virtual_ip_with_mask, ethernet_name);
-                                server_resources_takeover_status = false;
-                                P2FILE("***************************\n");
-                                P2FILE("* server release resource *\n");
-                                P2FILE("***************************\n");
-                            }
+                        // 如果发现 manual_switch_toggle 被置true，说明要手动切换，故设置故障
+                        if (manual_switch_toggle) {
+                            trouble = true;
                         }
 
-                        close(cfd);
-                        break;
-#pragma endregion server_recv_timeout
-                    } else {
-#pragma region server_recv      // server 正常收到从client来的数据
-                        bzero(buf, BUFSIZ);
-                        n = Read(cfd, buf, BUFSIZ);
-                        P2FILE("-------------\n");
-                        P2FILE("read num %d\n", n);
-                        P2FILE("-------------\n");
+                        // 在正常通信过程中，如果在deadtime时间内未收到客户端发来的消息，便认为客户端死亡，接管资源
+                        FD_ZERO(&set);
+                        FD_SET(cfd, &set);
+                        bzero(&tv, sizeof(struct timeval));
+                        tv.tv_sec = deadtime;
+                        ret = select(cfd + 1, &set, NULL, NULL, &tv);
 
-                        if (n == 0) {
-#pragma region client_closed_connect        // server发现client关闭了连接
-                            // 如果客户端关闭的连接，也接管资源
-                            P2FILE("-------------------------\n");
-                            P2FILE("| client close connect! |\n");
-                            P2FILE("-------------------------\n");
+                        if (ret == -1) {
+                            close(cfd);
+                            break;
+                        } else if (ret == 0) {
+#pragma region server_recv_timeout      // server等待从client来的信息超时
+                            P2FILE("time out\n");
                             SERVER_STATUS_DATAS datas = {0};
                             get_local_server_status_datas(&datas);
 
@@ -572,45 +579,118 @@ int start_by_server_mode(void) {
                                     P2FILE("***************************\n");
                                 }
                             }
+
                             close(cfd);
                             break;
+#pragma endregion server_recv_timeout
+                        } else {
+#pragma region server_recv      // server 正常收到从client来的数据
+                            bzero(buf, BUFSIZ);
+                            n = Read(cfd, buf, BUFSIZ);
+                            P2FILE("-------------\n");
+                            P2FILE("read num %d\n", n);
+                            P2FILE("-------------\n");
+
+                            if (n == 0) {
+                                if (trouble)
+                                    break;
+#pragma region client_closed_connect        // server发现client关闭了连接
+                                // 如果客户端关闭的连接，也接管资源
+                                P2FILE("-------------------------\n");
+                                P2FILE("| client close connect! |\n");
+                                P2FILE("-------------------------\n");
+                                SERVER_STATUS_DATAS datas = {0};
+                                get_local_server_status_datas(&datas);
+
+                                int act = policy_stand_alone_manager(datas.server_status, datas.have_virtual_ip, 1);
+                                if (act == NOLINK_ACT_DO_NOTING) {
+                                    // do nothing
+                                } else if (act == NOLINK_ACT_TAKEOVER) {
+                                    if (!server_resources_takeover_status) {
+                                        take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
+                                        server_resources_takeover_status = true;
+                                        P2FILE("*****************************\n");
+                                        P2FILE("* server take over resource *\n");
+                                        P2FILE("*****************************\n");
+                                    } else {
+                                        server_resources_takeover_status = true;
+                                        P2FILE("*************************************\n");
+                                        P2FILE("* server take over resource already *\n");
+                                        P2FILE("*************************************\n");
+                                    }
+
+                                } else {
+                                    // release
+                                    if (!server_resources_takeover_status) {
+                                        server_resources_takeover_status = false;
+                                        P2FILE("***********************************\n");
+                                        P2FILE("* server release resource already *\n");
+                                        P2FILE("***********************************\n");
+                                    } else {
+                                        release_resources(virtual_ip_with_mask, ethernet_name);
+                                        server_resources_takeover_status = false;
+                                        P2FILE("***************************\n");
+                                        P2FILE("* server release resource *\n");
+                                        P2FILE("***************************\n");
+                                    }
+                                }
+                                close(cfd);
+                                break;
 #pragma endregion client_closed_connect
-                        } else if (n == -1) {
-                            P2FILE("read error : %s\n", strerror(errno));
-                            close(cfd);
-                            break;
-                        }
+                            } else if (n == -1) {
+                                P2FILE("read error : %s\n", strerror(errno));
+                                close(cfd);
+                                break;
+                            }
 
-                        // 服务端开始处理收到的数据
-                        TRANS_DATA *next_send_data;
-                        // 1. 反序列化数据
-                        unsigned char *parsed_buf;
-                        std::string sbuf;
-                        sbuf.assign(buf, n);
-                        parse_telegram(sbuf, n, (void **) (&parsed_buf));
+                            // 服务端开始处理收到的数据
+                            TRANS_DATA *next_send_data;
+                            // 1. 反序列化数据
+                            unsigned char *parsed_buf;
+                            std::string sbuf;
+                            sbuf.assign(buf, n);
+                            parse_telegram(sbuf, n, (void **) (&parsed_buf));
 
-                        // 2. 根据收到的数据生成下次要发送的数据
-                        trans_data_generator(parsed_buf, (void **) (&next_send_data));
-                        free(parsed_buf);
+                            if (((TRANS_DATA*)parsed_buf)->manual_switch.toggle) {
+                                trouble = true;
 
-                        // 3. 序列化数据
-                        std::string serialized_data;
-                        size_t serialized_data_size;
-                        make_telegram(next_send_data, serialized_data, &serialized_data_size);
+                                if (((TRANS_DATA*)parsed_buf)->manual_switch.take_or_release == RELEASE_VIP) {
+                                    release_resources(virtual_ip_with_mask, ethernet_name);
+                                    server_resources_takeover_status = false;
+                                } else {
+                                    take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
+                                    server_resources_takeover_status = true;
+                                }
 
-                        // 4. 发送数据
-                        n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
-                        // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
-                        if (n == -1) {
-                            P2FILE("client close connect, write error: %s\n", strerror(errno));
-                            close(cfd);
-                            break;
-                        }
+                            }
 
-                        P2FILE("----------------------------------------\n");
-                        P2FILE("| server send %d bytes datas to client |\n", n);
-                        P2FILE("----------------------------------------\n");
+                            // 2. 根据收到的数据生成下次要发送的数据
+                            trans_data_generator(parsed_buf, (void **) (&next_send_data));
+                            free(parsed_buf);
+
+                            // 3. 序列化数据
+                            std::string serialized_data;
+                            size_t serialized_data_size;
+                            make_telegram(next_send_data, serialized_data, &serialized_data_size);
+
+                            // 4. 发送数据
+                            n = Write(cfd, (void *) serialized_data.c_str(), serialized_data_size);
+                            // 当n=-1的时候，就是发送出错了  不处理此错误，client直接会超时处理
+                            if (n == -1) {
+                                P2FILE("client close connect, write error: %s\n", strerror(errno));
+                                close(cfd);
+                                break;
+                            }
+
+                            P2FILE("----------------------------------------\n");
+                            P2FILE("| server send %d bytes datas to client |\n", n);
+                            P2FILE("----------------------------------------\n");
 #pragma endregion server_recv
+                        }
+                    } else {
+                        P2FILE("Generated faults manually\n");
+                        P2FILE("sleep %d seconds\n", keepalive);
+                        sleep(keepalive);
                     }
 
                 }
@@ -634,6 +714,8 @@ int start_by_server_mode(void) {
  * 手动切换的线程
  */
 void *manual_switch(void *) {
+
+#if 0
     int sfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len;
@@ -667,6 +749,47 @@ void *manual_switch(void *) {
         }
 
     }
+#endif
+
+    while (true) {
+        // 此端为接收端，故应以read方式打开fifo
+
+        int fd = open(FIFO_NAME, O_RDONLY);
+
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(fd, &set);
+
+        while (true) {
+            int ret = select(fd + 1, &set, NULL, NULL, NULL);
+
+            if (ret > 0) {
+                char buf[1024] = {0};
+                int read_bytes = read(fd, buf, 1024);
+
+                if (read_bytes == 0) {
+                    close(fd);
+                    break;
+                }
+
+                if (strcmp(buf, "takeover") == 0) {
+                    take_over_resources(virtual_ip_with_mask, ethernet_name, eth_num);
+                    manual_switch_toggle = true;
+                    manual_switch_action = RELEASE_VIP;
+                } else if (strcmp(buf, "standby") == 0) {
+                    release_resources(virtual_ip_with_mask, ethernet_name);
+                    manual_switch_toggle = true;
+                    manual_switch_action = TAKE_OVER_VIP;
+                } else {
+                    // do nothing
+                }
+
+            } else {
+                break;
+            }
+        }
+
+    }
 
     return NULL;
 }
@@ -677,15 +800,27 @@ int main(int argc, char *argv[]) {
     char mode[20];
     bool b_mode_set = false;
 
-    bzero(mode, 20);
+    int ret = 0;
 
+    bzero(mode, 20);
 
     // 忽略此信号，进程不终止
     signal(SIGPIPE, SIG_IGN);
 
-#pragma region set_log_path
-//    set_plug_log_path_and_prefix("/var/log", "ha-log");
-#pragma endregion set_log_path
+#pragma region create_fifo_file
+
+    // 判断fifo文件是否已存在
+    if (access(FIFO_NAME, F_OK) == -1) {
+        // 不存在则创建
+        ret = mkfifo(FIFO_NAME, 0666);
+
+        if (ret == -1) {
+            perror("mkfifo error");
+            return -1;
+        }
+    }
+
+#pragma endregion create_fifo_file
 
 #pragma region write_pidfile
     // 写pid到/var/run/infosec-heartbeat.pid
@@ -778,7 +913,7 @@ int main(int argc, char *argv[]) {
 #pragma region start_thread
 
     pthread_t manual_switch_tid, get_local_status_tid;
-    int ret = pthread_create(&manual_switch_tid, NULL, manual_switch, NULL);
+    ret = pthread_create(&manual_switch_tid, NULL, manual_switch, NULL);
     if (ret != 0) {
         perror("manual_switch pthread_create error");
         return -1;

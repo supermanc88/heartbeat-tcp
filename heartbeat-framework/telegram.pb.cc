@@ -15,9 +15,10 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DataCollection_telegram_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ManualSwitch_telegram_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ServerStatusDatas_telegram_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TransActionData_telegram_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_TransData_telegram_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_telegram_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_TransData_telegram_2eproto;
 class TransActionDataDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TransActionData> _instance;
@@ -30,6 +31,10 @@ class DataCollectionDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<DataCollection> _instance;
 } _DataCollection_default_instance_;
+class ManualSwitchDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ManualSwitch> _instance;
+} _ManualSwitch_default_instance_;
 class TransDataDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TransData> _instance;
@@ -54,6 +59,20 @@ static void InitDefaultsscc_info_DataCollection_telegram_2eproto() {
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DataCollection_telegram_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_DataCollection_telegram_2eproto}, {}};
+
+static void InitDefaultsscc_info_ManualSwitch_telegram_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_ManualSwitch_default_instance_;
+    new (ptr) ::ManualSwitch();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::ManualSwitch::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ManualSwitch_telegram_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ManualSwitch_telegram_2eproto}, {}};
 
 static void InitDefaultsscc_info_ServerStatusDatas_telegram_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -109,13 +128,14 @@ static void InitDefaultsscc_info_TransData_telegram_2eproto() {
   ::TransData::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_TransData_telegram_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_TransData_telegram_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_TransData_telegram_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_TransData_telegram_2eproto}, {
       &scc_info_TransActionData_telegram_2eproto.base,
       &scc_info_ServerStatusDatas_telegram_2eproto.base,
-      &scc_info_DataCollection_telegram_2eproto.base,}};
+      &scc_info_DataCollection_telegram_2eproto.base,
+      &scc_info_ManualSwitch_telegram_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_telegram_2eproto[5];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_telegram_2eproto[6];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_telegram_2eproto[2];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_telegram_2eproto = nullptr;
 
@@ -142,6 +162,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_telegram_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::DataCollection, size_),
   PROTOBUF_FIELD_OFFSET(::DataCollection, data_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::ManualSwitch, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::ManualSwitch, toggle_),
+  PROTOBUF_FIELD_OFFSET(::ManualSwitch, take_or_release_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::TransData, _internal_metadata_),
   ~0u,  // no _extensions_
   PROTOBUF_FIELD_OFFSET(::TransData, _oneof_case_[0]),
@@ -151,6 +178,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_telegram_2eproto::offsets[] PR
   offsetof(::TransDataDefaultTypeInternal, trans_action_data_),
   offsetof(::TransDataDefaultTypeInternal, server_status_datas_),
   offsetof(::TransDataDefaultTypeInternal, data_collection_),
+  PROTOBUF_FIELD_OFFSET(::TransData, manual_switch_),
   PROTOBUF_FIELD_OFFSET(::TransData, data_oneof_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Telegram, _internal_metadata_),
@@ -164,14 +192,16 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 0, -1, sizeof(::TransActionData)},
   { 7, -1, sizeof(::ServerStatusDatas)},
   { 14, -1, sizeof(::DataCollection)},
-  { 21, -1, sizeof(::TransData)},
-  { 32, -1, sizeof(::Telegram)},
+  { 21, -1, sizeof(::ManualSwitch)},
+  { 28, -1, sizeof(::TransData)},
+  { 40, -1, sizeof(::Telegram)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_TransActionData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ServerStatusDatas_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_DataCollection_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ManualSwitch_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_TransData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Telegram_default_instance_),
 };
@@ -181,24 +211,28 @@ const char descriptor_table_protodef_telegram_2eproto[] PROTOBUF_SECTION_VARIABL
   "ype\030\001 \001(\0162\013.ActionType\022\016\n\006result\030\002 \001(\010\"C"
   "\n\021ServerStatusDatas\022\025\n\rserver_status\030\001 \001"
   "(\010\022\027\n\017have_virtual_ip\030\002 \001(\010\",\n\016DataColle"
-  "ction\022\014\n\004size\030\001 \001(\005\022\014\n\004data\030\002 \001(\t\"\317\001\n\tTr"
-  "ansData\022\030\n\004type\030\001 \001(\0162\n.TransType\022\014\n\004siz"
-  "e\030\002 \001(\005\022-\n\021trans_action_data\030\003 \001(\0132\020.Tra"
-  "nsActionDataH\000\0221\n\023server_status_datas\030\004 "
-  "\001(\0132\022.ServerStatusDatasH\000\022*\n\017data_collec"
-  "tion\030\005 \001(\0132\017.DataCollectionH\000B\014\n\ndata_on"
-  "eof\"5\n\010Telegram\022\017\n\007version\030\001 \001(\t\022\030\n\004data"
-  "\030\002 \001(\0132\n.TransData*\206\001\n\tTransType\022\r\n\tHEAR"
-  "TBEAT\020\000\022\n\n\006ACTION\020\001\022\025\n\021GET_SERVER_STATUS"
-  "\020\002\022\014\n\010GET_DATA\020\003\022\020\n\014REPLY_ACTION\020\004\022\027\n\023RE"
-  "PLY_SERVER_STATUS\020\005\022\016\n\nREPLY_DATA\020\006*C\n\nA"
-  "ctionType\022\013\n\007GET_RES\020\000\022\013\n\007GOT_RES\020\001\022\014\n\010F"
-  "REE_RES\020\002\022\r\n\tFREED_RES\020\003b\006proto3"
+  "ction\022\014\n\004size\030\001 \001(\005\022\014\n\004data\030\002 \001(\t\"7\n\014Man"
+  "ualSwitch\022\016\n\006toggle\030\001 \001(\010\022\027\n\017take_or_rel"
+  "ease\030\002 \001(\005\"\365\001\n\tTransData\022\030\n\004type\030\001 \001(\0162\n"
+  ".TransType\022\014\n\004size\030\002 \001(\005\022-\n\021trans_action"
+  "_data\030\003 \001(\0132\020.TransActionDataH\000\0221\n\023serve"
+  "r_status_datas\030\004 \001(\0132\022.ServerStatusDatas"
+  "H\000\022*\n\017data_collection\030\005 \001(\0132\017.DataCollec"
+  "tionH\000\022$\n\rmanual_switch\030\006 \001(\0132\r.ManualSw"
+  "itchB\014\n\ndata_oneof\"5\n\010Telegram\022\017\n\007versio"
+  "n\030\001 \001(\t\022\030\n\004data\030\002 \001(\0132\n.TransData*\206\001\n\tTr"
+  "ansType\022\r\n\tHEARTBEAT\020\000\022\n\n\006ACTION\020\001\022\025\n\021GE"
+  "T_SERVER_STATUS\020\002\022\014\n\010GET_DATA\020\003\022\020\n\014REPLY"
+  "_ACTION\020\004\022\027\n\023REPLY_SERVER_STATUS\020\005\022\016\n\nRE"
+  "PLY_DATA\020\006*C\n\nActionType\022\013\n\007GET_RES\020\000\022\013\n"
+  "\007GOT_RES\020\001\022\014\n\010FREE_RES\020\002\022\r\n\tFREED_RES\020\003b"
+  "\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_telegram_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_telegram_2eproto_sccs[5] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_telegram_2eproto_sccs[6] = {
   &scc_info_DataCollection_telegram_2eproto.base,
+  &scc_info_ManualSwitch_telegram_2eproto.base,
   &scc_info_ServerStatusDatas_telegram_2eproto.base,
   &scc_info_Telegram_telegram_2eproto.base,
   &scc_info_TransActionData_telegram_2eproto.base,
@@ -206,10 +240,10 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tel
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_telegram_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_telegram_2eproto = {
-  false, false, descriptor_table_protodef_telegram_2eproto, "telegram.proto", 672,
-  &descriptor_table_telegram_2eproto_once, descriptor_table_telegram_2eproto_sccs, descriptor_table_telegram_2eproto_deps, 5, 0,
+  false, false, descriptor_table_protodef_telegram_2eproto, "telegram.proto", 767,
+  &descriptor_table_telegram_2eproto_once, descriptor_table_telegram_2eproto_sccs, descriptor_table_telegram_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_telegram_2eproto::offsets,
-  file_level_metadata_telegram_2eproto, 5, file_level_enum_descriptors_telegram_2eproto, file_level_service_descriptors_telegram_2eproto,
+  file_level_metadata_telegram_2eproto, 6, file_level_enum_descriptors_telegram_2eproto, file_level_service_descriptors_telegram_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -945,6 +979,235 @@ void DataCollection::InternalSwap(DataCollection* other) {
 
 // ===================================================================
 
+void ManualSwitch::InitAsDefaultInstance() {
+}
+class ManualSwitch::_Internal {
+ public:
+};
+
+ManualSwitch::ManualSwitch(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:ManualSwitch)
+}
+ManualSwitch::ManualSwitch(const ManualSwitch& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&toggle_, &from.toggle_,
+    static_cast<size_t>(reinterpret_cast<char*>(&take_or_release_) -
+    reinterpret_cast<char*>(&toggle_)) + sizeof(take_or_release_));
+  // @@protoc_insertion_point(copy_constructor:ManualSwitch)
+}
+
+void ManualSwitch::SharedCtor() {
+  ::memset(&toggle_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&take_or_release_) -
+      reinterpret_cast<char*>(&toggle_)) + sizeof(take_or_release_));
+}
+
+ManualSwitch::~ManualSwitch() {
+  // @@protoc_insertion_point(destructor:ManualSwitch)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void ManualSwitch::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void ManualSwitch::ArenaDtor(void* object) {
+  ManualSwitch* _this = reinterpret_cast< ManualSwitch* >(object);
+  (void)_this;
+}
+void ManualSwitch::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void ManualSwitch::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ManualSwitch& ManualSwitch::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_ManualSwitch_telegram_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void ManualSwitch::Clear() {
+// @@protoc_insertion_point(message_clear_start:ManualSwitch)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&toggle_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&take_or_release_) -
+      reinterpret_cast<char*>(&toggle_)) + sizeof(take_or_release_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* ManualSwitch::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // bool toggle = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          toggle_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 take_or_release = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          take_or_release_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* ManualSwitch::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:ManualSwitch)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // bool toggle = 1;
+  if (this->toggle() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(1, this->_internal_toggle(), target);
+  }
+
+  // int32 take_or_release = 2;
+  if (this->take_or_release() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_take_or_release(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:ManualSwitch)
+  return target;
+}
+
+size_t ManualSwitch::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:ManualSwitch)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bool toggle = 1;
+  if (this->toggle() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // int32 take_or_release = 2;
+  if (this->take_or_release() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_take_or_release());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ManualSwitch::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:ManualSwitch)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ManualSwitch* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<ManualSwitch>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:ManualSwitch)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:ManualSwitch)
+    MergeFrom(*source);
+  }
+}
+
+void ManualSwitch::MergeFrom(const ManualSwitch& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:ManualSwitch)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.toggle() != 0) {
+    _internal_set_toggle(from._internal_toggle());
+  }
+  if (from.take_or_release() != 0) {
+    _internal_set_take_or_release(from._internal_take_or_release());
+  }
+}
+
+void ManualSwitch::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:ManualSwitch)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ManualSwitch::CopyFrom(const ManualSwitch& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:ManualSwitch)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ManualSwitch::IsInitialized() const {
+  return true;
+}
+
+void ManualSwitch::InternalSwap(ManualSwitch* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ManualSwitch, take_or_release_)
+      + sizeof(ManualSwitch::take_or_release_)
+      - PROTOBUF_FIELD_OFFSET(ManualSwitch, toggle_)>(
+          reinterpret_cast<char*>(&toggle_),
+          reinterpret_cast<char*>(&other->toggle_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata ManualSwitch::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 void TransData::InitAsDefaultInstance() {
   ::_TransData_default_instance_.trans_action_data_ = const_cast< ::TransActionData*>(
       ::TransActionData::internal_default_instance());
@@ -952,12 +1215,15 @@ void TransData::InitAsDefaultInstance() {
       ::ServerStatusDatas::internal_default_instance());
   ::_TransData_default_instance_.data_collection_ = const_cast< ::DataCollection*>(
       ::DataCollection::internal_default_instance());
+  ::_TransData_default_instance_._instance.get_mutable()->manual_switch_ = const_cast< ::ManualSwitch*>(
+      ::ManualSwitch::internal_default_instance());
 }
 class TransData::_Internal {
  public:
   static const ::TransActionData& trans_action_data(const TransData* msg);
   static const ::ServerStatusDatas& server_status_datas(const TransData* msg);
   static const ::DataCollection& data_collection(const TransData* msg);
+  static const ::ManualSwitch& manual_switch(const TransData* msg);
 };
 
 const ::TransActionData&
@@ -971,6 +1237,10 @@ TransData::_Internal::server_status_datas(const TransData* msg) {
 const ::DataCollection&
 TransData::_Internal::data_collection(const TransData* msg) {
   return *msg->data_oneof_.data_collection_;
+}
+const ::ManualSwitch&
+TransData::_Internal::manual_switch(const TransData* msg) {
+  return *msg->manual_switch_;
 }
 void TransData::set_allocated_trans_action_data(::TransActionData* trans_action_data) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
@@ -1026,6 +1296,11 @@ TransData::TransData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 TransData::TransData(const TransData& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_manual_switch()) {
+    manual_switch_ = new ::ManualSwitch(*from.manual_switch_);
+  } else {
+    manual_switch_ = nullptr;
+  }
   ::memcpy(&type_, &from.type_,
     static_cast<size_t>(reinterpret_cast<char*>(&size_) -
     reinterpret_cast<char*>(&type_)) + sizeof(size_));
@@ -1052,9 +1327,9 @@ TransData::TransData(const TransData& from)
 
 void TransData::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_TransData_telegram_2eproto.base);
-  ::memset(&type_, 0, static_cast<size_t>(
+  ::memset(&manual_switch_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&size_) -
-      reinterpret_cast<char*>(&type_)) + sizeof(size_));
+      reinterpret_cast<char*>(&manual_switch_)) + sizeof(size_));
   clear_has_data_oneof();
 }
 
@@ -1066,6 +1341,7 @@ TransData::~TransData() {
 
 void TransData::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete manual_switch_;
   if (has_data_oneof()) {
     clear_data_oneof();
   }
@@ -1121,6 +1397,10 @@ void TransData::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  if (GetArena() == nullptr && manual_switch_ != nullptr) {
+    delete manual_switch_;
+  }
+  manual_switch_ = nullptr;
   ::memset(&type_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&size_) -
       reinterpret_cast<char*>(&type_)) + sizeof(size_));
@@ -1169,6 +1449,13 @@ const char* TransData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_data_collection(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .ManualSwitch manual_switch = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr = ctx->ParseMessage(_internal_mutable_manual_switch(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -1237,6 +1524,14 @@ failure:
         5, _Internal::data_collection(this), target, stream);
   }
 
+  // .ManualSwitch manual_switch = 6;
+  if (this->has_manual_switch()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        6, _Internal::manual_switch(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1252,6 +1547,13 @@ size_t TransData::ByteSizeLong() const {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // .ManualSwitch manual_switch = 6;
+  if (this->has_manual_switch()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *manual_switch_);
+  }
 
   // .TransType type = 1;
   if (this->type() != 0) {
@@ -1323,6 +1625,9 @@ void TransData::MergeFrom(const TransData& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.has_manual_switch()) {
+    _internal_mutable_manual_switch()->::ManualSwitch::MergeFrom(from._internal_manual_switch());
+  }
   if (from.type() != 0) {
     _internal_set_type(from._internal_type());
   }
@@ -1372,9 +1677,9 @@ void TransData::InternalSwap(TransData* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(TransData, size_)
       + sizeof(TransData::size_)
-      - PROTOBUF_FIELD_OFFSET(TransData, type_)>(
-          reinterpret_cast<char*>(&type_),
-          reinterpret_cast<char*>(&other->type_));
+      - PROTOBUF_FIELD_OFFSET(TransData, manual_switch_)>(
+          reinterpret_cast<char*>(&manual_switch_),
+          reinterpret_cast<char*>(&other->manual_switch_));
   swap(data_oneof_, other->data_oneof_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
@@ -1647,6 +1952,9 @@ template<> PROTOBUF_NOINLINE ::ServerStatusDatas* Arena::CreateMaybeMessage< ::S
 }
 template<> PROTOBUF_NOINLINE ::DataCollection* Arena::CreateMaybeMessage< ::DataCollection >(Arena* arena) {
   return Arena::CreateMessageInternal< ::DataCollection >(arena);
+}
+template<> PROTOBUF_NOINLINE ::ManualSwitch* Arena::CreateMaybeMessage< ::ManualSwitch >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::ManualSwitch >(arena);
 }
 template<> PROTOBUF_NOINLINE ::TransData* Arena::CreateMaybeMessage< ::TransData >(Arena* arena) {
   return Arena::CreateMessageInternal< ::TransData >(arena);

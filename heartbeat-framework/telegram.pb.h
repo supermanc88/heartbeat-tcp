@@ -48,7 +48,7 @@ struct TableStruct_telegram_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,6 +58,9 @@ extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table
 class DataCollection;
 class DataCollectionDefaultTypeInternal;
 extern DataCollectionDefaultTypeInternal _DataCollection_default_instance_;
+class ManualSwitch;
+class ManualSwitchDefaultTypeInternal;
+extern ManualSwitchDefaultTypeInternal _ManualSwitch_default_instance_;
 class ServerStatusDatas;
 class ServerStatusDatasDefaultTypeInternal;
 extern ServerStatusDatasDefaultTypeInternal _ServerStatusDatas_default_instance_;
@@ -72,6 +75,7 @@ class TransDataDefaultTypeInternal;
 extern TransDataDefaultTypeInternal _TransData_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::DataCollection* Arena::CreateMaybeMessage<::DataCollection>(Arena*);
+template<> ::ManualSwitch* Arena::CreateMaybeMessage<::ManualSwitch>(Arena*);
 template<> ::ServerStatusDatas* Arena::CreateMaybeMessage<::ServerStatusDatas>(Arena*);
 template<> ::Telegram* Arena::CreateMaybeMessage<::Telegram>(Arena*);
 template<> ::TransActionData* Arena::CreateMaybeMessage<::TransActionData>(Arena*);
@@ -597,6 +601,154 @@ class DataCollection PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class ManualSwitch PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:ManualSwitch) */ {
+ public:
+  inline ManualSwitch() : ManualSwitch(nullptr) {};
+  virtual ~ManualSwitch();
+
+  ManualSwitch(const ManualSwitch& from);
+  ManualSwitch(ManualSwitch&& from) noexcept
+    : ManualSwitch() {
+    *this = ::std::move(from);
+  }
+
+  inline ManualSwitch& operator=(const ManualSwitch& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ManualSwitch& operator=(ManualSwitch&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const ManualSwitch& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ManualSwitch* internal_default_instance() {
+    return reinterpret_cast<const ManualSwitch*>(
+               &_ManualSwitch_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(ManualSwitch& a, ManualSwitch& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ManualSwitch* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ManualSwitch* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ManualSwitch* New() const final {
+    return CreateMaybeMessage<ManualSwitch>(nullptr);
+  }
+
+  ManualSwitch* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ManualSwitch>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const ManualSwitch& from);
+  void MergeFrom(const ManualSwitch& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ManualSwitch* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "ManualSwitch";
+  }
+  protected:
+  explicit ManualSwitch(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_telegram_2eproto);
+    return ::descriptor_table_telegram_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kToggleFieldNumber = 1,
+    kTakeOrReleaseFieldNumber = 2,
+  };
+  // bool toggle = 1;
+  void clear_toggle();
+  bool toggle() const;
+  void set_toggle(bool value);
+  private:
+  bool _internal_toggle() const;
+  void _internal_set_toggle(bool value);
+  public:
+
+  // int32 take_or_release = 2;
+  void clear_take_or_release();
+  ::PROTOBUF_NAMESPACE_ID::int32 take_or_release() const;
+  void set_take_or_release(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_take_or_release() const;
+  void _internal_set_take_or_release(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:ManualSwitch)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  bool toggle_;
+  ::PROTOBUF_NAMESPACE_ID::int32 take_or_release_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_telegram_2eproto;
+};
+// -------------------------------------------------------------------
+
 class TransData PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:TransData) */ {
  public:
@@ -646,7 +798,7 @@ class TransData PROTOBUF_FINAL :
                &_TransData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(TransData& a, TransData& b) {
     a.Swap(&b);
@@ -717,12 +869,31 @@ class TransData PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kManualSwitchFieldNumber = 6,
     kTypeFieldNumber = 1,
     kSizeFieldNumber = 2,
     kTransActionDataFieldNumber = 3,
     kServerStatusDatasFieldNumber = 4,
     kDataCollectionFieldNumber = 5,
   };
+  // .ManualSwitch manual_switch = 6;
+  bool has_manual_switch() const;
+  private:
+  bool _internal_has_manual_switch() const;
+  public:
+  void clear_manual_switch();
+  const ::ManualSwitch& manual_switch() const;
+  ::ManualSwitch* release_manual_switch();
+  ::ManualSwitch* mutable_manual_switch();
+  void set_allocated_manual_switch(::ManualSwitch* manual_switch);
+  private:
+  const ::ManualSwitch& _internal_manual_switch() const;
+  ::ManualSwitch* _internal_mutable_manual_switch();
+  public:
+  void unsafe_arena_set_allocated_manual_switch(
+      ::ManualSwitch* manual_switch);
+  ::ManualSwitch* unsafe_arena_release_manual_switch();
+
   // .TransType type = 1;
   void clear_type();
   ::TransType type() const;
@@ -810,6 +981,7 @@ class TransData PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::ManualSwitch* manual_switch_;
   int type_;
   ::PROTOBUF_NAMESPACE_ID::int32 size_;
   union DataOneofUnion {
@@ -867,7 +1039,7 @@ class Telegram PROTOBUF_FINAL :
                &_Telegram_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(Telegram& a, Telegram& b) {
     a.Swap(&b);
@@ -1198,6 +1370,50 @@ inline void DataCollection::unsafe_arena_set_allocated_data(
 
 // -------------------------------------------------------------------
 
+// ManualSwitch
+
+// bool toggle = 1;
+inline void ManualSwitch::clear_toggle() {
+  toggle_ = false;
+}
+inline bool ManualSwitch::_internal_toggle() const {
+  return toggle_;
+}
+inline bool ManualSwitch::toggle() const {
+  // @@protoc_insertion_point(field_get:ManualSwitch.toggle)
+  return _internal_toggle();
+}
+inline void ManualSwitch::_internal_set_toggle(bool value) {
+  
+  toggle_ = value;
+}
+inline void ManualSwitch::set_toggle(bool value) {
+  _internal_set_toggle(value);
+  // @@protoc_insertion_point(field_set:ManualSwitch.toggle)
+}
+
+// int32 take_or_release = 2;
+inline void ManualSwitch::clear_take_or_release() {
+  take_or_release_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ManualSwitch::_internal_take_or_release() const {
+  return take_or_release_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ManualSwitch::take_or_release() const {
+  // @@protoc_insertion_point(field_get:ManualSwitch.take_or_release)
+  return _internal_take_or_release();
+}
+inline void ManualSwitch::_internal_set_take_or_release(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  take_or_release_ = value;
+}
+inline void ManualSwitch::set_take_or_release(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_take_or_release(value);
+  // @@protoc_insertion_point(field_set:ManualSwitch.take_or_release)
+}
+
+// -------------------------------------------------------------------
+
 // TransData
 
 // .TransType type = 1;
@@ -1459,6 +1675,87 @@ inline ::DataCollection* TransData::mutable_data_collection() {
   return _internal_mutable_data_collection();
 }
 
+// .ManualSwitch manual_switch = 6;
+inline bool TransData::_internal_has_manual_switch() const {
+  return this != internal_default_instance() && manual_switch_ != nullptr;
+}
+inline bool TransData::has_manual_switch() const {
+  return _internal_has_manual_switch();
+}
+inline void TransData::clear_manual_switch() {
+  if (GetArena() == nullptr && manual_switch_ != nullptr) {
+    delete manual_switch_;
+  }
+  manual_switch_ = nullptr;
+}
+inline const ::ManualSwitch& TransData::_internal_manual_switch() const {
+  const ::ManualSwitch* p = manual_switch_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::ManualSwitch*>(
+      &::_ManualSwitch_default_instance_);
+}
+inline const ::ManualSwitch& TransData::manual_switch() const {
+  // @@protoc_insertion_point(field_get:TransData.manual_switch)
+  return _internal_manual_switch();
+}
+inline void TransData::unsafe_arena_set_allocated_manual_switch(
+    ::ManualSwitch* manual_switch) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(manual_switch_);
+  }
+  manual_switch_ = manual_switch;
+  if (manual_switch) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:TransData.manual_switch)
+}
+inline ::ManualSwitch* TransData::release_manual_switch() {
+  auto temp = unsafe_arena_release_manual_switch();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::ManualSwitch* TransData::unsafe_arena_release_manual_switch() {
+  // @@protoc_insertion_point(field_release:TransData.manual_switch)
+  
+  ::ManualSwitch* temp = manual_switch_;
+  manual_switch_ = nullptr;
+  return temp;
+}
+inline ::ManualSwitch* TransData::_internal_mutable_manual_switch() {
+  
+  if (manual_switch_ == nullptr) {
+    auto* p = CreateMaybeMessage<::ManualSwitch>(GetArena());
+    manual_switch_ = p;
+  }
+  return manual_switch_;
+}
+inline ::ManualSwitch* TransData::mutable_manual_switch() {
+  // @@protoc_insertion_point(field_mutable:TransData.manual_switch)
+  return _internal_mutable_manual_switch();
+}
+inline void TransData::set_allocated_manual_switch(::ManualSwitch* manual_switch) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete manual_switch_;
+  }
+  if (manual_switch) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(manual_switch);
+    if (message_arena != submessage_arena) {
+      manual_switch = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, manual_switch, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  manual_switch_ = manual_switch;
+  // @@protoc_insertion_point(field_set_allocated:TransData.manual_switch)
+}
+
 inline bool TransData::has_data_oneof() const {
   return data_oneof_case() != DATA_ONEOF_NOT_SET;
 }
@@ -1637,6 +1934,8 @@ inline void Telegram::set_allocated_data(::TransData* data) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
