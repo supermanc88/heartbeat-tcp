@@ -10,7 +10,7 @@ int connect_retry = 3;
 int ping_timeout = 1500;
 int ping_retry = 3;
 
-//0Îª²»¼ì²é£¬1Îª¼ì²é
+//0ä¸ºä¸æ£€æŸ¥ï¼Œ1ä¸ºæ£€æŸ¥
 int if_chk_detect_ret = 0;
 
 int detect_strLen = 0;
@@ -24,17 +24,17 @@ char b64_det_str_no_trash[FILEBUFFSIZE] = {0x00};
 int debug_mode = 0;
 #define IF_DEBUG if(0 != debug_mode)
 
-//0 Îª²»¿ªÆô¼ì²éÖ÷»ú·şÎñ£¬1Îª¿ªÆô¼ì²éÖ÷»ú·şÎñ£¬ 
-//Ä¬ÈÏÉèÖÃÎª²»ÆôÓÃ¼ì²éÊÇÎªÁË·ÀÖ¹Ö÷»ú·şÎñ°ó¶¨ÔÚĞéIPÉÏ¡£
+//0 ä¸ºä¸å¼€å¯æ£€æŸ¥ä¸»æœºæœåŠ¡ï¼Œ1ä¸ºå¼€å¯æ£€æŸ¥ä¸»æœºæœåŠ¡ï¼Œ 
+//é»˜è®¤è®¾ç½®ä¸ºä¸å¯ç”¨æ£€æŸ¥æ˜¯ä¸ºäº†é˜²æ­¢ä¸»æœºæœåŠ¡ç»‘å®šåœ¨è™šIPä¸Šã€‚
 
-//Èç¹ûmon_modeÎª0£¬Ôò(¼à¿Ø³ÌĞò½öÔÚHAÖ÷»úÔËĞĞ£¬Ö÷»ú¼à¿Ø±¾Éí·şÎñ£¬²»Õı³£ÔòÇĞ»»£¬Õı³£ÔòÍùÖ÷»ú»ØÇĞ)
-//Èç¹ûmon_modeÎª1£¬Ôò(Èç¹ûĞéIP²»ÔÚ±¾»úÔò¼ì²âÓĞĞéIPµÄ»úÆ÷·şÎñ×´Ì¬£¬Èç¹ûÔÚ±¾»úÔòÊ²Ã´¶¼²»×ö)
-//Èç¹ûmon_modeÎª2£¬Ôò(±¾»úÓĞĞéIP->±¾»ú·şÎñ²»Õı³£->¶Ô¶Ë·şÎñÕı³£->ÇĞ»»¹ıÈ¥)
+//å¦‚æœmon_modeä¸º0ï¼Œåˆ™(ç›‘æ§ç¨‹åºä»…åœ¨HAä¸»æœºè¿è¡Œï¼Œä¸»æœºç›‘æ§æœ¬èº«æœåŠ¡ï¼Œä¸æ­£å¸¸åˆ™åˆ‡æ¢ï¼Œæ­£å¸¸åˆ™å¾€ä¸»æœºå›åˆ‡)
+//å¦‚æœmon_modeä¸º1ï¼Œåˆ™(å¦‚æœè™šIPä¸åœ¨æœ¬æœºåˆ™æ£€æµ‹æœ‰è™šIPçš„æœºå™¨æœåŠ¡çŠ¶æ€ï¼Œå¦‚æœåœ¨æœ¬æœºåˆ™ä»€ä¹ˆéƒ½ä¸åš)
+//å¦‚æœmon_modeä¸º2ï¼Œåˆ™(æœ¬æœºæœ‰è™šIP->æœ¬æœºæœåŠ¡ä¸æ­£å¸¸->å¯¹ç«¯æœåŠ¡æ­£å¸¸->åˆ‡æ¢è¿‡å»)
 int mon_mode = 0;
 
 static int lock_fd = -1;
 
-//	¼ì²â·şÎñÁ¬½Ó¼°ÏìÓ¦
+//	æ£€æµ‹æœåŠ¡è¿æ¥åŠå“åº”
 int DetectService(char *IpAddr, int Port, int TimeOut)
 {
     int ret = 0;
@@ -62,24 +62,24 @@ int DetectService(char *IpAddr, int Port, int TimeOut)
     return 0;
 }
 
-//	»ñÈ¡·şÎñ×´Ì¬£¬Õı³£·µ»Ø0£¬²»Õı³£·µ»Ø·Ç0
+//	è·å–æœåŠ¡çŠ¶æ€ï¼Œæ­£å¸¸è¿”å›0ï¼Œä¸æ­£å¸¸è¿”å›é0
 int GetSrvStatus(char *RIP, char *VIP)
 {
     int Ret = 0;
     int ConnectCount = 0;
 
-    //½âÎöNetSignÅäÖÃÎÄ¼ş²¢¼ì²âÃ¿¸ö·şÎñÊÇ·ñÕı³£½«½á¹û´æÈëSrv_StatusÊı×é
+    //è§£æNetSigné…ç½®æ–‡ä»¶å¹¶æ£€æµ‹æ¯ä¸ªæœåŠ¡æ˜¯å¦æ­£å¸¸å°†ç»“æœå­˜å…¥Srv_Statusæ•°ç»„
     NodeIterator NodeIter;
     XmlDocument readingDoc;
 
-    //ÔØÈëxmlÎÄ¼ş
+    //è½½å…¥xmlæ–‡ä»¶
     bool ld = readingDoc.loadFromFile(SRV_CONF_PATH);
     if (false == ld) {
         LOGERROR("%s\n", "LOADXML_ERROR");
         return LOADXML_ERROR;
     }
 
-    //»ñÈ¡¸ù½Úµã
+    //è·å–æ ¹èŠ‚ç‚¹
     XmlNode *readingNode = readingDoc.findChild("service-config");
     if (NULL == readingNode) {
         LOGERROR("%s\n", "GET_ROOTNODE_ERROR");
@@ -91,19 +91,19 @@ int GetSrvStatus(char *RIP, char *VIP)
          NULL != serviceNode;
          serviceNode = readingNode->findNextChild("service", NodeIter)) {
 
-        //Ö±½Ó»ñÈ¡check-service
+        //ç›´æ¥è·å–check-service
         XmlNode *ifchksrvNode = serviceNode->findChild("checkService");
 
         if (NULL == ifchksrvNode || 0 == strcmp(ifchksrvNode->getString(), "true")) {
 
-            //»ñÈ¡serviceÃû³Æ
+            //è·å–serviceåç§°
             XmlAttribute *attr = serviceNode->findAttribute("name");
             if (attr == NULL) {
                 LOGERROR("%s\n", "GET_SRVNAME_ERROR");
                 return GET_SRVNAME;
             }
 
-            //Ö±½Ó»ñÈ¡service port
+            //ç›´æ¥è·å–service port
             XmlNode *portNode = serviceNode->findChild("port");
             if (portNode == NULL) {
                 LOGERROR("%s\n", "GET_PORTNODE_ERROR");
@@ -135,7 +135,7 @@ int GetSrvStatus(char *RIP, char *VIP)
 }
 
 
-//	´Óconf.iniÖĞ¶ÁÈ¡ÅäÖÃ²ÎÊı
+//	ä»conf.iniä¸­è¯»å–é…ç½®å‚æ•°
 int LoadMonSrvConf()
 {
     char Buff[FILEBUFFSIZE] = {0x00};
@@ -155,8 +155,8 @@ int LoadMonSrvConf()
         fgets(Buff, FILEBUFFSIZE, fp);
 
 
-        //ÕâÀïµ¥¶À¶Ôdetectstring´¦ÀíÊÇÒòÎªdetectstringÊÇBase64×Ö·û´®£¬
-        //µ±ÖĞ¿ÉÄÜº¬ÓĞ=ºÅ£¬ÓÃstrtok²»·½±ã´¦Àí¡£
+        //è¿™é‡Œå•ç‹¬å¯¹detectstringå¤„ç†æ˜¯å› ä¸ºdetectstringæ˜¯Base64å­—ç¬¦ä¸²ï¼Œ
+        //å½“ä¸­å¯èƒ½å«æœ‰=å·ï¼Œç”¨strtokä¸æ–¹ä¾¿å¤„ç†ã€‚
         if (0 == memcmp(Buff, "detectstring=", strlen("detectstring="))) {
             strcpy(base64_detect_string, strstr(Buff, "=") + 1);
 
@@ -207,7 +207,7 @@ int LoadMonSrvConf()
 
 int monitor_srv_init()
 {
-    //ÔØÈëÅäÖÃÎÄ¼ş
+    //è½½å…¥é…ç½®æ–‡ä»¶
     if (0 != LoadMonSrvConf()) {
         LOGERROR("%s\n", "LoadMonSrvIni err");
         goto EXIT;

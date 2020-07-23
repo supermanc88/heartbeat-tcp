@@ -1,16 +1,16 @@
 #include "MyLog.h"
 
-//	去除字符串首尾不可见字符
+//	鍘婚櫎瀛楃涓查灏句笉鍙瀛楃
 char * trim(char *str)
 {
 	int index=0,i=0;
 
-	//去除串首空格 
+	//鍘婚櫎涓查绌烘牸 
 	while(str[index]==' ') index++;
 	for(i=0; i<strlen(str)-index; i++) str[i] = str[i+index]; 
 	str[i]='\0';
 
-	//去除串尾空格 
+	//鍘婚櫎涓插熬绌烘牸 
 	index= strlen(str);
 	//while(index>0 && (str[index-1]==' '))  index--;
 	while(index>0 && ( 0x20 >= (unsigned char)str[index-1]))  

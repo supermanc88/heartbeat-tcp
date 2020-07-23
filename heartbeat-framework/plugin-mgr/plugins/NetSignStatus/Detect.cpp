@@ -292,14 +292,14 @@ int receiveTotalLen(int sockFd, int *ifRecv)
 
     clearMem((unsigned char *) tempbuf);
 
-    iRet = readn(sockFd, tempbuf, COMMLENGTHLEN + 1, TIMEOUT);/*¶Á»ØÍÏÀ­»úÍ·²¿*/
+    iRet = readn(sockFd, tempbuf, COMMLENGTHLEN + 1, TIMEOUT);/*è¯»å›žæ‹–æ‹‰æœºå¤´éƒ¨*/
 
     if (iRet > 0) {
         *ifRecv = 1;
     }
     if (iRet <= 0) return iRet;
 
-    iRet = atoi(tempbuf + 1);/*·µ»Ø±¨ÎÄµÄ×Ü³¤¶È*/
+    iRet = atoi(tempbuf + 1);/*è¿”å›žæŠ¥æ–‡çš„æ€»é•¿åº¦*/
 
     return iRet;
 
@@ -312,7 +312,7 @@ int receiveContent(int sockFd, int iSegmentLen, unsigned char *tmpBuffer, int *i
 
     clearMem(tmpBuffer);
 
-    iCurrentReceiveLen = readn(sockFd, (char *) tmpBuffer, iSegmentLen, TIMEOUT);/*¶Á»ØÂìÒÏÍ·²¿*/
+    iCurrentReceiveLen = readn(sockFd, (char *) tmpBuffer, iSegmentLen, TIMEOUT);/*è¯»å›žèš‚èšå¤´éƒ¨*/
 
     *iHaveReceiveLen += iCurrentReceiveLen;
 
@@ -337,12 +337,12 @@ int receiveTagAndLen(int sockFd, unsigned char *TAG, int *iSegmentLen, int *iHav
 
     clearMem((unsigned char *) tempbuf);
 
-    memcpy(tempbuf, tmpBuffer, TAGNAMELEN);/*´ÓtmpBufferÖÐ»ñÈ¡±êÊ¶*/
+    memcpy(tempbuf, tmpBuffer, TAGNAMELEN);/*ä»ŽtmpBufferä¸­èŽ·å–æ ‡è¯†*/
 
     *TAG = tempbuf[0];
 
 
-    memcpy(tempbuf, tmpBuffer + TAGNAMELEN + TAGCLASSLEN, COMMLENGTHLEN);/*´ÓtmpBufferÖÐ»ñÈ¡³¤¶È*/
+    memcpy(tempbuf, tmpBuffer + TAGNAMELEN + TAGCLASSLEN, COMMLENGTHLEN);/*ä»ŽtmpBufferä¸­èŽ·å–é•¿åº¦*/
 
     *iSegmentLen = atoi(tempbuf);
 
@@ -368,7 +368,7 @@ int handleResult(unsigned char TAG, char *tmpBuffer, int iReadLen, int handleTyp
                 *iResult = atoi(tmpBuffer);
                 break;
 
-                /*ÅÐ¶Ïresult,Èç¹ûÊ§°Ü£¬·µ»Ø,Èç¹ûresultÊ§°Ü£¬×öÊ§°Ü±ê¼Ç£¬·µ»Ø*/
+                /*åˆ¤æ–­result,å¦‚æžœå¤±è´¥ï¼Œè¿”å›ž,å¦‚æžœresultå¤±è´¥ï¼Œåšå¤±è´¥æ ‡è®°ï¼Œè¿”å›ž*/
             case TAG_ERROR_MESSAGE:
                 //fprintf(stdout,"[%s],recverrmsg:[%s]\n",info,tmpBuffer);
                 break;
@@ -425,7 +425,7 @@ int ParseReceive(int sockFd, char *debugInfo, char *retValue, void *lenOrMem, in
     //printf("iRecTotalLen = %d\n", iRecTotalLen );
 
     while (iRecSofarLen < iRecTotalLen) {
-        //½ÓÊÕtag±ê¼Ç¼°Ê£ÏÂµÄÄÚÈÝ²¿·Ö
+        //æŽ¥æ”¶tagæ ‡è®°åŠå‰©ä¸‹çš„å†…å®¹éƒ¨åˆ†
         iRet = receiveTagAndLen(sockFd, &TAG, &iRecCRSegLen, &iRecSofarLen);
         if (iRet < 0) {
             return Err_RecvDataFromServer;
@@ -516,7 +516,7 @@ int ParseReceive(int sockFd, char *debugInfo, char *retValue, void *lenOrMem, in
     return iReturnValue;
 }
 
-//	¼ì²âÁ¬½ÓÏìÓ¦
+//	æ£€æµ‹è¿žæŽ¥å“åº”
 int DetectResponse(int iSockfd, char *pDetectStr, int iDetectStrlen)
 {
 
@@ -541,7 +541,7 @@ int DetectResponse(int iSockfd, char *pDetectStr, int iDetectStrlen)
     return 0;
 }
 
-//	SocketÊÔÌ½·þÎñ
+//	Socketè¯•æŽ¢æœåŠ¡
 int DetectConnect(char *IpAddr, int Port, int TimeOut, int *Socket)
 {
     int ret = 0;
@@ -567,7 +567,7 @@ int DetectConnect(char *IpAddr, int Port, int TimeOut, int *Socket)
 
     bzero(&(serv_addr.sin_zero), 8);
 
-    //ÉèÖÃÎª·Ç×èÈûÄ£Ê½
+    //è®¾ç½®ä¸ºéžé˜»å¡žæ¨¡å¼
     flags = fcntl(sockfd, F_GETFL, 0);
     ret = fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
@@ -580,27 +580,27 @@ int DetectConnect(char *IpAddr, int Port, int TimeOut, int *Socket)
     FD_SET(sockfd, &fds);
     FD_SET(sockfd, &rfds);
 
-    timeout.tv_sec = TimeOut / 1000;     //Á¬½Ó³¬Ê±Ê±¼ä£¬³¬¹ý´ËÊ±¼äÉÐÎ´Á¬½Ó³É¹¦Ôò·µ»Ø
+    timeout.tv_sec = TimeOut / 1000;     //è¿žæŽ¥è¶…æ—¶æ—¶é—´ï¼Œè¶…è¿‡æ­¤æ—¶é—´å°šæœªè¿žæŽ¥æˆåŠŸåˆ™è¿”å›ž
     timeout.tv_usec = (TimeOut % 1000) * 1000;
 
 
-    //select»áµÈ´ýtimeoutÀïÉè¶¨µÄÊ±¼äºóÔÙ·µ»Ø
+    //selectä¼šç­‰å¾…timeouté‡Œè®¾å®šçš„æ—¶é—´åŽå†è¿”å›ž
     ret = select(sockfd + 1, &rfds, &fds, NULL, &timeout);
-    if (ret == -1 || ret == 0)     //0£­£­³¬Ê±,-1£­£­³ö´í
+    if (ret == -1 || ret == 0)     //0ï¼ï¼è¶…æ—¶,-1ï¼ï¼å‡ºé”™
     {
         close(sockfd);
         return SOCKET_CONNECT;
     }
 
-    // A)µ±Á¬½Ó½¨Á¢³É¹¦Ê±£¬Ì×½Ó¿ÚÃèÊö·û±ä³É ¿ÉÐ´£»
-    // B)µ±Á¬½Ó½¨Á¢³ö´íÊ±£¬Ì×½Ó¿ÚÃèÊö·û±ä³É ¼È¿É¶ÁÓÖ¿ÉÐ´£»
+    // A)å½“è¿žæŽ¥å»ºç«‹æˆåŠŸæ—¶ï¼Œå¥—æŽ¥å£æè¿°ç¬¦å˜æˆ å¯å†™ï¼›
+    // B)å½“è¿žæŽ¥å»ºç«‹å‡ºé”™æ—¶ï¼Œå¥—æŽ¥å£æè¿°ç¬¦å˜æˆ æ—¢å¯è¯»åˆå¯å†™ï¼›
     if (FD_ISSET(sockfd, &fds) && FD_ISSET(sockfd, &rfds)) {
         close(sockfd);
         return SOCKET_CONNECT;
     }
 
 
-    //¸ÄÎª×èÈûÄ£Ê½
+    //æ”¹ä¸ºé˜»å¡žæ¨¡å¼
     flags = fcntl(sockfd, F_GETFL, 0);
     ret = fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK);
 
@@ -615,7 +615,7 @@ int DetectConnect(char *IpAddr, int Port, int TimeOut, int *Socket)
 
 }
 
-//	¹Ø±ÕSocketÁ¬½Ó
+//	å…³é—­Socketè¿žæŽ¥
 void SocketClose(int sockfd)
 {
     close(sockfd);

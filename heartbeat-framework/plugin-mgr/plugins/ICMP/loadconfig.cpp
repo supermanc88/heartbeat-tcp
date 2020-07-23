@@ -15,7 +15,7 @@ int debug_mode = 0;
 #define IF_DEBUG if(0 != debug_mode)
 
 
-//	´Óconf.iniÖĞ¶ÁÈ¡ÅäÖÃ²ÎÊı
+//	ä»conf.iniä¸­è¯»å–é…ç½®å‚æ•°
 int loadconfig() {
     char Buff[BUFSIZ] = {0x00};
 
@@ -54,16 +54,16 @@ int loadconfig() {
     return 0;
 }
 
-//	È¥³ı×Ö·û´®Ê×Î²²»¿É¼û×Ö·û
+//	å»é™¤å­—ç¬¦ä¸²é¦–å°¾ä¸å¯è§å­—ç¬¦
 char *trim_str(char *str) {
     int index = 0, i = 0;
 
-    //È¥³ı´®Ê×¿Õ¸ñ
+    //å»é™¤ä¸²é¦–ç©ºæ ¼
     while (str[index] == ' ') index++;
     for (i = 0; i < strlen(str) - index; i++) str[i] = str[i + index];
     str[i] = '\0';
 
-    //È¥³ı´®Î²¿Õ¸ñ
+    //å»é™¤ä¸²å°¾ç©ºæ ¼
     index = strlen(str);
     //while(index>0 && (str[index-1]==' '))  index--;
     while (index > 0 && (0x20 >= (unsigned char) str[index - 1]))
