@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <signal.h>
+#include <netdb.h>
+#include <net/if.h>
 
 
 #include "wrap.h"
@@ -38,6 +40,7 @@ char ping_target[BUFSIZ] = "192.168.231.1";
 char peer_addr[BUFSIZ] = SERVER_IP;
 char virtual_ip_with_mask[BUFSIZ] = VIRTUAL_IP;
 char ethernet_name[BUFSIZ] = "eth0";
+char router_ethernet_name[BUFSIZ] = "eth0";                 // ipv6需要指定可以路由的网卡
 int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
@@ -63,6 +66,8 @@ int start_by_client_mode(void) {
     struct sockaddr_in serv_addr;
     unsigned int i_addr;
 
+    struct addrinfo hints, *res, *ressave;
+
     char buf[BUFSIZ];
     TRANS_DATA *next_send_data;
 
@@ -77,16 +82,58 @@ int start_by_client_mode(void) {
 
 #pragma region client_create_connect    //客户端创建连接
     reconnect:
-    cfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-    inet_pton(AF_INET, peer_addr, &i_addr);
+    bzero(&hints, sizeof(hints));
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(commonport);
-    serv_addr.sin_addr.s_addr = i_addr;
+    res = NULL;
+    std::string str_port;
+    str_port = std::to_string(commonport);
 
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_protocol = IPPROTO_IP;
+    hints.ai_socktype = SOCK_STREAM;
 
-    ret = connect(cfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+    ret = getaddrinfo(peer_addr,str_port.c_str(), &hints, &res);
+
+    if (ret != 0) {
+        P2FILE("getaddrinfo error\n");
+        return -1;
+    }
+
+    ressave = res;
+
+    while (res != NULL) {
+
+        cfd = Socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+        // 绑定一个可以路由的网卡
+        struct ifreq interface;
+        strncpy(interface.ifr_ifrn.ifrn_name, router_ethernet_name, strlen(router_ethernet_name));
+
+        if (setsockopt(cfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&interface, sizeof(interface)) == -1) {
+            P2FILE("setsockopt error : %s\n", strerror(errno));
+            return -1;
+        }
+
+        ret = connect(cfd, res->ai_addr, res->ai_addrlen);
+
+        res = res->ai_next;
+        break;
+    }
+
+    freeaddrinfo(ressave);
+
+//    cfd = Socket(AF_INET, SOCK_STREAM, 0);
+//
+//    inet_pton(AF_INET, peer_addr, &i_addr);
+//
+//    serv_addr.sin_family = AF_INET;
+//    serv_addr.sin_port = htons(commonport);
+//    serv_addr.sin_addr.s_addr = i_addr;
+//
+//
+//    ret = connect(cfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 #pragma endregion client_create_connect
 
 #pragma region client_connect_fail  // 客户端创建连接失败
@@ -364,22 +411,63 @@ int start_by_client_mode(void) {
 int start_by_server_mode(void) {
     int lfd, cfd;
     int n, i, ret;
-    struct sockaddr_in serv_addr;
-    struct sockaddr_in client_addr;
     struct timeval tv;
+    bool is_ipv4 = true;
+
+    char buf[BUFSIZ] = {0};
 
     P2FILE("enter start by server\n");
 #pragma region server_pre_create_connect    // 设置端口复用等
-    lfd = Socket(AF_INET, SOCK_STREAM, 0);
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(commonport);
-//    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    struct addrinfo hints, *res, *ressave;
+    bzero(&hints, sizeof(hints));
+    res = NULL;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AI_PASSIVE;
+    hints.ai_protocol = IPPROTO_IP;
+    hints.ai_socktype = SOCK_STREAM;
+
+    std::string str_port;
+    str_port = std::to_string(commonport);
+
+    if (gethostbyname2(peer_addr, AF_INET6) != NULL) {
+        // ipv6
+        ret = getaddrinfo("::", str_port.c_str(), &hints, &res);
+
+        if (ret != 0) {
+            P2FILE("getaddrinfo error\n");
+            return -1;
+        }
+        is_ipv4 = false;
+
+    } else if (gethostbyname2(peer_addr, AF_INET) != NULL) {
+        // ipv4
+        ret = getaddrinfo("0.0.0.0", str_port.c_str(), &hints, &res);
+
+        if (ret != 0) {
+            P2FILE("getaddrinfo error\n");
+            return -1;
+        }
+        is_ipv4 = true;
+    } else {
+        P2FILE("ip format error\n");
+        return -1;
+    }
+
+    ressave = res;
+
+    lfd = Socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+//    lfd = Socket(AF_INET, SOCK_STREAM, 0);
+//    serv_addr.sin_family = AF_INET;
+//    serv_addr.sin_port = htons(commonport);
+////    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
+//
+//    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     // 设置端口重用
-    setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, &serv_addr, sizeof(serv_addr));
+    setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, res->ai_addr, res->ai_addrlen);
 
-    ret = Bind(lfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+    ret = Bind(lfd, res->ai_addr, res->ai_addrlen);
 
     if (ret == -1) {
         return -1;
@@ -391,9 +479,10 @@ int start_by_server_mode(void) {
         return -1;
     }
 
-    socklen_t addr_len = sizeof(serv_addr);
+    socklen_t addr_len = res->ai_addrlen;
 
-    char buf[BUFSIZ];
+    freeaddrinfo(ressave);
+
     memset(buf, 0, BUFSIZ);
 #pragma endregion server_pre_create_connect
 
@@ -457,12 +546,26 @@ int start_by_server_mode(void) {
 #pragma region server_create_connect_success
                 P2FILE("a read comming!\n");
                 // 在deadtime时间内建立连接
-                cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
-                inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
 
-                // 打印连入的客户端信息
-                P2FILE("client addr: %s\n", buf);
-                P2FILE("client port: %d\n", ntohs(client_addr.sin_port));
+                if (is_ipv4) {
+                    struct sockaddr_in client_addr;
+                    cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
+                    bzero(buf, BUFSIZ);
+                    inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, buf, BUFSIZ);
+
+                    // 打印连入的客户端信息
+                    P2FILE("client ipv4 addr: %s\n", buf);
+                    P2FILE("client port: %d\n", ntohs(client_addr.sin_port));
+                } else {
+                    struct sockaddr_in6 client_addr;
+                    cfd = Accept(lfd, (struct sockaddr *) &client_addr, &addr_len);
+                    bzero(buf, BUFSIZ);
+                    inet_ntop(AF_INET6, &client_addr.sin6_addr, buf, BUFSIZ);
+
+                    // 打印连入的客户端信息
+                    P2FILE("client ipv6 addr: %s\n", buf);
+                    P2FILE("client port: %d\n", ntohs(client_addr.sin6_port));
+                }
 
                 // 连入的客户端不是ha.cf中的对端ip，直接丢弃
                 if (strcmp(buf, peer_addr) != 0) {
@@ -642,26 +745,87 @@ int start_by_server_mode(void) {
  */
 void *manual_switch(void *) {
     int sfd;
-    struct sockaddr_in server_addr, client_addr;
     socklen_t client_len;
     char buf[BUFSIZ];
+    int ret;
+    bool is_ipv4 = true;
 
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_addr.sin_port = htons(commonport);
 
-    sfd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct addrinfo hints, *res, *ressave;
+    bzero(&hints, sizeof(hints));
+    res = NULL;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AI_PASSIVE;
+    hints.ai_protocol = IPPROTO_IP;
+    hints.ai_socktype = SOCK_DGRAM;
 
-    bind(sfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    std::string str_port;
+    str_port = std::to_string(commonport);
 
-    client_len = sizeof(client_addr);
+    if (gethostbyname2(peer_addr, AF_INET6) != NULL) {
+        // ipv6
+        ret = getaddrinfo("::", str_port.c_str(), &hints, &res);
+
+        if (ret != 0) {
+            P2FILE("getaddrinfo error\n");
+            P2FILE("manual_switch thread stopped\n");
+            return NULL;
+        }
+        is_ipv4 = false;
+
+    } else if (gethostbyname2(peer_addr, AF_INET) != NULL) {
+        // ipv4
+        ret = getaddrinfo("0.0.0.0", str_port.c_str(), &hints, &res);
+
+        if (ret != 0) {
+            P2FILE("getaddrinfo error\n");
+            P2FILE("manual_switch thread stopped\n");
+            return NULL;
+        }
+        is_ipv4 = true;
+    } else {
+        P2FILE("ip format error\n");
+        P2FILE("manual_switch thread stopped\n");
+        return NULL;
+    }
+
+    ressave = res;
+
+    sfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+    bind(sfd, res->ai_addr, res->ai_addrlen);
+
+    client_len = res->ai_addrlen;
+
+    freeaddrinfo(ressave);
+
+
+//    server_addr.sin_family = AF_INET;
+//    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+//    server_addr.sin_port = htons(commonport);
+
+//    sfd = socket(AF_INET, SOCK_DGRAM, 0);
+//
+//    bind(sfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
+//
+//    client_len = sizeof(client_addr);
 
     while (1) {
         bzero(buf, BUFSIZ);
-        int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *) &client_addr, &client_len);
-        if (n == -1) {
-            perror("recvfrom error");
+        if (is_ipv4) {
+            struct sockaddr_in client_addr;
+            int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *) &client_addr, &client_len);
+            if (n == -1) {
+                perror("recvfrom error");
+            }
+        } else {
+            struct sockaddr_in6 client_addr;
+            int n = recvfrom(sfd, buf, BUFSIZ, 0, (struct sockaddr *) &client_addr, &client_len);
+            if (n == -1) {
+                perror("recvfrom error");
+            }
         }
+
         P2FILE("manual_switch thread : recvfrom buf = %s\n", buf);
         if (strcmp(buf, "standby") == 0) {
             trouble = true;
@@ -761,14 +925,15 @@ int main(int argc, char *argv[]) {
     P2FILE("-------------------------------------------------------------------\n");
 
 
-    std::string saddr;
-    saddr.assign(ucast);
-    int offset = saddr.find(" ");
+    std::string str_ucast;
+    str_ucast.assign(ucast);
+    int offset = str_ucast.find(" ");
     if (offset != std::string::npos) {
-        strcpy(peer_addr, saddr.substr(offset + 1).c_str());
+        strcpy(router_ethernet_name, str_ucast.substr(0, offset).c_str());
+        strcpy(peer_addr, str_ucast.substr(offset + 1).c_str());
     }
 
-    P2FILE("peer_addr = %s\n", peer_addr);
+    P2FILE("router_ethernet_name = %s, peer_addr = %s\n", router_ethernet_name, peer_addr);
     P2FILE("-------------------------------------------------------------------\n");
 
 
