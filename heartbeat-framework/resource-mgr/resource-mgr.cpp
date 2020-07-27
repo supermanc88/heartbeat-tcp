@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <string.h>
+#include <netdb.h>
 
 #include "plugin-mgr/plugin-manager.h"
 #include "common/custom-functions.h"
@@ -456,26 +457,37 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
 {
     char cmd_str[256] = {0};
 
-    // 开始接管资源
-    P2FILE("Start taking over resources...\n");
-
-    // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
-            eth_num);
-
-    system_to_file((const char *) cmd_str, "/tmp/takeover.tmp");
-
-
-    bzero(cmd_str, 256);
-    // 2. 发送免费arp
     // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
     std::string str_virtual_ip, str_virtual_ip_with_mask;
     str_virtual_ip_with_mask.assign(virtual_ip_with_mask);
     str_virtual_ip = str_virtual_ip_with_mask.substr(0, str_virtual_ip_with_mask.find_last_of("/"));
-    sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", str_virtual_ip.c_str(), ethernet_name,
-            str_virtual_ip.c_str());
 
-    system_to_file((const char *) cmd_str, "/tmp/send_arp.tmp");
+
+    // 开始接管资源
+    P2FILE("Start taking over resources...\n");
+
+    if (gethostbyname2(str_virtual_ip.c_str(), AF_INET) != NULL) {
+        // 1. 绑定ip到网卡
+        sprintf(cmd_str, "ip -f inet addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
+                eth_num);
+
+        system_to_file((const char *) cmd_str, "/tmp/takeover.tmp");
+
+
+        bzero(cmd_str, 256);
+        // 2. 发送免费arp
+        sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", str_virtual_ip.c_str(), ethernet_name,
+                str_virtual_ip.c_str());
+
+        system_to_file((const char *) cmd_str, "/tmp/send_arp.tmp");
+    } else if(gethostbyname2(str_virtual_ip.c_str(), AF_INET6) != NULL) {
+        // 1. 绑定ip到网卡
+        sprintf(cmd_str, "ip -f inet6 addr add %s dev %s label %s:%d", virtual_ip_with_mask, ethernet_name, ethernet_name,
+                eth_num);
+
+        system_to_file((const char *) cmd_str, "/tmp/takeover.tmp");
+    }
+
     return 0;
 }
 
@@ -485,8 +497,18 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
     // 开始释放资源
     P2FILE("Start to release resources...\n");
 
-    // 1. 绑定ip到网卡
-    sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
+    // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
+    std::string str_virtual_ip, str_virtual_ip_with_mask;
+    str_virtual_ip_with_mask.assign(virtual_ip_with_mask);
+    str_virtual_ip = str_virtual_ip_with_mask.substr(0, str_virtual_ip_with_mask.find_last_of("/"));
+
+    if (gethostbyname2(str_virtual_ip.c_str(), AF_INET) != NULL) {
+        // 1. 删除网卡ip
+        sprintf(cmd_str, "ip -f inet addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
+    } else if(gethostbyname2(str_virtual_ip.c_str(), AF_INET6) != NULL) {
+        // 1. 删除网卡ip
+        sprintf(cmd_str, "ip -f inet6 addr delete %s dev %s", virtual_ip_with_mask, ethernet_name);
+    }
 
     system_to_file((const char *) cmd_str, "/tmp/release_resources.tmp");
     return 0;
