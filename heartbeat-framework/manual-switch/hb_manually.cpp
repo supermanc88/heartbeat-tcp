@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
     int ret = 0;
     bool is_ipv4 = true;
 
+    printf("................\n");
+
     if (argc != 3)
         exit(1);
 
@@ -31,6 +33,7 @@ int main(int argc, char *argv[]) {
     if (operation[strlen(operation)] == '\n') {
         operation[strlen(operation)] = '\0';
     }
+
 
     HBConfig hb_config;
     int tcpport, udpport, commonport;
@@ -107,13 +110,20 @@ int main(int argc, char *argv[]) {
 
     sfd = socket(res->ai_family, SOCK_DGRAM, res->ai_protocol);
 
-    struct ifreq interface;
-    strncpy(interface.ifr_ifrn.ifrn_name, router_ethernet_name, strlen(router_ethernet_name));
 
-    if(setsockopt(sfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&interface, sizeof(interface)) == -1) {
-        perror("setsockopt error");
-        return  -1;
+    if (strcmp(peer_addr, "127.0.0.1") != 0 &&
+        strcmp(peer_addr, "::1") != 0) {
+
+        struct ifreq interface;
+        strncpy(interface.ifr_ifrn.ifrn_name, router_ethernet_name, strlen(router_ethernet_name));
+
+        if(setsockopt(sfd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&interface, sizeof(interface)) == -1) {
+            perror("setsockopt error");
+            return  -1;
+        }
     }
+
+
 
 //    struct sockaddr_in serv_addr;
 //
@@ -126,7 +136,9 @@ int main(int argc, char *argv[]) {
     else
         operation = "standby";
 
-    ret = sendto(sfd, operation, strlen(operation), 0, (struct sockaddr *) res->ai_addr, res->ai_addrlen);
+    ret = sendto(sfd, operation, strlen(operation), 0, res->ai_addr, res->ai_addrlen);
+
+    close(sfd);
 
     if (ret == -1) {
         perror("sendto error");

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <string>
+#include <netdb.h>
 
 
 #include "plugin-mgr/hb-plugin.h"
@@ -16,11 +17,13 @@
 #include "log/hb-log.h"
 
 char ping_target[BUFSIZ] = "192.168.1.1";
+char router_ethernet_name[BUFSIZ] = "eth0";
 extern int ping_timeout;
 extern int ping_retry;
 
 int plug_init(void *data) {
 
+    char ucast[BUFSIZ] = {0};
     PLUG_DATA *pdata = (PLUG_DATA *) data;
 
     pdata->initStruct.sdkVersion = 1;
@@ -38,8 +41,18 @@ int plug_init(void *data) {
         char value[BUFSIZ] = {0};
         if (hb.GetValue("ping", value) == RET_SUCCESS)
             strcpy(ping_target, value);
+        if (hb.GetValue("ucast", value) == RET_SUCCESS)
+            strcpy(ucast, value);
     }
     hb.CloseFile();
+
+
+    std::string str_ucast;
+    str_ucast.assign(ucast);
+    int offset = str_ucast.find(" ");
+    if (offset != std::string::npos) {
+        strcpy(router_ethernet_name, str_ucast.substr(0, offset).c_str());
+    }
 
 
     loadconfig();
@@ -62,11 +75,24 @@ int plug_run(void *data) {
 
     char cmdstr[BUFSIZ] = {0};
 
-    if (ping_timeout > 0) {
-        sprintf(cmdstr, "ping -c %d -W %d %s", ping_retry, ping_timeout, ping_target);
-    } else {
-        sprintf(cmdstr, "ping -c %d %s", ping_retry, ping_target);
+    if (gethostbyname2(ping_target, AF_INET6) != NULL) {
+        // ipv6
+
+        if (ping_timeout > 0) {
+            sprintf(cmdstr, "ping6 -c %d -W %d %s%%%s", ping_retry, ping_timeout, ping_target, router_ethernet_name);
+        } else {
+            sprintf(cmdstr, "ping6 -c %d %s%%%s", ping_retry, ping_target, router_ethernet_name);
+        }
+
+    } else if (gethostbyname2(ping_target, AF_INET) != NULL) {
+        // ipv4
+        if (ping_timeout > 0) {
+            sprintf(cmdstr, "ping -c %d -W %d %s", ping_retry, ping_timeout, ping_target);
+        } else {
+            sprintf(cmdstr, "ping -c %d %s", ping_retry, ping_target);
+        }
     }
+
 
     ret = system_to_file(cmdstr, MY_TMP_FILENAME);
 
