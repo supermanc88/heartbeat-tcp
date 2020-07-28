@@ -45,7 +45,7 @@ int eth_num = 0;
 char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
 char primary_node[BUFSIZ] = "netsign";                      // haresources中主机名
-
+char hostname[BUFSIZ] = {0};
 
 //资源接管状态,资源接管后置为true，释放后置为false
 extern bool client_resources_takeover_status;
@@ -66,12 +66,14 @@ int start_by_client_mode(void) {
     struct sockaddr_in serv_addr;
     unsigned int i_addr;
 
-    struct addrinfo hints, *res, *ressave;
+    struct addrinfo hints, client_hints, *res, *client_res, *ressave, *client_ressave;
 
     char buf[BUFSIZ];
     TRANS_DATA *next_send_data;
 
     int n, i, ret;
+
+    bool is_ipv4 = true;
 
     int try_time_sum = 0;
     struct timeval tv;
@@ -80,12 +82,14 @@ int start_by_client_mode(void) {
 
     P2FILE("enter start by client\n");
 
+
 #pragma region client_create_connect    //客户端创建连接
     reconnect:
 
     bzero(&hints, sizeof(hints));
 
     res = NULL;
+    client_res = NULL;
     std::string str_port;
     str_port = std::to_string(commonport);
 
@@ -94,12 +98,60 @@ int start_by_client_mode(void) {
     hints.ai_protocol = IPPROTO_IP;
     hints.ai_socktype = SOCK_STREAM;
 
+    client_hints.ai_flags = AI_PASSIVE;
+    client_hints.ai_family = AF_UNSPEC;
+    client_hints.ai_protocol = IPPROTO_IP;
+    client_hints.ai_socktype = SOCK_STREAM;
+
+    // 根据本机hostname获取本机ip地址
+    if (gethostbyname2(peer_addr, AF_INET6) != NULL) {
+        // ipv6
+        struct hostent * hp;
+        hp = gethostbyname2(hostname, AF_INET6);
+
+        if (hp == NULL) {
+            P2FILE("%s\n", gai_strerror(h_errno));
+            return -1;
+        }
+        bzero(buf, BUFSIZ);
+        inet_ntop(AF_INET6, ((struct in6_addr *)(hp->h_addr_list[0])), buf, BUFSIZ);
+        ret = getaddrinfo(buf, NULL, &client_hints, &client_res);
+
+        if (ret != 0) {
+            P2FILE("ipv6 getaddrinfo error : %s\n", gai_strerror(ret));
+            return -1;
+        }
+        is_ipv4 = false;
+
+    } else if (gethostbyname2(peer_addr, AF_INET) != NULL) {
+        // ipv4
+        struct hostent * hp;
+        hp = gethostbyname2(hostname, AF_INET);
+
+        if (hp == NULL) {
+            P2FILE("%s\n", gai_strerror(h_errno));
+            return -1;
+        }
+        bzero(buf, BUFSIZ);
+        inet_ntop(AF_INET, ((struct in_addr *)(hp->h_addr_list[0])), buf, BUFSIZ);
+        ret = getaddrinfo(buf, NULL, &client_hints, &client_res);
+
+        if (ret != 0) {
+            P2FILE("ipv4 getaddrinfo error : %s\n", gai_strerror(ret));
+            return -1;
+        }
+        is_ipv4 = true;
+    }
+
+    client_ressave = client_res;
+
     ret = getaddrinfo(peer_addr,str_port.c_str(), &hints, &res);
 
     if (ret != 0) {
-        P2FILE("getaddrinfo error\n");
+        P2FILE("getaddrinfo error: %s\n", gai_strerror(ret));
         return -1;
     }
+
 
     ressave = res;
 
@@ -116,12 +168,14 @@ int start_by_client_mode(void) {
             return -1;
         }
 
+        bind(cfd, client_res->ai_addr, client_res->ai_addrlen);
+
         ret = connect(cfd, res->ai_addr, res->ai_addrlen);
 
         res = res->ai_next;
         break;
     }
-
+    freeaddrinfo(client_ressave);
     freeaddrinfo(ressave);
 
 //    cfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -356,6 +410,7 @@ int start_by_client_mode(void) {
                         }
 
                     }
+                    sleep(keepalive);
                     goto reconnect;
 #pragma endregion server_closed_connect
                 } else if (n == -1) {
@@ -423,7 +478,7 @@ int start_by_server_mode(void) {
     bzero(&hints, sizeof(hints));
     res = NULL;
     hints.ai_family = AF_UNSPEC;
-    hints.ai_family = AI_PASSIVE;
+    hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_IP;
     hints.ai_socktype = SOCK_STREAM;
 
@@ -435,7 +490,7 @@ int start_by_server_mode(void) {
         ret = getaddrinfo("::", str_port.c_str(), &hints, &res);
 
         if (ret != 0) {
-            P2FILE("getaddrinfo error\n");
+            P2FILE("ipv6 getaddrinfo error : %s\n", gai_strerror(ret));
             return -1;
         }
         is_ipv4 = false;
@@ -445,7 +500,7 @@ int start_by_server_mode(void) {
         ret = getaddrinfo("0.0.0.0", str_port.c_str(), &hints, &res);
 
         if (ret != 0) {
-            P2FILE("getaddrinfo error\n");
+            P2FILE("ipv4 getaddrinfo error : %s\n", gai_strerror(ret));
             return -1;
         }
         is_ipv4 = true;
@@ -569,6 +624,7 @@ int start_by_server_mode(void) {
 
                 // 连入的客户端不是ha.cf中的对端ip，直接丢弃
                 if (strcmp(buf, peer_addr) != 0) {
+                    P2FILE("client ip addr : %s, peer_addr : %s\n", buf, peer_addr);
                     close(cfd);
                     continue;
                 }
@@ -755,7 +811,7 @@ void *manual_switch(void *) {
     bzero(&hints, sizeof(hints));
     res = NULL;
     hints.ai_family = AF_UNSPEC;
-    hints.ai_family = AI_PASSIVE;
+    hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_IP;
     hints.ai_socktype = SOCK_DGRAM;
 
@@ -767,7 +823,7 @@ void *manual_switch(void *) {
         ret = getaddrinfo("::", str_port.c_str(), &hints, &res);
 
         if (ret != 0) {
-            P2FILE("getaddrinfo error\n");
+            P2FILE("ipv6 getaddrinfo error : %s\n", gai_strerror(ret));
             P2FILE("manual_switch thread stopped\n");
             return NULL;
         }
@@ -778,7 +834,7 @@ void *manual_switch(void *) {
         ret = getaddrinfo("0.0.0.0", str_port.c_str(), &hints, &res);
 
         if (ret != 0) {
-            P2FILE("getaddrinfo error\n");
+            P2FILE("ipv4 getaddrinfo error : %s\n", gai_strerror(ret));
             P2FILE("manual_switch thread stopped\n");
             return NULL;
         }
@@ -972,7 +1028,6 @@ int main(int argc, char *argv[]) {
     // 启动之前检查hostname是否匹配
 
     // 获取hostname 用户判断主备机
-    char hostname[BUFSIZ];
     gethostname(hostname, BUFSIZ);
 
     P2FILE("hostname = %s\n", hostname);

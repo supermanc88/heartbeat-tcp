@@ -58,7 +58,7 @@ void HBRes::open_file(char *filename) {
         std::string str_laststring = str_line.substr(str_line.find(" ") + 1);
         std::string str_partofipaddr = str_laststring.substr(0, str_laststring.find(" "));
 
-        std::string str_ipaddr = str_partofipaddr.substr(str_partofipaddr.find_last_of(":") + 1);
+        std::string str_ipaddr = str_partofipaddr.substr(str_partofipaddr.find("IPaddr::") + strlen("IPaddr::"));
 
 
 #pragma region parse_IPaddr
@@ -69,14 +69,13 @@ void HBRes::open_file(char *filename) {
 
         svip = str_ipaddr.substr(0, pos);
         seth_and_num = str_ipaddr.substr(pos + 1, str_ipaddr.length() - pos - 1);
-
+        strcpy(vip, svip.c_str());
         std::string str_eth, str_eth_num;
         pos = seth_and_num.find(":");
         if (pos != std::string::npos) {
             str_eth = seth_and_num.substr(0, pos);
             str_eth_num = seth_and_num.substr(pos + 1, str_ipaddr.length() - pos - 1);
             strcpy(eth, str_eth.c_str());
-            strcpy(vip, svip.c_str());
             eth_num = atoi(str_eth_num.c_str());
         } else {
             // 没有找到冒号分隔，则整个就是网卡名
