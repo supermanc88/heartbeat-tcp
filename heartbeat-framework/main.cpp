@@ -1008,23 +1008,6 @@ int main(int argc, char *argv[]) {
 
 #pragma endregion main_read_config
 
-#pragma region start_thread
-
-    pthread_t manual_switch_tid, get_local_status_tid;
-    int ret = pthread_create(&manual_switch_tid, NULL, manual_switch, NULL);
-    if (ret != 0) {
-        perror("manual_switch pthread_create error");
-        return -1;
-    }
-
-    ret = pthread_create(&manual_switch_tid, NULL, get_local_server_status_datas_thread, NULL);
-    if (ret != 0) {
-        perror("get_local_server_status_datas_thread pthread_create error");
-        return -1;
-    }
-
-#pragma endregion start_thread
-
     // 启动之前检查hostname是否匹配
 
     // 获取hostname 用户判断主备机
@@ -1073,6 +1056,25 @@ int main(int argc, char *argv[]) {
     // 初始化插件管理器
     plugin_manager_init();
     load_all_plugin();
+
+
+#pragma region start_thread
+
+    pthread_t manual_switch_tid, get_local_status_tid;
+    int ret = pthread_create(&manual_switch_tid, NULL, manual_switch, NULL);
+    if (ret != 0) {
+        perror("manual_switch pthread_create error");
+        return -1;
+    }
+
+    ret = pthread_create(&manual_switch_tid, NULL, get_local_server_status_datas_thread, NULL);
+    if (ret != 0) {
+        perror("get_local_server_status_datas_thread pthread_create error");
+        return -1;
+    }
+
+#pragma endregion start_thread
+
 
     if (strcmp(mode, "client") == 0)
         start_by_client_mode();
