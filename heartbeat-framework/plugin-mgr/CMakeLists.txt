@@ -8,5 +8,5 @@ set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/plugins)
 
 message(${LIBRARY_OUTPUT_PATH})
 
-add_executable(loadtest loadtest.cpp)
-target_link_libraries(loadtest dl)
+#add_executable(loadtest loadtest.cpp)
+#target_link_libraries(loadtest dl)

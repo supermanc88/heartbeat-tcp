@@ -31,5 +31,5 @@ add_library(plug_netsignstatus SHARED ${NETSIGN_SRC})
 
 target_link_libraries(plug_netsignstatus hb-log)
 
-add_executable(netsigntest ${NETSIGN_SRC})
-target_link_libraries(netsigntest hb-log)
+#add_executable(netsigntest ${NETSIGN_SRC})
+#target_link_libraries(netsigntest hb-log)
