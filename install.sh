@@ -62,6 +62,7 @@ cd /usr/local/lib
 ln -s libprotobuf.so.23.0.3 libprotobuf.so.23 > /dev/null 2>&1
 ln -s libprotobuf.so.23.0.3 libprotobuf.so > /dev/null 2>&1
 #ln -s libstdc++.so.6.0.18 libstdc++.so.6 > /dev/null 2>&1
+ln -s libstdc++.so.6.0.20 libstdc++.so.6 > /dev/null 2>&1
 echo "/usr/local/lib" > /etc/ld.so.conf.d/hb_runtimes.conf
 ldconfig > /dev/null 2>&1
 

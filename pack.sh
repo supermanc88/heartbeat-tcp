@@ -42,7 +42,10 @@ cp install.sh $rootPath
 cp uninstall.sh $rootPath
 cp infosec-heartbeat.service $rootPath
 cp /usr/local/lib/libprotobuf.so.23.0.3 $runtimes
-cp /usr/local/lib64/libstdc++.so.6.0.18 $runtimes
+# gcc 4.8.1
+#cp /usr/local/lib64/libstdc++.so.6.0.18 $runtimes
+# gcc 4.9.2
+cp /usr/local/lib64/libstdc++.so.6.0.20 $runtimes
 cp ./heartbeat-framework/resource-mgr/policy* $policyPath
 cp ./heartbeat-framework/manual-switch/*.sh $rootPath
 echo "copy complete!"
