@@ -969,6 +969,9 @@ int main(int argc, char *argv[]) {
                 udpport = atoi(value);
             commonport = udpport;
         }
+        if (hb_config.GetValue("plugins_dir", value) == RET_SUCCESS) {
+            strcpy(plugins_dir, value);
+        }
     }
     hb_config.CloseFile();
 
@@ -978,6 +981,7 @@ int main(int argc, char *argv[]) {
     P2FILE("ping_target = %s, tcpport = %d\n", ping_target, tcpport);
     P2FILE("ucast = %s\n", ucast);
     P2FILE("udpport = %d\n", udpport);
+    P2FILE("plugins_dir = %s\n", plugins_dir);
     P2FILE("-------------------------------------------------------------------\n");
 
 

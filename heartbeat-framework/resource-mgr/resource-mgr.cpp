@@ -457,6 +457,25 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
 {
     char cmd_str[256] = {0};
 
+    char current_absolute_path[256];
+    //获取当前程序绝对路径
+    int cnt = readlink("/proc/self/exe", current_absolute_path, 256);
+    if (cnt < 0 || cnt >= 256)
+    {
+        P2FILE("get current_absolute_path error,exit!\n");
+        exit(0);
+    }
+    //获取当前目录绝对路径，即去掉程序名
+    int i;
+    for (i = cnt; i >=0; --i)
+    {
+        if (current_absolute_path[i] == '/')
+        {
+            current_absolute_path[i+1] = '\0';
+            break;
+        }
+    }
+
     // 这里使用的virtual_ip 是用网段表示的 应该去掉网段
     std::string str_virtual_ip, str_virtual_ip_with_mask;
     str_virtual_ip_with_mask.assign(virtual_ip_with_mask);
@@ -476,7 +495,7 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
 
         bzero(cmd_str, 256);
         // 2. 发送免费arp
-        sprintf(cmd_str, "/opt/infosec-heartbeat/bin/send_arp -c 5 -s %s -w 5 -I %s %s", str_virtual_ip.c_str(), ethernet_name,
+        sprintf(cmd_str, "%ssend_arp -c 5 -s %s -w 5 -I %s %s", current_absolute_path, str_virtual_ip.c_str(), ethernet_name,
                 str_virtual_ip.c_str());
 
         system_to_file((const char *) cmd_str, "/tmp/send_arp.tmp");
@@ -613,6 +632,26 @@ void *get_local_server_status_datas_thread(void *)
         int ret;
         int check_vip_ret;
         char vip[BUFSIZ];
+
+        char current_absolute_path[256];
+        //获取当前程序绝对路径
+        int cnt = readlink("/proc/self/exe", current_absolute_path, 256);
+        if (cnt < 0 || cnt >= 256)
+        {
+            P2FILE("get current_absolute_path error,exit!\n");
+            exit(0);
+        }
+        //获取当前目录绝对路径，即去掉程序名
+        int i;
+        for (i = cnt; i >=0; --i)
+        {
+            if (current_absolute_path[i] == '/')
+            {
+                current_absolute_path[i+1] = '\0';
+                break;
+            }
+        }
+
         // 这里运行一次本地的插件获取状态
         P2FILE("get_local_server_status_datas...\n");
 
@@ -622,7 +661,7 @@ void *get_local_server_status_datas_thread(void *)
 
         strcpy(vip, svirtual_ip.c_str());
         // 这里通过check-vip程序来获取本机是否有虚ip
-        sprintf(cmd_str, "/opt/infosec-heartbeat/bin/check-virtual-ip %s", vip);
+        sprintf(cmd_str, "%scheck-virtual-ip %s", current_absolute_path, vip);
 
         ret = system(cmd_str);
 
