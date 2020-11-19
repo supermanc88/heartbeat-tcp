@@ -520,7 +520,7 @@ int start_by_server_mode(void) {
 //
 //    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     // 设置端口重用
-//    setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, res->ai_addr, res->ai_addrlen);// 在centos 5.6上不支持端口重用
+    setsockopt(lfd, SOL_SOCKET, SO_REUSEPORT, res->ai_addr, res->ai_addrlen);// 在centos 5.6上不支持端口重用
 
     ret = Bind(lfd, res->ai_addr, res->ai_addrlen);
 
