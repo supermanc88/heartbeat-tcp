@@ -10,6 +10,7 @@ HBRes::HBRes() {
     bzero(vip, BUFSIZ);
     bzero(eth, BUFSIZ);
     bzero(node_name, BUFSIZ);
+    bzero(script_name, BUFSIZ);
     eth_num = 0;
 }
 
@@ -46,18 +47,33 @@ void HBRes::open_file(char *filename) {
         std::string str_line;
         str_line.assign(readlnbuf);
 
+        // 清除前后的空格
+        str_line.erase(0, str_line.find_first_not_of(" "));
+        str_line.erase(str_line.find_last_not_of(" ") + 1);
+
+
+#pragma region get_script_name
+        std::string str_script_name = str_line.substr(str_line.rfind(" ") + 1);
+        strcpy(script_name, str_script_name.c_str());
+#pragma endregion
+
         // 读出来的类似 netsign1 IPaddr::192.168.0.153/24/eth0 SendArp::192.168.0.153/eth0 netsignscript.dat
         // 现在要把 netsign1 和 192.168.0.153/24/eth0 拿出来
 
         // 解析出node
         std::string str_node;
         str_node = str_line.substr(0, str_line.find(" "));
+        // 解析出 netsign1
         strcpy(node_name, str_node.c_str());
 
         // 解析IPaddr
+        // str_laststring 为 IPaddr::192.168.0.153/24/eth0 SendArp::192.168.0.153/eth0 netsignscript.dat
         std::string str_laststring = str_line.substr(str_line.find(" ") + 1);
+
+        // str_partofipaddr 为 IPaddr::192.168.0.153/24/eth0
         std::string str_partofipaddr = str_laststring.substr(0, str_laststring.find(" "));
 
+        // str_ipaddr 为 192.168.0.153/24/eth0
         std::string str_ipaddr = str_partofipaddr.substr(str_partofipaddr.find("IPaddr::") + strlen("IPaddr::"));
 
 
@@ -108,8 +124,9 @@ void HBRes::open_file(char *filename) {
             eth_num++;
             fclose(fp);
         }
-        break;
 #pragma endregion parse_IPaddr
+        break;
+
     }
 }
 
@@ -121,7 +138,15 @@ void HBRes::close_file() {
 }
 
 void HBRes::get_primary_node(char *node_name) {
-    if (node_name[0]) {
+    if (node_name) {
         strcpy(node_name, this->node_name);
+    }
+}
+
+
+void HBRes::get_script_name(char *script_name)
+{
+    if (script_name) {
+        strcpy(script_name, this->script_name);
     }
 }

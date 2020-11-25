@@ -46,6 +46,7 @@ char plugins_dir[BUFSIZ] = "/opt/infosec-heartbeat/plugins/";
 int udpport = 694;
 char primary_node[BUFSIZ] = "netsign";                      // haresources中主机名
 char hostname[BUFSIZ] = {0};
+char script_name[BUFSIZ] = {0};                             // haresources中的脚本名
 
 //资源接管状态,资源接管后置为true，释放后置为false
 extern bool client_resources_takeover_status;
@@ -1002,12 +1003,14 @@ int main(int argc, char *argv[]) {
     hb_res.get_virtual_ip(virtual_ip_with_mask);
     hb_res.get_ethernet_name(ethernet_name, &eth_num);
     hb_res.get_primary_node(primary_node);
+    hb_res.get_script_name(script_name);
     hb_res.close_file();
 
     P2FILE("virtual_ip_with_mask = %s\n", virtual_ip_with_mask);
     P2FILE("ethernet_name = %s\n", ethernet_name);
     P2FILE("eth_num = %d\n", eth_num);
     P2FILE("primary_node = %s\n", primary_node);
+    P2FILE("script_name = %s\n", script_name);
     P2FILE("---------------------------------------\n");
 
 #pragma endregion main_read_config

@@ -28,6 +28,12 @@ public:
  */
     void get_primary_node(char *node_name);
 
+/**
+ * @brief 获取脚本名
+ * @param script_name
+ */
+    void get_script_name(char *script_name);
+
     void open_file(char *filename);
 
     void close_file();
@@ -37,6 +43,7 @@ private:
     char vip[BUFSIZ];
     char eth[BUFSIZ];
     char node_name[BUFSIZ];
+    char script_name[BUFSIZ];
     int eth_num;
     FILE *fp;
 };

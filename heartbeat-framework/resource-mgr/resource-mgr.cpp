@@ -27,8 +27,10 @@ extern bool auto_failback;
 extern char peer_addr[BUFSIZ];
 extern char virtual_ip_with_mask[BUFSIZ];
 extern char ethernet_name[BUFSIZ];
+extern char script_name[BUFSIZ];
 extern int eth_num;
 extern int detect_interval;
+
 
 
 bool host_vip_status = false;
@@ -456,6 +458,7 @@ int policy_no_link_init()
 int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_name, int eth_num)
 {
     char cmd_str[256] = {0};
+    char cmd_script_str[256] = {0};
 
     char current_absolute_path[256];
     //获取当前程序绝对路径
@@ -507,12 +510,39 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
         system_to_file((const char *) cmd_str, "/tmp/takeover.tmp");
     }
 
+
+    // 执行脚本
+    bzero(cmd_script_str, 256);
+    sprintf(cmd_script_str, "%s%s start", current_absolute_path, script_name);
+    system_to_file((const char *)cmd_script_str, "/tmp/script_result.tmp");
+
     return 0;
 }
 
 int release_resources(const char *virtual_ip_with_mask, const char *ethernet_name)
 {
     char cmd_str[256] = {0};
+    char cmd_script_str[256] = {0};
+
+    char current_absolute_path[256];
+    //获取当前程序绝对路径
+    int cnt = readlink("/proc/self/exe", current_absolute_path, 256);
+    if (cnt < 0 || cnt >= 256)
+    {
+        P2FILE("get current_absolute_path error,exit!\n");
+        exit(0);
+    }
+    //获取当前目录绝对路径，即去掉程序名
+    int i;
+    for (i = cnt; i >=0; --i)
+    {
+        if (current_absolute_path[i] == '/')
+        {
+            current_absolute_path[i+1] = '\0';
+            break;
+        }
+    }
+
     // 开始释放资源
     P2FILE("Start to release resources...\n");
 
@@ -530,6 +560,11 @@ int release_resources(const char *virtual_ip_with_mask, const char *ethernet_nam
     }
 
     system_to_file((const char *) cmd_str, "/tmp/release_resources.tmp");
+
+    // 执行脚本
+    bzero(cmd_script_str, 256);
+    sprintf(cmd_script_str, "%s%s stop", current_absolute_path, script_name);
+    system_to_file((const char *)cmd_script_str, "/tmp/script_result.tmp");
     return 0;
 }
 
