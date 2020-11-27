@@ -514,6 +514,9 @@ int take_over_resources(const char *virtual_ip_with_mask, const char *ethernet_n
     // 执行脚本
     bzero(cmd_script_str, 256);
     sprintf(cmd_script_str, "%s%s start", current_absolute_path, script_name);
+
+    P2FILE("cmd_script_string = %s\n", cmd_script_str);
+
     system_to_file((const char *)cmd_script_str, "/tmp/script_result.tmp");
 
     return 0;

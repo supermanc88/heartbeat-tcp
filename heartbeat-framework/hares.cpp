@@ -54,6 +54,8 @@ void HBRes::open_file(char *filename) {
 
 #pragma region get_script_name
         std::string str_script_name = str_line.substr(str_line.rfind(" ") + 1);
+        str_script_name.erase(str_script_name.find_last_not_of("\r") + 1);
+        str_script_name.erase(str_script_name.find_last_not_of("\n") + 1);
         strcpy(script_name, str_script_name.c_str());
 #pragma endregion
 
