@@ -9,10 +9,17 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#define PLUG_LOG_FILE_PATH "/opt/infosec/NetSignServer52/NetSignServer/haplugin/log"
+//#define PLUG_LOG_FILE_PATH "/opt/infosec/NetSignServer52/NetSignServer/haplugin/log"
+//#define PLUG_LOG_FILE_PREFIX "pluglog"
+//
+//#define MAIN_LOG_FILE_PATH "/var/log"
+//#define MAIN_LOG_FILE_PREFIX "halog"
+
+
+#define PLUG_LOG_FILE_PATH "/var/log/halog"
 #define PLUG_LOG_FILE_PREFIX "pluglog"
 
-#define MAIN_LOG_FILE_PATH "/var/log"
+#define MAIN_LOG_FILE_PATH "/var/log/halog"
 #define MAIN_LOG_FILE_PREFIX "halog"
 
 
