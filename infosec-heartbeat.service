@@ -57,6 +57,14 @@ stop()
   then
     rm $PID_FILE
   fi
+
+  netCard=`cat /etc/ha.d/haresources | awk -F ':' 'END {print $3}'`
+  IFS='/'
+  set -- $netCard; ipAddr=$1;port1=$3
+  IFS=' '
+  set -- $port1; port=$1
+  ip addr del $ipAddr dev $port
+
   echo ''
 }
 restart()
